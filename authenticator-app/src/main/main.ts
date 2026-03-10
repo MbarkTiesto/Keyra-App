@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
 import * as path from 'path';
-import { getAccounts, saveAccounts, backupAccounts } from '../core/storage';
+import { signup, verifyEmail, login, logout, getCurrentUser, getActiveAccounts, saveActiveAccounts, checkSession } from '../core/auth';
 import { generateTOTP, getRemainingSeconds } from '../core/totp';
 
 let mainWindow: BrowserWindow | null = null;
@@ -59,29 +59,46 @@ app.on('activate', () => {
 });
 
 // IPC Communication
+// -- Auth & Multi-User IPC --
+ipcMain.handle('signup', (event, user, email, pass) => signup(user, email, pass));
+ipcMain.handle('verify-email', (event, email, code) => verifyEmail(email, code));
+ipcMain.handle('login', (event, user, pass) => login(user, pass));
+ipcMain.handle('check-session', () => checkSession());
+ipcMain.handle('logout', () => logout());
+ipcMain.handle('get-current-user', () => getCurrentUser());
+
+// -- Vault Access (Requires Active User) --
 ipcMain.handle('get-accounts', () => {
-    return getAccounts();
+    try { return getActiveAccounts(); }
+    catch (err) { return []; }
 });
 
 ipcMain.handle('save-account', (event, account) => {
-    const accounts = getAccounts();
-    const existingIndex = accounts.findIndex(a => a.id === account.id);
-
-    if (existingIndex >= 0) {
-        accounts[existingIndex] = account; // Update
-    } else {
-        accounts.push(account); // Add new
+    try {
+        const accounts = getActiveAccounts();
+        const existingIndex = accounts.findIndex((a: any) => a.id === account.id);
+        if (existingIndex >= 0) {
+            accounts[existingIndex] = account; // Update
+        } else {
+            accounts.push(account); // Add new
+        }
+        saveActiveAccounts(accounts);
+        return accounts;
+    } catch (err) {
+        console.error("Save Account Error:", err);
+        return [];
     }
-
-    saveAccounts(accounts);
-    return accounts; // Return updated state
 });
 
 ipcMain.handle('delete-account', (event, id) => {
-    let accounts = getAccounts();
-    accounts = accounts.filter(a => a.id !== id);
-    saveAccounts(accounts);
-    return accounts;
+    try {
+        let accounts = getActiveAccounts();
+        accounts = accounts.filter((a: any) => a.id !== id);
+        saveActiveAccounts(accounts);
+        return accounts;
+    } catch (err) {
+        return [];
+    }
 });
 
 ipcMain.handle('generate-totp', (event, secret) => {

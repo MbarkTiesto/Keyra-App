@@ -12,6 +12,66 @@
 
 <body class="theme-dark">
 
+    <!-- Authentication Vessel (Blocks UI until logged in) -->
+    <div id="auth-vessel" class="overlay show"
+        style="z-index: 999999; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, var(--v-1) 0%, var(--v-0) 100%);">
+        <!-- Login Form -->
+        <div class="modal" id="auth-login-box">
+            <div class="logo-wrap large" style="margin: 0 auto 32px;"><i data-lucide="shield-check"></i></div>
+            <h3 style="text-align: center;">Welcome Back</h3>
+            <form id="form-login">
+                <input type="text" id="login-username" class="modal-input" placeholder="Username" required />
+                <input type="password" id="login-password" class="modal-input" placeholder="Password" required />
+                <p id="login-error"
+                    style="color: #ff4757; opacity: 0; min-height: 20px; font-size: 0.9rem; text-align: center; margin-bottom: 16px;">
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" class="btn" id="btn-show-signup" style="flex: 1;">Register</button>
+                    <button type="submit" class="btn btn-p" style="flex: 1.5;">Unlock Vault</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="modal hidden" id="auth-signup-box">
+            <div class="logo-wrap large" style="margin: 0 auto 32px;"><i data-lucide="user-plus"></i></div>
+            <h3 style="text-align: center;">Join Keyra</h3>
+            <form id="form-signup">
+                <input type="text" id="signup-username" class="modal-input" placeholder="New Username" required />
+                <input type="email" id="signup-email" class="modal-input" placeholder="Email Address" required />
+                <input type="password" id="signup-password" class="modal-input" placeholder="Master Password"
+                    required />
+                <p id="signup-error"
+                    style="color: #ff4757; opacity: 0; min-height: 20px; font-size: 0.9rem; text-align: center; margin-bottom: 16px;">
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" class="btn" id="btn-show-login" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn btn-p" style="flex: 1.5;">Sign Up</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Email Verification Form -->
+        <div class="modal hidden" id="auth-verify-box">
+            <div class="logo-wrap large" style="margin: 0 auto 32px;"><i data-lucide="mail"></i></div>
+            <h3 style="text-align: center;">Verify Email</h3>
+            <p style="text-align: center; color: var(--t4); margin-bottom: 24px;">Enter the 6-digit code printed in your
+                app console/logs.</p>
+            <form id="form-verify">
+                <input type="hidden" id="verify-email-field" />
+                <input type="text" id="verify-code" class="modal-input" placeholder="000000" maxlength="6"
+                    style="text-align: center; font-size: 2rem; letter-spacing: 8px;" required />
+                <p id="verify-error"
+                    style="color: #ff4757; opacity: 0; min-height: 20px; font-size: 0.9rem; text-align: center; margin-bottom: 16px;">
+                </p>
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" class="btn" id="btn-show-login-from-verify" style="flex: 1;">Cancel</button>
+                    <button type="submit" class="btn btn-p" style="flex: 1.5;">Activate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Custom Titlebar -->
     <div class="titlebar">
         <div class="titlebar-controls">
@@ -37,9 +97,25 @@
                         <span>Vault</span></button>
                     <button class="tab-item" data-view="settings"><i data-lucide="settings"></i>
                         <span>Settings</span></button>
-                    <button class="tab-item" data-view="about"><i data-lucide="help-circle"></i>
-                        <span>About</span></button>
                 </nav>
+
+                <!-- User Profile Dropdown -->
+                <div class="user-profile-wrap" id="user-profile-wrap">
+                    <button class="tab-item user-btn" id="btn-user-profile">
+                        <i data-lucide="user"></i>
+                        <span id="label-username">User</span>
+                        <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: -4px;"></i>
+                    </button>
+                    <div class="profile-dropdown hidden" id="profile-dropdown">
+                        <div class="p-drop-header">
+                            <span id="drop-username" style="font-weight: 800; color: var(--t1);"></span>
+                            <span id="drop-email" style="font-size: 0.8rem; color: var(--t4);"></span>
+                        </div>
+                        <button class="p-drop-item text-danger" id="btn-logout">
+                            <i data-lucide="log-out"></i> Log Out
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -123,16 +199,6 @@
                                 <select id="setting-theme" class="s-select">
                                     <option value="theme-dark">Nightfall Bloom</option>
                                     <option value="theme-light">Snowbloom</option>
-                                </select>
-                            </div>
-                            <div class="s-item">
-                                <div class="s-item-info">
-                                    <strong>Navigation Map</strong>
-                                    <span>Snap the navigation tabs to Top or Bottom.</span>
-                                </div>
-                                <select id="setting-nav-pos" class="s-select">
-                                    <option value="nav-top">Top</option>
-                                    <option value="nav-bottom">Bottom</option>
                                 </select>
                             </div>
                         </div>
@@ -288,6 +354,22 @@
                 <button type="button" class="btn btn-close-modal" style="flex: 1;">Keep it</button>
                 <button type="button" class="btn" id="btn-confirm-delete"
                     style="flex: 1; background: #ff4757; border: none; color: #fff;">Delete Forever</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation -->
+    <div class="overlay hidden" id="modal-logout">
+        <div class="modal" style="text-align: center; width: 440px;">
+            <div style="margin-bottom: 24px; color: var(--v-5);"><i data-lucide="log-out"
+                    style="width: 48px; height: 48px;"></i></div>
+            <h3>End Session?</h3>
+            <p style="color: var(--t4); margin-bottom: 32px;">Your vault will be locked and you will be signed out.</p>
+            <div style="display: flex; gap: 12px;">
+                <button type="button" class="btn btn-close-modal" style="flex: 1;"
+                    id="btn-cancel-logout">Cancel</button>
+                <button type="button" class="btn" id="btn-confirm-logout"
+                    style="flex: 1; background: var(--v-5); border: none; color: #fff;">Log Out</button>
             </div>
         </div>
     </div>

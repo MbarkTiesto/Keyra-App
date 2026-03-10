@@ -1,60 +1,44 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { app } from 'electron';
-import { AuthenticatorAccount, EncryptedAccount, encryptSecret, decryptSecret } from './crypto';
-import * as crypto from 'crypto'; // For UUID
+import { AuthenticatorAccount, encryptVault, decryptVault } from './crypto';
 
-const STORE_PATH = path.join(app.getPath('userData'), 'accounts.json');
+const STORE_PATH = path.join(app.getPath('userData'), 'users.json');
 
-export function getAccounts(): AuthenticatorAccount[] {
+export interface UserRecord {
+    id: string;
+    username: string;
+    email: string;
+    hash: string;
+    salt: string;
+    isActivated: boolean;
+    activationCode?: string; // Tmp code for simulated email validation
+    encryptedVaultData: string; // The user's AES-256-GCM encrypted vault
+}
+
+export function getUsers(): UserRecord[] {
     try {
-        if (!fs.existsSync(STORE_PATH)) {
-            return [];
-        }
-
+        if (!fs.existsSync(STORE_PATH)) return [];
         const data = fs.readFileSync(STORE_PATH, 'utf-8');
-        const encryptedAccounts: EncryptedAccount[] = JSON.parse(data);
-
-        return encryptedAccounts.map(acc => {
-            try {
-                return {
-                    id: acc.id,
-                    issuer: acc.issuer,
-                    account: acc.account,
-                    secret: decryptSecret(acc.encryptedSecret),
-                    isFavorite: acc.isFavorite || false,
-                    category: acc.category || 'All'
-                };
-            } catch (e) {
-                console.error(`Failed to decrypt account ${acc.id}`);
-                return null;
-            }
-        }).filter(a => a !== null) as AuthenticatorAccount[];
+        return JSON.parse(data);
     } catch (error) {
-        console.error('Failed to read accounts', error);
+        console.error('Failed to read users.json', error);
         return [];
     }
 }
 
-export function saveAccounts(accounts: AuthenticatorAccount[]): void {
+export function saveUsers(users: UserRecord[]): void {
     try {
-        const encryptedAccounts: EncryptedAccount[] = accounts.map(acc => ({
-            id: acc.id || crypto.randomUUID(),
-            issuer: acc.issuer,
-            account: acc.account,
-            encryptedSecret: encryptSecret(acc.secret),
-            isFavorite: acc.isFavorite || false,
-            category: acc.category || 'All'
-        }));
-
-        fs.writeFileSync(STORE_PATH, JSON.stringify(encryptedAccounts, null, 2), 'utf-8');
+        fs.writeFileSync(STORE_PATH, JSON.stringify(users, null, 2), 'utf-8');
     } catch (error) {
-        console.error('Failed to save accounts', error);
+        console.error('Failed to save users.json', error);
         throw error;
     }
 }
 
-export function backupAccounts(filePath: string, accounts: AuthenticatorAccount[]): void {
-    // A simple unencrypted backup - in production, this should be encrypted with a password
-    fs.writeFileSync(filePath, JSON.stringify(accounts, null, 2), 'utf-8');
+/**
+ * Utility to back up raw user data (Not recommended to expose directly to user without warnings)
+ */
+export function backupUsers(filePath: string, users: UserRecord[]): void {
+    fs.writeFileSync(filePath, JSON.stringify(users, null, 2), 'utf-8');
 }

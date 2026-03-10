@@ -1,6 +1,15 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('api', {
+    // Auth System
+    signup: (user: string, email: string, pass: string) => ipcRenderer.invoke('signup', user, email, pass),
+    verifyEmail: (email: string, code: string) => ipcRenderer.invoke('verify-email', email, code),
+    login: (user: string, pass: string) => ipcRenderer.invoke('login', user, pass),
+    checkSession: () => ipcRenderer.invoke('check-session'),
+    logout: () => ipcRenderer.invoke('logout'),
+    getCurrentUser: () => ipcRenderer.invoke('get-current-user'),
+
+    // Operations
     getAccounts: () => ipcRenderer.invoke('get-accounts'),
     saveAccount: (account: any) => ipcRenderer.invoke('save-account', account),
     deleteAccount: (id: string) => ipcRenderer.invoke('delete-account', id),

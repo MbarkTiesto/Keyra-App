@@ -93,13 +93,16 @@ export function unlockVault() {
     renderAccounts(); // Force render to ensure accounts show up after initial startup unlock
 }
 
+// ─── LocalStorage Prefix Helper ──────────────────────────────────
+const LSK = (k: string) => ((window as any).currentUserId || 'default') + '_' + k;
+
 // ─── Hide Codes Setup ──────────────────────────────────────────
 export function initHideCodes() {
     const hcToggle = document.getElementById('setting-hide') as HTMLInputElement;
     if (hcToggle) {
-        hcToggle.checked = localStorage.getItem('hide_codes') === 'true';
+        hcToggle.checked = localStorage.getItem(LSK('hide_codes')) === 'true';
         hcToggle.addEventListener('change', () => {
-            localStorage.setItem('hide_codes', hcToggle.checked.toString());
+            localStorage.setItem(LSK('hide_codes'), hcToggle.checked.toString());
             renderAccounts();
             showToast(hcToggle.checked ? 'Codes Hidden' : 'Codes Revealed');
         });
@@ -134,7 +137,7 @@ export async function renderAccounts(filter = '') {
         const iconName = getServiceIcon(a.issuer);
 
         return `
-        <div class="card ${localStorage.getItem('hide_codes') === 'true' ? 'hidden-codes-active' : ''}" data-id="${a.id}" data-code="${code}" style="animation: app-entry 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s forwards; opacity: 0;">
+        <div class="card ${localStorage.getItem(LSK('hide_codes')) === 'true' ? 'hidden-codes-active' : ''}" data-id="${a.id}" data-code="${code}" style="animation: app-entry 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s forwards; opacity: 0;">
             <div class="card-header">
                 <div class="service-grp">
                     <div class="avatar"><i data-lucide="${iconName}"></i></div>
@@ -153,9 +156,9 @@ export async function renderAccounts(filter = '') {
             </div>
             <div class="otp-box">
                 <div class="otp-val" data-raw="${fmt}">
-                    ${localStorage.getItem('hide_codes') === 'true' ? '••• •••' : fmt}
+                    ${localStorage.getItem(LSK('hide_codes')) === 'true' ? '••• •••' : fmt}
                 </div>
-                ${localStorage.getItem('hide_codes') === 'true' ? '<i data-lucide="eye" class="btn-reveal-code" style="color: var(--t4); cursor: pointer; margin-left: auto;"></i>' : ''}
+                ${localStorage.getItem(LSK('hide_codes')) === 'true' ? '<i data-lucide="eye" class="btn-reveal-code" style="color: var(--t4); cursor: pointer; margin-left: auto;"></i>' : ''}
             </div>
             <div class="card-foot">
                 <div class="progress-wrap"><div class="progress-bar" style="width:100%"></div></div>
@@ -256,7 +259,7 @@ function toggleTheme() {
 
     // Preserve nav layout
     const themeStr = b.classList.contains('theme-light') ? 'theme-light' : 'theme-dark';
-    localStorage.setItem('theme', themeStr);
+    localStorage.setItem(LSK('theme'), themeStr);
 
     const ts = document.getElementById('setting-theme') as HTMLSelectElement;
     if (ts) ts.value = themeStr;
@@ -309,32 +312,26 @@ export function setupUI() {
         });
     });
 
+    // Logo opens 'About' view
+    document.querySelector('.brand')?.addEventListener('click', () => {
+        switchView('about');
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    });
+
     // Theme Logic
     document.getElementById('btn-theme')?.addEventListener('click', toggleTheme);
     const themeSelect = document.getElementById('setting-theme') as HTMLSelectElement;
     if (themeSelect) {
-        // Find existing theme
-        const currentTheme = document.body.classList.contains('theme-light') ? 'theme-light' : 'theme-dark';
+        // Find existing theme explicitly from scoped storage
+        const currentTheme = localStorage.getItem(LSK('theme')) || 'theme-dark';
         themeSelect.value = currentTheme;
+        document.body.classList.remove('theme-light', 'theme-dark');
+        document.body.classList.add(currentTheme);
 
         themeSelect.addEventListener('change', () => {
             document.body.classList.remove('theme-light', 'theme-dark');
             document.body.classList.add(themeSelect.value);
-            localStorage.setItem('theme', themeSelect.value);
-        });
-    }
-
-    // Navigation Layout Logic
-    const navSelect = document.getElementById('setting-nav-pos') as HTMLSelectElement;
-    if (navSelect) {
-        const storedNav = localStorage.getItem('nav_pos') || 'nav-top';
-        navSelect.value = storedNav;
-        document.body.classList.add(storedNav);
-
-        navSelect.addEventListener('change', () => {
-            document.body.classList.remove('nav-top', 'nav-bottom');
-            document.body.classList.add(navSelect.value);
-            localStorage.setItem('nav_pos', navSelect.value);
+            localStorage.setItem(LSK('theme'), themeSelect.value);
         });
     }
 
@@ -345,7 +342,7 @@ export function setupUI() {
 
     function updateSetupPinBtnState() {
         if (!btnSetupPin) return;
-        if (localStorage.getItem('vault_pin')) {
+        if (localStorage.getItem(LSK('vault_pin'))) {
             btnSetupPin.textContent = 'Change PIN';
             btnSetupPin.classList.remove('btn-p');
             btnSetupPin.style.background = ''; // Clear inline styles
@@ -370,12 +367,12 @@ export function setupUI() {
     const autolockSelect = document.getElementById('setting-autolock') as HTMLSelectElement;
 
     if (autolockSelect) {
-        autolockSelect.value = localStorage.getItem('autolock') || '0';
+        autolockSelect.value = localStorage.getItem(LSK('autolock')) || '0';
         autolockSelect.addEventListener('change', () => {
             const val = autolockSelect.value;
-            if (val !== '0' && !localStorage.getItem('vault_pin')) {
+            if (val !== '0' && !localStorage.getItem(LSK('vault_pin'))) {
                 // Require Master PIN setup first
-                autolockSelect.value = localStorage.getItem('autolock') || '0'; // Revert visually
+                autolockSelect.value = localStorage.getItem(LSK('autolock')) || '0'; // Revert visually
                 showToast('Please Set Master App PIN first.', true);
 
                 // Highlight the PIN setup button briefly
@@ -386,7 +383,7 @@ export function setupUI() {
                 ], { duration: 300 });
 
             } else {
-                localStorage.setItem('autolock', val);
+                localStorage.setItem(LSK('autolock'), val);
                 showToast(val === '0' ? 'Auto-Lock Disabled' : `Auto-Lock set to ${autolockSelect.options[autolockSelect.selectedIndex].text}`);
             }
         });
@@ -398,7 +395,7 @@ export function setupUI() {
     });
 
     setupPinInput('setup-pin-input', 'setup-pin-dots', (pin) => {
-        localStorage.setItem('vault_pin', pin);
+        localStorage.setItem(LSK('vault_pin'), pin);
         hideModal(document.getElementById('modal-set-pin')!);
         (document.getElementById('setup-pin-input') as HTMLInputElement).value = '';
         clearPinDots('setup-pin-dots');
@@ -408,7 +405,7 @@ export function setupUI() {
     });
 
     setupPinInput('unlock-pin-input', 'unlock-pin-dots', (pin) => {
-        const stored = localStorage.getItem('vault_pin');
+        const stored = localStorage.getItem(LSK('vault_pin'));
         if (pin === stored) {
             unlockVault();
             (document.getElementById('unlock-pin-input') as HTMLInputElement).value = '';

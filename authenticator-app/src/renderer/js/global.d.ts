@@ -3,6 +3,13 @@ export { };
 declare global {
     interface Window {
         api: {
+            signup(user: string, email: string, pass: string): Promise<{ success: boolean, message: string }>;
+            verifyEmail(email: string, code: string): Promise<{ success: boolean, message: string }>;
+            login(user: string, pass: string): Promise<{ success: boolean, message: string }>;
+            checkSession(): Promise<{ success: boolean, message: string }>;
+            logout(): Promise<void>;
+            getCurrentUser(): Promise<{ id: string, username: string, email: string } | null>;
+
             generateTOTP(secret: string): Promise<string>;
             saveAccount(acc: any): Promise<void>;
             deleteAccount(id: string): Promise<void>;

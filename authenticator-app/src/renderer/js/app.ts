@@ -1,14 +1,14 @@
 import { syncVault } from './store.js';
 import { setupUI, renderAccounts, lockVault } from './ui.js';
-import { runTimer } from './timer.js';
-import { setupScanner } from './qr.js';
+import { setupAuthUI, setAppInitCallback } from './auth.js';
 
 let inactivityTimer: any = null;
 
 function resetInactivityTimer() {
     if (inactivityTimer) clearTimeout(inactivityTimer);
 
-    const timeoutMinutes = parseInt(localStorage.getItem('autolock') || '0');
+    const uid = (window as any).currentUserId || 'default';
+    const timeoutMinutes = parseInt(localStorage.getItem(`${uid}_autolock`) || '0');
     if (timeoutMinutes > 0) {
         inactivityTimer = setTimeout(() => {
             lockVault();
@@ -25,30 +25,20 @@ function initAutoLock() {
 }
 
 async function init() {
-    // 0. Startup Security Check
-    const hasPin = !!localStorage.getItem('vault_pin');
-    if (hasPin) {
-        lockVault();
-        // Wait for unlock before rendering accounts (handled loosely by unlock event/UI state)
-    }
+    setupAuthUI();
 
-    // 1. Initial State Sync
-    await syncVault(() => renderAccounts());
+    setAppInitCallback(() => {
+        // 0. Startup Security Check (Post-Auth)
+        const uid = (window as any).currentUserId || 'default';
+        const hasPin = !!localStorage.getItem(`${uid}_vault_pin`);
+        if (hasPin) lockVault();
 
-    // 2. Setup UI Components and Events
-    setupUI();
+        // 2. Setup UI Components
+        setupUI();
 
-    // 3. Render initial list
-    if (!hasPin) renderAccounts(); // Ensure it doesn't render prematurely if locked, though syncVault does a render above.
-
-    // 4. Start OTP Timer
-    runTimer();
-
-    // 4.5 Start Scanner
-    setupScanner();
-
-    // 5. Initialize Security Logic
-    initAutoLock();
+        // 5. Initialize Security Logic
+        initAutoLock();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', init);
