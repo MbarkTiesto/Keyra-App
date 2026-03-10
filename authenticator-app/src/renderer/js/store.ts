@@ -4,7 +4,6 @@ export let accounts: AuthenticatorAccount[] = [];
 
 export function setAccounts(newAccounts: AuthenticatorAccount[]) {
     accounts = newAccounts;
-    accounts.sort((a, b) => a.issuer.localeCompare(b.issuer));
 }
 
 // Utility to fetch and sync

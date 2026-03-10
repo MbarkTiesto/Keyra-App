@@ -14,7 +14,25 @@ const SERVICE_ICONS: Record<string, string> = {
     'linkedin': 'linkedin',
     'twitch': 'twitch',
     'dropbox': 'box',
-    'digitalocean': 'droplet'
+    'digitalocean': 'droplet',
+    'spotify': 'music',
+    'netflix': 'play-circle',
+    'amazon': 'shopping-cart',
+    'apple': 'monitor',
+    'steam': 'gamepad-2',
+    'reddit': 'message-circle',
+    'slack': 'slack',
+    'basecamp': 'triangle',
+    'bitbucket': 'code-2',
+    'gitlab': 'git-pull-request',
+    'npm': 'package',
+    'cloudflare': 'cloud-lightning',
+    'heroku': 'zap',
+    'vercel': 'triangle',
+    'paypal': 'dollar-sign',
+    'stripe': 'credit-card',
+    'zoom': 'video',
+    'notion': 'file-text'
 };
 
 function getServiceIcon(issuer: string): string {
@@ -97,6 +115,44 @@ export function unlockVault() {
 const LSK = (k: string) => ((window as any).currentUserId || 'default') + '_' + k;
 
 // ─── Hide Codes Setup ──────────────────────────────────────────
+// ─── Auto-Lock System ─────────────────────────────────────────
+let lastActivity = Date.now();
+let lockInterval: any = null;
+
+export function initAutoLock() {
+    const alSelect = document.getElementById('setting-autolock') as HTMLSelectElement;
+    if (alSelect) {
+        alSelect.value = localStorage.getItem(LSK('autolock')) || '0';
+        alSelect.addEventListener('change', () => {
+            localStorage.setItem(LSK('autolock'), alSelect.value);
+            startAutoLockTimer();
+        });
+    }
+
+    // Tracker
+    ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(ev => {
+        document.addEventListener(ev, () => lastActivity = Date.now());
+    });
+
+    startAutoLockTimer();
+}
+
+function startAutoLockTimer() {
+    if (lockInterval) clearInterval(lockInterval);
+    const mins = parseInt(localStorage.getItem(LSK('autolock')) || '0');
+    if (mins === 0) return;
+
+    lockInterval = setInterval(() => {
+        const diff = (Date.now() - lastActivity) / 1000 / 60;
+        if (diff >= mins) {
+            // Only lock if not already locked
+            if (document.getElementById('lock-screen')?.classList.contains('hidden')) {
+                lockVault();
+            }
+        }
+    }, 10000); // Check every 10s
+}
+
 export function initHideCodes() {
     const hcToggle = document.getElementById('setting-hide') as HTMLInputElement;
     if (hcToggle) {
@@ -115,9 +171,24 @@ export async function renderAccounts(filter = '') {
     if (!list) return;
 
     const term = filter || (document.getElementById('search-input') as HTMLInputElement)?.value.toLowerCase() || '';
-    const filtered = accounts.filter(a =>
-        a.issuer.toLowerCase().includes(term) || (a.account || '').toLowerCase().includes(term)
-    );
+
+    // Fuzzy matching logic
+    const filtered = accounts.filter(a => {
+        if (!term) return true;
+        const issuer = a.issuer.toLowerCase();
+        const account = (a.account || '').toLowerCase();
+
+        // Exact match
+        if (issuer.includes(term) || account.includes(term)) return true;
+
+        // Very basic fuzzy match (characters exist in order)
+        let i = 0, j = 0;
+        while (i < term.length && j < issuer.length) {
+            if (term[i] === issuer[j]) i++;
+            j++;
+        }
+        return i === term.length;
+    });
 
     if (filtered.length === 0) {
         list.innerHTML = `
@@ -137,7 +208,9 @@ export async function renderAccounts(filter = '') {
         const iconName = getServiceIcon(a.issuer);
 
         return `
-        <div class="card ${localStorage.getItem(LSK('hide_codes')) === 'true' ? 'hidden-codes-active' : ''}" data-id="${a.id}" data-code="${code}" style="animation: app-entry 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s forwards; opacity: 0;">
+        <div class="card ${localStorage.getItem(LSK('hide_codes')) === 'true' ? 'hidden-codes-active' : ''}" 
+             data-id="${a.id}" data-code="${code}" draggable="true"
+             style="animation: app-entry 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s forwards; opacity: 0;">
             <div class="card-header">
                 <div class="service-grp">
                     <div class="avatar"><i data-lucide="${iconName}"></i></div>
@@ -175,7 +248,46 @@ export async function renderAccounts(filter = '') {
     list.innerHTML = html.join('');
     if (typeof (window as any).lucide !== 'undefined') (window as any).lucide.createIcons();
     attachCardListeners();
+    setupDragAndDrop();
 }
+
+function setupDragAndDrop() {
+    const cards = document.querySelectorAll('.card');
+
+    cards.forEach(card => {
+        card.addEventListener('dragstart', () => {
+            card.classList.add('dragging');
+        });
+
+        card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+            const newOrder = Array.from(document.querySelectorAll('.card'))
+                .map(c => c.getAttribute('data-id'));
+
+            // Reorder accounts array to match newOrder
+            const reordered = newOrder.map(id => accounts.find(a => a.id === id)).filter(Boolean);
+            accounts.length = 0;
+            accounts.push(...(reordered as any));
+            syncVault(() => renderAccounts());
+        });
+
+        card.addEventListener('dragover', (e) => {
+            const de = e as DragEvent;
+            de.preventDefault();
+            const dragging = document.querySelector('.dragging') as HTMLElement;
+            if (!dragging || dragging === card) return;
+
+            const rect = card.getBoundingClientRect();
+            const midpoint = rect.top + rect.height / 2;
+            if (de.clientY < midpoint) {
+                card.parentElement?.insertBefore(dragging, card);
+            } else {
+                card.parentElement?.insertBefore(dragging, card.nextSibling);
+            }
+        });
+    });
+}
+
 
 // ─── Interactions ──────────────────────────────────────────────
 function attachCardListeners() {
@@ -501,5 +613,6 @@ export function setupUI() {
     document.getElementById('btn-close')?.addEventListener('click', () => window.api.close());
 
     initHideCodes();
+    initAutoLock();
 }
 
