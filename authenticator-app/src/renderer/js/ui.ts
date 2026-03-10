@@ -143,9 +143,12 @@ export async function renderAccounts(filter = '') {
                         <div class="identity">${a.account || 'Secured'}</div>
                     </div>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <div class="btn-icon-m btn-edit-card" data-id="${a.id}"><i data-lucide="edit-3"></i></div>
-                    <div class="btn-icon-m danger btn-del-card" data-id="${a.id}"><i data-lucide="trash-2"></i></div>
+                <div class="card-actions-wrap">
+                    <button class="btn-icon-m btn-more-ops" data-id="${a.id}"><i data-lucide="more-vertical"></i></button>
+                    <div class="card-menu hidden" id="menu-${a.id}">
+                        <div class="menu-item btn-edit-card" data-id="${a.id}"><i data-lucide="edit-3"></i> Edit</div>
+                        <div class="menu-item danger btn-del-card" data-id="${a.id}"><i data-lucide="trash-2"></i> Delete</div>
+                    </div>
                 </div>
             </div>
             <div class="otp-box">
@@ -173,10 +176,25 @@ export async function renderAccounts(filter = '') {
 
 // ─── Interactions ──────────────────────────────────────────────
 function attachCardListeners() {
+    // Menu Toss Logic
+    document.addEventListener('click', (e) => {
+        document.querySelectorAll('.card-menu').forEach(m => m.classList.add('hidden'));
+    });
+
+    document.querySelectorAll('.btn-more-ops').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.card-menu').forEach(m => m.classList.add('hidden'));
+            const id = (btn as HTMLElement).getAttribute('data-id');
+            const menu = document.getElementById(`menu-${id}`);
+            if (menu) menu.classList.remove('hidden');
+        });
+    });
+
     document.querySelectorAll('.card').forEach(card => {
         card.addEventListener('click', async (e) => {
             const target = e.target as HTMLElement;
-            if (target.closest('.btn-icon-m')) return;
+            if (target.closest('.card-actions-wrap')) return;
 
             // Handle Reveal Code
             if (target.closest('.btn-reveal-code')) {
@@ -233,10 +251,15 @@ let editingAccountId: string | null = null;
 
 function toggleTheme() {
     const b = document.body;
-    b.className = b.classList.contains('theme-dark') ? 'theme-light' : 'theme-dark';
-    localStorage.setItem('theme', b.className);
+    b.classList.toggle('theme-light');
+    b.classList.toggle('theme-dark');
+
+    // Preserve nav layout
+    const themeStr = b.classList.contains('theme-light') ? 'theme-light' : 'theme-dark';
+    localStorage.setItem('theme', themeStr);
+
     const ts = document.getElementById('setting-theme') as HTMLSelectElement;
-    if (ts) ts.value = b.className;
+    if (ts) ts.value = themeStr;
 }
 
 // ─── PIN System Logic ─────────────────────────────────────────
@@ -290,10 +313,28 @@ export function setupUI() {
     document.getElementById('btn-theme')?.addEventListener('click', toggleTheme);
     const themeSelect = document.getElementById('setting-theme') as HTMLSelectElement;
     if (themeSelect) {
-        themeSelect.value = document.body.className;
+        // Find existing theme
+        const currentTheme = document.body.classList.contains('theme-light') ? 'theme-light' : 'theme-dark';
+        themeSelect.value = currentTheme;
+
         themeSelect.addEventListener('change', () => {
-            document.body.className = themeSelect.value;
+            document.body.classList.remove('theme-light', 'theme-dark');
+            document.body.classList.add(themeSelect.value);
             localStorage.setItem('theme', themeSelect.value);
+        });
+    }
+
+    // Navigation Layout Logic
+    const navSelect = document.getElementById('setting-nav-pos') as HTMLSelectElement;
+    if (navSelect) {
+        const storedNav = localStorage.getItem('nav_pos') || 'nav-top';
+        navSelect.value = storedNav;
+        document.body.classList.add(storedNav);
+
+        navSelect.addEventListener('change', () => {
+            document.body.classList.remove('nav-top', 'nav-bottom');
+            document.body.classList.add(navSelect.value);
+            localStorage.setItem('nav_pos', navSelect.value);
         });
     }
 

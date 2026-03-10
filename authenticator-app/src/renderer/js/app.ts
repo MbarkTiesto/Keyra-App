@@ -1,6 +1,7 @@
 import { syncVault } from './store.js';
 import { setupUI, renderAccounts, lockVault } from './ui.js';
 import { runTimer } from './timer.js';
+import { setupScanner } from './qr.js';
 
 let inactivityTimer: any = null;
 
@@ -42,6 +43,9 @@ async function init() {
 
     // 4. Start OTP Timer
     runTimer();
+
+    // 4.5 Start Scanner
+    setupScanner();
 
     // 5. Initialize Security Logic
     initAutoLock();
