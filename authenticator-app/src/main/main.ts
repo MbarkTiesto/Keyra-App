@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
 import * as path from 'path';
-import { signup, verifyEmail, login, logout, getCurrentUser, getActiveAccounts, saveActiveAccounts, checkSession } from '../core/auth';
+import { signup, resendCode, verifyEmail, login, logout, getCurrentUser, getActiveAccounts, saveActiveAccounts, checkSession } from '../core/auth';
 import { generateTOTP, getRemainingSeconds } from '../core/totp';
 
 let mainWindow: BrowserWindow | null = null;
@@ -61,6 +61,7 @@ app.on('activate', () => {
 // IPC Communication
 // -- Auth & Multi-User IPC --
 ipcMain.handle('signup', (event, user, email, pass) => signup(user, email, pass));
+ipcMain.handle('resend-code', (event, email) => resendCode(email));
 ipcMain.handle('verify-email', (event, email, code) => verifyEmail(email, code));
 ipcMain.handle('login', (event, user, pass) => login(user, pass));
 ipcMain.handle('check-session', () => checkSession());

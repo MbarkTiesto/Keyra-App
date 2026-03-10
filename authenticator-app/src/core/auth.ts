@@ -4,16 +4,26 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { app, safeStorage } from 'electron';
+import { sendActivationEmail } from './mailer';
 
 let currentUser: UserRecord | null = null;
 let currentKey: Buffer | null = null;
 
-// Mock email helper
-function sendMockEmail(email: string, code: string) {
-    const msg = `[MOCK EMAIL] To: ${email} | Subject: Keyra Activation | Code: ${code}\n`;
+// Email helper with Real/Simulation fallback
+async function sendActivationCode(email: string, code: string) {
+    const msg = `[KEYRA] Activation code for ${email}: ${code}`;
     console.log(msg);
+
+    // Try real email
+    const result = await sendActivationEmail({
+        to: email,
+        subject: 'Keyra Activation Code',
+        code: code
+    });
+
+    // Always log to mock file for debugging
     const mockDbPath = path.join(app.getPath('userData'), 'mock_emails.txt');
-    fs.appendFileSync(mockDbPath, `[${new Date().toISOString()}] ${msg}`);
+    fs.appendFileSync(mockDbPath, `[${new Date().toISOString()}] ${msg} | Real Sent: ${result.success}\n`);
 }
 
 export function getCurrentUser() {
@@ -25,7 +35,7 @@ export function getCurrentUser() {
     };
 }
 
-export function signup(username: string, email: string, password: string): { success: boolean, message: string } {
+export function signup(username: string, email: string, password: string): { success: boolean, message: string, code?: string } {
     const users = getUsers();
     if (users.find(u => u.username === username || u.email === email)) {
         return { success: false, message: "Username or email already exists." };
@@ -53,9 +63,23 @@ export function signup(username: string, email: string, password: string): { suc
     users.push(newUser);
     saveUsers(users);
 
-    sendMockEmail(email, activationCode);
+    sendActivationCode(email, activationCode);
 
-    return { success: true, message: "Account created. Please check your mock email for the activation code." };
+    return { success: true, message: "Account created.", code: activationCode };
+}
+
+export function resendCode(email: string): { success: boolean, message: string, code?: string } {
+    const users = getUsers();
+    const userIndex = users.findIndex(u => u.email === email);
+    if (userIndex === -1) return { success: false, message: "User not found." };
+    if (users[userIndex].isActivated) return { success: false, message: "Account already activated." };
+
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    users[userIndex].activationCode = newCode;
+    saveUsers(users);
+
+    sendActivationCode(email, newCode);
+    return { success: true, message: "Verification code resent.", code: newCode };
 }
 
 export function verifyEmail(email: string, code: string): { success: boolean, message: string } {

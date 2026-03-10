@@ -54,21 +54,46 @@
         <!-- Email Verification Form -->
         <div class="modal hidden" id="auth-verify-box">
             <div class="logo-wrap large" style="margin: 0 auto 32px;"><i data-lucide="mail"></i></div>
-            <h3 style="text-align: center;">Verify Email</h3>
-            <p style="text-align: center; color: var(--t4); margin-bottom: 24px;">Enter the 6-digit code printed in your
-                app console/logs.</p>
+            <h3 style="text-align: center;">Verify Your Identity</h3>
+            <p id="verify-subtext" style="text-align: center; color: var(--t4); margin-bottom: 32px;">We've sent a
+                6-digit activation code to your email.</p>
+
             <form id="form-verify">
                 <input type="hidden" id="verify-email-field" />
-                <input type="text" id="verify-code" class="modal-input" placeholder="000000" maxlength="6"
-                    style="text-align: center; font-size: 2rem; letter-spacing: 8px;" required />
+                <div class="verify-input-group" id="verify-digit-container">
+                    <input type="text" class="verify-digit" maxlength="1" inputmode="numeric"
+                        autocomplete="one-time-code" />
+                    <input type="text" class="verify-digit" maxlength="1" inputmode="numeric" />
+                    <input type="text" class="verify-digit" maxlength="1" inputmode="numeric" />
+                    <input type="text" class="verify-digit" maxlength="1" inputmode="numeric" />
+                    <input type="text" class="verify-digit" maxlength="1" inputmode="numeric" />
+                    <input type="text" class="verify-digit" maxlength="1" inputmode="numeric" />
+                </div>
+
                 <p id="verify-error"
-                    style="color: #ff4757; opacity: 0; min-height: 20px; font-size: 0.9rem; text-align: center; margin-bottom: 16px;">
+                    style="color: #ff4757; opacity: 0; min-height: 20px; font-size: 0.9rem; text-align: center; margin: 16px 0;">
                 </p>
+
+                <div style="text-align: center; margin-bottom: 32px;">
+                    <button type="button" class="btn-resend" id="btn-resend-code" disabled>
+                        Resend Code <span id="resend-timer">(60s)</span>
+                    </button>
+                </div>
+
                 <div style="display: flex; gap: 12px;">
                     <button type="button" class="btn" id="btn-show-login-from-verify" style="flex: 1;">Cancel</button>
-                    <button type="submit" class="btn btn-p" style="flex: 1.5;">Activate</button>
+                    <button type="submit" class="btn btn-p" style="flex: 1.5;">Activate Account</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Simulation Toast (Hidden by default) -->
+    <div id="simulation-toast" class="sim-toast hidden">
+        <div class="sim-toast-icon"><i data-lucide="mail"></i></div>
+        <div class="sim-toast-content">
+            <strong>Keyra System</strong>
+            <span>Verification code sent: <code id="sim-code">------</code></span>
         </div>
     </div>
 

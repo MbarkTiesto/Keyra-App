@@ -121,6 +121,15 @@ export async function setupAuthUI() {
                 boxVerify.classList.remove('hidden');
                 (document.getElementById('verify-email-field') as HTMLInputElement).value = email;
 
+                // Simulation Toast
+                if (result.code) showSimulationToast(result.code);
+
+                // Start Resend Timer
+                startResendTimer();
+
+                // Focus first box
+                (document.querySelector('.verify-digit') as HTMLElement)?.focus();
+
                 // Reset inputs
                 (document.getElementById('signup-username') as HTMLInputElement).value = '';
                 (document.getElementById('signup-password') as HTMLInputElement).value = '';
@@ -135,21 +144,78 @@ export async function setupAuthUI() {
         }
     });
 
+    // 6-Digit Verification UI Logic
+    const digitInputs = document.querySelectorAll('.verify-digit') as NodeListOf<HTMLInputElement>;
+    digitInputs.forEach((input, idx) => {
+        input.addEventListener('input', (e) => {
+            const val = input.value;
+            if (val && digitInputs[idx + 1]) {
+                digitInputs[idx + 1].focus();
+            }
+            checkAutoSubmit();
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !input.value && digitInputs[idx - 1]) {
+                digitInputs[idx - 1].focus();
+            }
+        });
+
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const data = e.clipboardData?.getData('text').slice(0, 6);
+            if (data) {
+                data.split('').forEach((char, i) => {
+                    if (digitInputs[i]) digitInputs[i].value = char;
+                });
+                checkAutoSubmit();
+            }
+        });
+    });
+
+    async function checkAutoSubmit() {
+        const code = Array.from(digitInputs).map(i => i.value).join('');
+        if (code.length === 6) {
+            await handleVerification(code);
+        }
+    }
+
     document.getElementById('form-verify')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = (document.getElementById('verify-email-field') as HTMLInputElement).value;
-        const code = (document.getElementById('verify-code') as HTMLInputElement).value;
-        const err = document.getElementById('verify-error')!;
+        const code = Array.from(digitInputs).map(i => i.value).join('');
+        if (code.length < 6) {
+            const err = document.getElementById('verify-error')!;
+            err.textContent = "Please enter all 6 digits.";
+            err.style.opacity = '1';
+            return;
+        }
+        await handleVerification(code);
+    });
 
+    async function handleVerification(code: string) {
+        const email = (document.getElementById('verify-email-field') as HTMLInputElement).value;
+        const err = document.getElementById('verify-error')!;
         err.style.opacity = '0';
+
         try {
             const result = await window.api.verifyEmail(email, code);
             if (result.success) {
-                boxVerify.classList.add('hidden');
-                boxLogin.classList.remove('hidden');
-                (document.getElementById('verify-code') as HTMLInputElement).value = '';
-                // The newly registered user can now just log in properly.
+                // Success animation on boxes
+                digitInputs.forEach(i => i.classList.add('valid'));
+
+                setTimeout(() => {
+                    boxVerify.classList.add('hidden');
+                    boxLogin.classList.remove('hidden');
+                    digitInputs.forEach(i => {
+                        i.value = '';
+                        i.classList.remove('valid');
+                    });
+                }, 800);
             } else {
+                digitInputs.forEach(i => {
+                    i.classList.add('invalid');
+                    setTimeout(() => i.classList.remove('invalid'), 500);
+                });
                 err.textContent = result.message;
                 err.style.opacity = '1';
             }
@@ -158,7 +224,51 @@ export async function setupAuthUI() {
             err.style.opacity = '1';
             console.error(error);
         }
+    }
+
+    // Resend Logic
+    const btnResend = document.getElementById('btn-resend-code') as HTMLButtonElement;
+    const resendTimerLabel = document.getElementById('resend-timer')!;
+    let resendInterval: any;
+
+    function startResendTimer() {
+        let timeLeft = 60;
+        btnResend.disabled = true;
+        resendTimerLabel.style.display = 'inline';
+
+        if (resendInterval) clearInterval(resendInterval);
+
+        resendInterval = setInterval(() => {
+            timeLeft--;
+            resendTimerLabel.textContent = `(${timeLeft}s)`;
+            if (timeLeft <= 0) {
+                clearInterval(resendInterval);
+                btnResend.disabled = false;
+                resendTimerLabel.style.display = 'none';
+            }
+        }, 1000);
+    }
+
+    btnResend?.addEventListener('click', async () => {
+        const email = (document.getElementById('verify-email-field') as HTMLInputElement).value;
+        const result = await window.api.resendCode(email);
+        if (result.success) {
+            if (result.code) showSimulationToast(result.code);
+            startResendTimer();
+        }
     });
+
+    // Simulation Toast
+    function showSimulationToast(code: string) {
+        const toast = document.getElementById('simulation-toast')!;
+        const codeLabel = document.getElementById('sim-code')!;
+        codeLabel.textContent = code;
+        toast.classList.remove('hidden');
+
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 8000);
+    }
 
     // Profile Dropdown Logic
     const btnProfile = document.getElementById('btn-user-profile');

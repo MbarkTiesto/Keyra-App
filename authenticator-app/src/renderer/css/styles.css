@@ -1575,3 +1575,134 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--v-5);
 }
+
+/* ─── Verification UI ───────────────────────────────────────── */
+.verify-input-group {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.verify-digit {
+    width: 50px;
+    height: 60px;
+    background: var(--surface-solid);
+    border: var(--border);
+    border-radius: var(--r-md);
+    color: var(--v-6);
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.verify-digit:focus {
+    border-color: var(--v-6);
+    background: var(--surface);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(111, 45, 189, 0.2);
+}
+
+.verify-digit.valid {
+    border-color: #00ff88;
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.verify-digit.invalid {
+    border-color: var(--danger);
+    color: var(--danger);
+    background: rgba(255, 51, 102, 0.05);
+    animation: shake 0.4s ease;
+}
+
+.btn-resend {
+    background: none;
+    border: none;
+    color: var(--v-5);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-resend:not(:disabled):hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+.btn-resend:disabled {
+    cursor: not-allowed;
+    color: var(--t4);
+}
+
+/* ─── Simulation Toast ───────────────────────────────────────── */
+.sim-toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--surface);
+    border: var(--border);
+    border-radius: var(--r-lg);
+    padding: 16px 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 9999999;
+    animation: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    backdrop-filter: blur(20px);
+}
+
+@keyframes slide-up {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.sim-toast-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--accent-gradient);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.sim-toast-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.sim-toast-content strong {
+    font-size: 0.95rem;
+    color: var(--v-5);
+}
+
+.sim-toast-content span {
+    font-size: 0.9rem;
+    color: var(--t2);
+}
+
+.sim-toast-content code {
+    background: rgba(111, 45, 189, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--v-6);
+    font-weight: 800;
+}

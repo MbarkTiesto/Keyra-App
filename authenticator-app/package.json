@@ -13,8 +13,13 @@
   "author": "Keyra",
   "license": "ISC",
   "devDependencies": {
+    "@types/nodemailer": "^7.0.11",
     "electron": "^28.0.0",
     "jsqr": "^1.4.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "nodemailer": "^8.0.2"
   }
 }
