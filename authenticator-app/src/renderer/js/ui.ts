@@ -125,9 +125,41 @@ export class UIManager {
 
     public setTheme(theme: 'light' | 'dark') {
         this.currentTheme = theme;
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem(this.getStorageKey('theme'), theme);
         
+        // Update body classes for new theme system
+        const body = document.body;
+        body.classList.remove('light-theme', 'dark-theme');
+        body.classList.add(`${theme}-theme`);
+        
+        // Update legacy attribute for compatibility
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        // Save to both storage systems
+        localStorage.setItem(this.getStorageKey('theme'), theme);
+        localStorage.setItem('keyra_theme', theme);
+        
+        // Update segmented control
+        const segments = document.querySelectorAll('#theme-segmented .segment');
+        const indicator = document.querySelector('#theme-segmented .segment-indicator');
+        
+        segments.forEach(segment => {
+            if (segment.getAttribute('data-val') === theme) {
+                segment.classList.add('active');
+            } else {
+                segment.classList.remove('active');
+            }
+        });
+        
+        // Move indicator
+        if (indicator) {
+            const activeSegment = document.querySelector(`#theme-segmented .segment[data-val="${theme}"]`) as HTMLElement;
+            if (activeSegment) {
+                (indicator as HTMLElement).style.left = `${activeSegment.offsetLeft}px`;
+                (indicator as HTMLElement).style.width = `${activeSegment.offsetWidth}px`;
+            }
+        }
+        
+        // Update legacy theme icons
         const themeIcon = document.getElementById('theme-icon-lucide');
         const themeText = document.getElementById('theme-text');
         
@@ -324,6 +356,70 @@ export class UIManager {
 
         // Setup accent color selector
         this.setupAccentColorSelector();
+
+        // Initialize activity tracking
+        this.updateLastActivity('Vault opened');
+        this.updateLastActivityDisplay();
+
+        // Initialize theme with system detection
+        this.initializeTheme();
+
+        // Track tab switches
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                this.updateLastActivity(`Switched to ${tabName}`);
+                
+                // Update activity display when switching to settings
+                if (tabName === 'settings') {
+                    setTimeout(() => {
+                        this.updateLastActivityDisplay();
+                    }, 100); // Small delay to ensure DOM is ready
+                }
+            });
+        });
+
+        // Track lock/unlock actions
+        const lockBtn = document.getElementById('lock-vault-btn');
+        if (lockBtn) {
+            lockBtn.addEventListener('click', () => {
+                this.updateLastActivity('Vault locked');
+            });
+        }
+
+        // Track add token action
+        const addBtn = document.getElementById('add-account-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => {
+                this.updateLastActivity('Added new token');
+            });
+        }
+
+        // Track theme changes
+        const themeSegmented = document.getElementById('theme-segmented');
+        if (themeSegmented) {
+            themeSegmented.addEventListener('click', () => {
+                setTimeout(() => {
+                    this.updateLastActivity('Changed theme');
+                }, 100);
+            });
+        }
+
+        // Track export/import actions
+        const exportBtn = document.getElementById('btn-export-vault');
+        const importBtn = document.getElementById('btn-import-vault');
+        
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                this.updateLastActivity('Exported vault');
+            });
+        }
+        
+        if (importBtn) {
+            importBtn.addEventListener('click', () => {
+                this.updateLastActivity('Imported vault');
+            });
+        }
     }
 
     private setupAccentColorSelector() {
@@ -371,6 +467,99 @@ export class UIManager {
             
             // Save to localStorage
             localStorage.setItem('keyra_accent_color', accentColor);
+        }
+    }
+
+    private initializeTheme() {
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('keyra_theme') as 'light' | 'dark' | null;
+        
+        if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+            // Use saved theme
+            this.setTheme(savedTheme);
+        } else {
+            // Detect system theme
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const systemTheme = prefersDark ? 'dark' : 'light';
+            this.setTheme(systemTheme);
+            localStorage.setItem('keyra_theme', systemTheme);
+        }
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            // Only auto-switch if user hasn't manually set a preference
+            if (!localStorage.getItem('keyra_theme_manual_override')) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                this.setTheme(newTheme);
+                localStorage.setItem('keyra_theme', newTheme);
+            }
+        });
+
+        // Setup theme switcher
+        this.setupThemeSwitcher();
+    }
+
+    private setupThemeSwitcher() {
+        const segments = document.querySelectorAll('#theme-segmented .segment');
+        const oledToggle = document.getElementById('oled-mode-toggle') as HTMLInputElement;
+        const oledModeRow = document.getElementById('oled-mode-row');
+        
+        // Setup theme segments
+        segments.forEach(segment => {
+            segment.addEventListener('click', () => {
+                const theme = segment.getAttribute('data-val');
+                if (theme && (theme === 'light' || theme === 'dark')) {
+                    this.setTheme(theme);
+                    localStorage.setItem('keyra_theme', theme);
+                    localStorage.setItem('keyra_theme_manual_override', 'true');
+                    this.updateLastActivity(`Changed to ${theme} mode`);
+                    this.showToast(`Switched to ${theme} mode`, 'success');
+                }
+            });
+        });
+
+        // Setup OLED toggle
+        if (oledToggle && oledModeRow) {
+            // Load saved OLED preference
+            const savedOledMode = localStorage.getItem('keyra_oled_mode') === 'true';
+            oledToggle.checked = savedOledMode;
+
+            // Show/hide OLED option based on theme
+            const updateOledVisibility = () => {
+                const isDarkTheme = document.body.classList.contains('dark-theme');
+                oledModeRow.style.display = isDarkTheme ? 'flex' : 'none';
+            };
+
+            // Initial visibility
+            updateOledVisibility();
+
+            // Handle OLED toggle changes
+            oledToggle.addEventListener('change', () => {
+                const isEnabled = oledToggle.checked;
+                localStorage.setItem('keyra_oled_mode', isEnabled.toString());
+                
+                if (isEnabled) {
+                    document.body.classList.add('oled-optimized');
+                    this.showToast('OLED optimization enabled', 'success');
+                } else {
+                    document.body.classList.remove('oled-optimized');
+                    this.showToast('OLED optimization disabled', 'info');
+                }
+                
+                this.updateLastActivity(`${isEnabled ? 'Enabled' : 'Disabled'} OLED optimization`);
+            });
+
+            // Update visibility when theme changes
+            const originalSetTheme = this.setTheme.bind(this);
+            this.setTheme = (theme: 'light' | 'dark') => {
+                originalSetTheme(theme);
+                updateOledVisibility();
+                
+                // Auto-enable OLED in dark mode if previously enabled
+                if (theme === 'dark' && savedOledMode) {
+                    document.body.classList.add('oled-optimized');
+                }
+            };
         }
     }
 
@@ -538,12 +727,102 @@ export class UIManager {
             }
         }
 
+        // Remove existing click listener to prevent duplicates
+        const newCodeElement = codeElement.cloneNode(true) as HTMLElement;
+        codeElement.parentNode?.replaceChild(newCodeElement, codeElement);
+
+        // Add click-to-copy functionality
+        newCodeElement.addEventListener('click', () => {
+            this.copyOTPToClipboard(otp.replace(/\s/g, ''), newCodeElement);
+        });
+
+        // Add cursor pointer for better UX
+        newCodeElement.style.cursor = 'pointer';
+        newCodeElement.title = 'Click to copy';
+
+        // Update timer
         const remaining = await (window as any).api.getRemainingSeconds();
         const dashOffset = 163.36 * (1 - remaining / 30);
         const progressCircle = card.querySelector('.timer-progress') as HTMLElement;
         if (progressCircle) {
             progressCircle.style.strokeDashoffset = dashOffset.toString();
             progressCircle.style.stroke = remaining <= 5 ? '#ff3b30' : 'var(--accent-primary)';
+        }
+    }
+
+    private copyOTPToClipboard(otp: string, element: HTMLElement) {
+        navigator.clipboard.writeText(otp).then(() => {
+            // Show visual feedback
+            this.showCopyFeedback(element);
+            
+            // Update activity
+            this.updateLastActivity('OTP copied');
+            
+            // Show toast
+            this.showToast('OTP code copied to clipboard', 'success');
+        }).catch(() => {
+            this.showToast('Failed to copy code', 'error');
+        });
+    }
+
+    private showCopyFeedback(element: HTMLElement) {
+        const originalText = element.textContent;
+        const originalColor = element.style.color;
+        
+        // Change to "Copied!" with green color
+        element.textContent = 'Copied!';
+        element.style.color = '#28a745';
+        element.style.transform = 'scale(1.1)';
+        
+        setTimeout(() => {
+            element.textContent = originalText;
+            element.style.color = originalColor;
+            element.style.transform = 'scale(1)';
+        }, 1000);
+    }
+
+    private updateLastActivity(action: string) {
+        const now = new Date().toISOString();
+        localStorage.setItem('keyra_last_activity', now);
+        localStorage.setItem('keyra_last_action', action);
+        
+        // Update the display if settings are open
+        this.updateLastActivityDisplay();
+    }
+
+    private updateLastActivityDisplay() {
+        const lastActivityElement = document.getElementById('last-activity-display');
+        const lastActionElement = document.getElementById('last-action-display');
+        
+        if (lastActivityElement) {
+            const lastActivity = localStorage.getItem('keyra_last_activity');
+            const lastAction = localStorage.getItem('keyra_last_action') || 'No activity';
+            
+            if (lastActivity) {
+                const date = new Date(lastActivity);
+                const now = new Date();
+                const diffMs = now.getTime() - date.getTime();
+                const diffMins = Math.floor(diffMs / 60000);
+                
+                let timeAgo;
+                if (diffMins < 1) {
+                    timeAgo = 'Just now';
+                } else if (diffMins < 60) {
+                    timeAgo = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+                } else if (diffMins < 1440) {
+                    const hours = Math.floor(diffMins / 60);
+                    timeAgo = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                } else {
+                    const days = Math.floor(diffMins / 1440);
+                    timeAgo = `${days} day${days > 1 ? 's' : ''} ago`;
+                }
+                
+                lastActivityElement.textContent = timeAgo;
+            }
+            
+            if (lastActionElement) {
+                lastActionElement.textContent = lastAction;
+            }
         }
     }
 

@@ -344,6 +344,17 @@
                                 </div>
                             </div>
 
+                            <div class="setting-row" id="oled-mode-row">
+                                <div class="setting-info">
+                                    <div class="setting-name">OLED Optimization</div>
+                                    <div class="setting-desc">Pure black for power savings</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="oled-mode-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
                             <div style="margin-top: var(--space-lg);">
                                 <div class="setting-name" style="margin-bottom: 12px;">Wallpaper Library</div>
                                 <div class="wallpaper-grid">
@@ -390,6 +401,16 @@
                                     <div class="setting-desc">Stable v1.0.0-PRO</div>
                                 </div>
                                 <div class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">LATEST</div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <div class="setting-name">Last Activity</div>
+                                    <div class="setting-desc" id="last-action-display">No activity</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 13px; font-weight: 700;">
+                                    <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
+                                    <span id="last-activity-display">Never</span>
+                                </div>
                             </div>
                             <div class="setting-row">
                                 <div class="setting-info">
