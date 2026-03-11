@@ -162,10 +162,17 @@
             <!-- Vault View -->
             <section id="vault-view" class="view-section">
                 <div class="section-header" style="margin-bottom: var(--space-xl);">
-                    <div>
+                    <div style="flex: 1;">
                         <h1 class="section-title">Security Vault</h1>
                         <p class="section-subtitle">PROTECTING YOUR SECURE IDENTITIES</p>
                     </div>
+                    
+                    <!-- Real-time Search Integration -->
+                    <div class="search-vessel" style="flex: 1; max-width: 320px; position: relative; margin-right: 12px;">
+                        <i data-lucide="search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--text-secondary); opacity: 0.6;"></i>
+                        <input type="text" id="vault-search" class="form-input search-input" placeholder="Search identities..." style="padding-left: 44px; height: 58px; background: hsla(var(--h), 20%, 50%, 0.05); border-radius: var(--radius-md);">
+                    </div>
+
                     <button class="btn-primary" id="add-account-btn" style="height: 58px; padding: 0 32px;">
                         <i data-lucide="plus" style="width: 24px; height: 24px;"></i>
                         <span>Initialize Token</span>
@@ -210,6 +217,16 @@
                             <h3 style="font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">Security Enclave</h3>
                         </div>
                         <div class="bento-content">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <div class="setting-name">Privacy Mode</div>
+                                    <div class="setting-desc" style="font-size: 14px; font-weight: 500;">Mask OTP codes until requested</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="privacy-mode-toggle">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
                             <div class="setting-row">
                                 <div class="setting-info">
                                     <div class="setting-name">Access PIN</div>

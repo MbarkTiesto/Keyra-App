@@ -5,12 +5,21 @@ export class UIManager {
     private currentTab: 'vault' | 'settings' = 'vault';
     private accounts: any[] = [];
     private timerInterval: any = null;
+    private privacyMode: boolean = false;
+    private searchQuery: string = '';
 
     constructor() {
         this.initTheme();
+        this.initPrivacyMode();
         this.setupEventListeners();
         this.startTimer();
         this.loadInitialData();
+    }
+
+    private initPrivacyMode() {
+        this.privacyMode = localStorage.getItem('privacyMode') === 'true';
+        const toggle = document.getElementById('privacy-mode-toggle') as HTMLInputElement;
+        if (toggle) toggle.checked = this.privacyMode;
     }
 
     private initTheme() {
@@ -97,16 +106,33 @@ export class UIManager {
         // Settings PIN
         document.getElementById('setup-pin-btn')?.addEventListener('click', () => this.showPinSetup());
 
-        // Unlock Form
-        document.getElementById('form-unlock')?.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleUnlock();
+        // Privacy Mode Toggle
+        document.getElementById('privacy-mode-toggle')?.addEventListener('change', (e) => {
+            const target = e.target as HTMLInputElement;
+            this.privacyMode = target.checked;
+            localStorage.setItem('privacyMode', String(this.privacyMode));
+            this.renderAccounts(); // Re-render to apply/remove masking
+            this.showToast(this.privacyMode ? "Privacy Mode Enabled" : "Privacy Mode Disabled", "info");
+        });
+
+        // Search Input
+        const searchInput = document.getElementById('vault-search') as HTMLInputElement;
+        searchInput?.addEventListener('input', (e) => {
+            const target = e.target as HTMLInputElement;
+            this.searchQuery = target.value.toLowerCase().trim();
+            this.renderAccounts();
         });
 
         // Close modal on overlay click
         const modalOverlay = document.getElementById('modal-overlay');
         modalOverlay?.addEventListener('click', (e) => {
             if (e.target === e.currentTarget) this.hideModal();
+        });
+
+        // Unlock Form
+        document.getElementById('form-unlock')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleUnlock();
         });
         
         // Handle window resize for icon refreshing if layout shifts majorly
@@ -160,6 +186,12 @@ export class UIManager {
         const emptyState = document.getElementById('empty-state');
         if (!grid || !emptyState) return;
 
+        // Filter accounts based on search query
+        const filtered = this.accounts.filter(acc => 
+            acc.issuer.toLowerCase().includes(this.searchQuery) || 
+            acc.account.toLowerCase().includes(this.searchQuery)
+        );
+
         if (this.accounts.length === 0) {
             grid.classList.add('hidden');
             emptyState.classList.remove('hidden');
@@ -167,7 +199,7 @@ export class UIManager {
             grid.classList.remove('hidden');
             emptyState.classList.add('hidden');
             grid.innerHTML = '';
-            this.accounts.forEach((acc, index) => {
+            filtered.forEach((acc, index) => {
                 grid.appendChild(this.createAccountCard(acc, index));
             });
         }
@@ -197,7 +229,9 @@ export class UIManager {
             </div>
             
             <div class="otp-box">
-                <div class="otp-code" data-id="${account.id}">------</div>
+                <div class="otp-code ${this.privacyMode ? 'privacy-hidden' : ''}" data-id="${account.id}">
+                    ${this.privacyMode ? '••••••' : '------'}
+                </div>
                 <div class="timer-container" style="position: absolute; right: 12px; width: 24px; height: 24px;">
                     <svg viewBox="0 0 60 60">
                         <circle cx="30" cy="30" r="26" fill="none" class="timer-bg" style="stroke: var(--border-color); stroke-width: 4;"></circle>
@@ -219,8 +253,8 @@ export class UIManager {
 
         const copyBtn = card.querySelector('.copy-btn') as HTMLElement;
         copyBtn.onclick = async () => {
-            const code = card.querySelector('.otp-code')?.textContent?.replace(/\s/g, '') || '';
-            await navigator.clipboard.writeText(code);
+            const otpCode = await (window as any).api.generateTOTP(account.secret);
+            await navigator.clipboard.writeText(otpCode);
             this.showToast("OTP Copied to Clipboard", "success");
         };
 
@@ -243,8 +277,13 @@ export class UIManager {
         if (!codeElement) return;
 
         const otp = await (window as any).api.generateTOTP(secret);
-        if (codeElement.textContent?.replace(/\s/g, '') !== otp) {
-            codeElement.textContent = otp.substring(0, 3) + ' ' + otp.substring(3);
+        
+        if (this.privacyMode) {
+            codeElement.textContent = '••••••';
+        } else {
+            if (codeElement.textContent?.replace(/\s/g, '') !== otp) {
+                codeElement.textContent = otp.substring(0, 3) + ' ' + otp.substring(3);
+            }
         }
 
         const remaining = await (window as any).api.getRemainingSeconds();
