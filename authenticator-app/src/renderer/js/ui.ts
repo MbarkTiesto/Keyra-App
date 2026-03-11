@@ -358,8 +358,8 @@ export class UIManager {
                 </div>
                 
                 <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
-                    <button class="btn-primary" id="save-new-account" style="flex: 2; height: 64px; font-size: 17px;">Verify & Secure</button>
-                    <button class="user-button" id="cancel-add-btn" style="flex: 1; justify-content: center; height: 64px; font-weight: 800;">Discard</button>
+                    <button class="btn-primary" id="save-new-account" style="flex: 2; height: var(--btn-h-lg); font-size: 17px;">Verify & Secure</button>
+                    <button class="user-button" id="cancel-add-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Discard</button>
                 </div>
             </div>
         `;
@@ -403,8 +403,8 @@ export class UIManager {
                 </div>
                 
                 <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
-                    <button class="btn-primary" id="update-account" style="flex: 2; height: 64px; font-size: 17px;">Commit Changes</button>
-                    <button class="user-button" id="cancel-edit-btn" style="flex: 1; justify-content: center; height: 64px; font-weight: 800;">Discard</button>
+                    <button class="btn-primary" id="update-account" style="flex: 2; height: var(--btn-h-lg); font-size: 17px;">Commit Changes</button>
+                    <button class="user-button" id="cancel-edit-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Discard</button>
                 </div>
             </div>
         `;
@@ -497,8 +497,8 @@ export class UIManager {
                 </div>
                 
                 <div style="display: flex; gap: 16px; margin-top: 40px;">
-                    <button class="btn-primary" id="save-pin" style="flex: 2; height: 56px;">Lock Vault</button>
-                    <button class="user-button" id="cancel-pin-btn" style="flex: 1; justify-content: center; height: 56px;">Discard</button>
+                    <button class="btn-primary" id="save-pin" style="flex: 2; height: var(--btn-h-lg);">Lock Vault</button>
+                    <button class="user-button" id="cancel-pin-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg);">Discard</button>
                 </div>
             </div>
         `;
@@ -529,8 +529,8 @@ export class UIManager {
                 </div>
                 
                 <div style="display: flex; gap: 16px;">
-                    <button class="btn-primary" id="confirm-delete" style="flex: 1; height: 56px; background: #ff3b30; box-shadow: 0 8px 24px rgba(255, 59, 48, 0.2);">Confirm Erase</button>
-                    <button class="user-button" id="cancel-delete-btn" style="flex: 1; justify-content: center; height: 56px;">Discard</button>
+                    <button class="btn-primary" id="confirm-delete" style="flex: 1; height: var(--btn-h-lg); background: #ff3b30; box-shadow: 0 8px 24px rgba(255, 59, 48, 0.2);">Confirm Erase</button>
+                    <button class="user-button" id="cancel-delete-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg);">Discard</button>
                 </div>
             </div>
         `;

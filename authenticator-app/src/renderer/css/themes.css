@@ -38,13 +38,20 @@
     --shadow-medium: 0 12px 36px hsla(var(--h), var(--s), 20%, 0.08);
     --shadow-hard: 0 24px 64px hsla(var(--h), var(--s), 20%, 0.12);
     
-    --radius-sm: 12px;
-    --radius-md: 18px;
-    --radius-lg: 28px;
-    --radius-xl: 40px;
+    --radius-sm: 8px;   /* Inner Icons / Menus */
+    --radius-md: 16px;  /* Buttons / Standard Inputs */
+    --radius-lg: 24px;  /* Cards / Standard Modals */
+    --radius-xl: 32px;  /* Large Containers */
+    --radius-full: 999px; /* Capsule Shapes */
     
     --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-medium: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Scientific Dimensional Scaling */
+    --btn-h-lg: 60px;   /* Hero / Main Actions */
+    --btn-h-md: 48px;   /* Standard Interaction */
+    --btn-h-sm: 36px;   /* Compact / Tertiary */
+    --btn-px: clamp(16px, 4vw, 32px);
 }
 
 [data-theme="dark"] {
