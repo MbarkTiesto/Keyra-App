@@ -249,7 +249,7 @@ i[data-lucide] { stroke-width: 2.2px; }
     position: relative;
     flex: 1;
     max-width: 320px;
-    min-width: 200px;
+    min-width: 120px; /* Reduced to allow single-row header */
 }
 
 .search-icon {
@@ -330,6 +330,15 @@ input:checked + .slider:before { transform: translateX(20px); background-color: 
 .form-group { margin-bottom: var(--space-md); width: 100%; }
 .form-label { display: block; font-weight: 800; font-size: 12px; margin-bottom: 8px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; }
 
+.modal-help-text {
+    margin-top: 8px; /* Scientific spacing below inputs */
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
 .form-input {
     width: 100%; padding: 18px 24px;
     border-radius: var(--radius-md);
@@ -370,16 +379,4 @@ input:checked + .slider:before { transform: translateX(20px); background-color: 
    SCIENTIFIC RESPONSIVITY
    ───────────────────────────────────────────────────────────────────────────── */
 
-@media (max-width: 768px) {
-    .navbar { height: 72px; }
-    .brand-text { display: none; }
-    .nav-tab span { display: none; }
-    .nav-tab { padding: 10px 14px; }
-}
-
-@media (max-width: 540px) {
-    .navbar-wrapper { padding: 0 var(--space-sm); gap: var(--space-xs); }
-    .nav-tabs { background: var(--bg-tertiary); padding: 4px; }
-    .section-header { flex-direction: column; align-items: flex-start; gap: var(--space-sm); }
-    .btn-primary#add-account-btn { width: 100%; }
-}
+/* Responsive refined in layout.css */
