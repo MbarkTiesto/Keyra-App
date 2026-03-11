@@ -8,7 +8,7 @@ export class UIManager {
     private privacyMode: boolean = false;
     private searchQuery: string = '';
 
-    constructor() {
+    constructor(public userId: string = 'default') {
         this.initTheme();
         this.initPrivacyMode();
         this.setupEventListeners();
@@ -16,21 +16,25 @@ export class UIManager {
         this.loadInitialData();
     }
 
+    private getStorageKey(key: string): string {
+        return `${this.userId}_${key}`;
+    }
+
     private initPrivacyMode() {
-        this.privacyMode = localStorage.getItem('privacyMode') === 'true';
+        this.privacyMode = localStorage.getItem(this.getStorageKey('privacyMode')) === 'true';
         const toggle = document.getElementById('privacy-mode-toggle') as HTMLInputElement;
         if (toggle) toggle.checked = this.privacyMode;
     }
 
     private initTheme() {
-        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
+        const savedTheme = localStorage.getItem(this.getStorageKey('theme')) as 'light' | 'dark' || 'light';
         this.setTheme(savedTheme);
     }
 
     public setTheme(theme: 'light' | 'dark') {
         this.currentTheme = theme;
         document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
+        localStorage.setItem(this.getStorageKey('theme'), theme);
         
         const themeIcon = document.getElementById('theme-icon-lucide');
         const themeText = document.getElementById('theme-text');
@@ -110,7 +114,7 @@ export class UIManager {
         document.getElementById('privacy-mode-toggle')?.addEventListener('change', (e) => {
             const target = e.target as HTMLInputElement;
             this.privacyMode = target.checked;
-            localStorage.setItem('privacyMode', String(this.privacyMode));
+            localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacyMode));
             this.renderAccounts(); // Re-render to apply/remove masking
             this.showToast(this.privacyMode ? "Privacy Mode Enabled" : "Privacy Mode Disabled", "info");
         });
