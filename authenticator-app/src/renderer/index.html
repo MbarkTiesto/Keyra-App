@@ -206,6 +206,7 @@
                 </div>
                 
                 <div class="settings-grid">
+                    <!-- Security Enclave Card -->
                     <div class="account-card bento-card">
                         <div class="bento-header" style="margin-bottom: var(--space-md);">
                             <div class="account-icon" style="width: 48px; height: 48px; background: var(--accent-soft);">
@@ -217,7 +218,7 @@
                             <div class="setting-row">
                                 <div class="setting-info">
                                     <div class="setting-name">Privacy Mode</div>
-                                    <div class="setting-desc" style="font-size: 14px; font-weight: 500;">Mask OTP codes until requested</div>
+                                    <div class="setting-desc">Mask OTP codes until requested</div>
                                 </div>
                                 <label class="switch">
                                     <input type="checkbox" id="privacy-mode-toggle">
@@ -226,24 +227,31 @@
                             </div>
                             <div class="setting-row">
                                 <div class="setting-info">
-                                    <div class="setting-name">Access PIN</div>
-                                    <div class="setting-desc" style="font-size: 14px; font-weight: 500;">Multi-factor verification core</div>
+                                    <div class="setting-name">Auto-Lock Vault</div>
+                                    <div class="setting-desc">Timeout after inactivity</div>
                                 </div>
-                                <button class="user-button" id="setup-pin-btn" style="min-width: 120px; justify-content: center;">Initialize</button>
+                                <div class="segmented-control" id="autolock-segmented">
+                                    <button class="segment" data-val="0">Off</button>
+                                    <button class="segment" data-val="1">1m</button>
+                                    <button class="segment" data-val="5">5m</button>
+                                    <button class="segment" data-val="15">15m</button>
+                                    <div class="segment-indicator"></div>
+                                </div>
                             </div>
                             <div class="setting-row">
                                 <div class="setting-info">
-                                    <div class="setting-name">Vault Persistence</div>
-                                    <div class="setting-desc" style="font-size: 14px; font-weight: 500;">Encrypted state management</div>
+                                    <div class="setting-name">Access PIN</div>
+                                    <div class="setting-desc">Multi-factor verification core</div>
                                 </div>
-                                <div class="badge" style="background: hsla(145, 100%, 45%, 0.15); color: #28a745; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 900; letter-spacing: 0.5px;">ENCRYPTED</div>
+                                <button class="user-button" id="setup-pin-btn" style="min-width: 100px; justify-content: center;">Setup PIN</button>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Visual Interface Card -->
                     <div class="account-card bento-card">
                         <div class="bento-header" style="margin-bottom: var(--space-md);">
-                            <div class="account-icon" style="width: 48px; height: 48px; background: hsla(280, 100%, 75%, 0.15);">
+                            <div class="account-icon" style="width: 48px; height: 48px; background: hsla(280, 100%, 75%, 0.1);">
                                 <i data-lucide="palette" style="width: 24px; height: 24px; color: hsl(280, 100%, 75%);"></i>
                             </div>
                             <h3 style="font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">Visual Interface</h3>
@@ -252,9 +260,42 @@
                             <div class="setting-row">
                                 <div class="setting-info">
                                     <div class="setting-name">Interface Mode</div>
-                                    <div class="setting-desc" style="font-size: 14px; font-weight: 500;">Dynamic Aura luminosity</div>
+                                    <div class="setting-desc">Universal Aura luminosity</div>
                                 </div>
-                                <button class="user-button" id="settings-theme-toggle" style="min-width: 120px; justify-content: center;">Toggle</button>
+                                <div class="segmented-control" id="theme-segmented">
+                                    <button class="segment" data-val="light">Light</button>
+                                    <button class="segment" data-val="dark">Dark</button>
+                                    <div class="segment-indicator"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- About & Support Card -->
+                    <div class="account-card bento-card">
+                        <div class="bento-header" style="margin-bottom: var(--space-md);">
+                            <div class="account-icon" style="width: 48px; height: 48px; background: hsla(145, 100%, 45%, 0.1);">
+                                <i data-lucide="info" style="width: 24px; height: 24px; color: #28a745;"></i>
+                            </div>
+                            <h3 style="font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">About Keyra</h3>
+                        </div>
+                        <div class="bento-content">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <div class="setting-name">System Version</div>
+                                    <div class="setting-desc">Stable v1.0.0-PRO</div>
+                                </div>
+                                <div class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">LATEST</div>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <div class="setting-name">Vault Analytics</div>
+                                    <div class="setting-desc">Optimized security state</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px; color: #28a745; font-size: 13px; font-weight: 800;">
+                                    <i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i>
+                                    OPERATIONAL
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -11,9 +11,41 @@ export class UIManager {
     constructor(public userId: string = 'default') {
         this.initTheme();
         this.initPrivacyMode();
+        this.initSegmentedStates();
         this.setupEventListeners();
         this.startTimer();
         this.loadInitialData();
+    }
+
+    private initSegmentedStates() {
+        // Theme
+        const theme = localStorage.getItem(this.getStorageKey('theme')) || 'light';
+        this.updateSegmentedUI('theme-segmented', theme);
+        
+        // Autolock
+        const autolock = localStorage.getItem(this.getStorageKey('autolock')) || '0';
+        this.updateSegmentedUI('autolock-segmented', autolock);
+    }
+
+    private updateSegmentedUI(containerId: string, value: string) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const segments = container.querySelectorAll('.segment');
+        const indicator = container.querySelector('.segment-indicator') as HTMLElement;
+        
+        let activeIdx = 0;
+        segments.forEach((seg, idx) => {
+            const isActive = seg.getAttribute('data-val') === value;
+            seg.classList.toggle('active', isActive);
+            if (isActive) activeIdx = idx;
+        });
+
+        if (indicator) {
+            const segmentWidth = 100 / segments.length;
+            indicator.style.width = `calc(${segmentWidth}% - 6px)`;
+            indicator.style.left = `calc(${activeIdx * segmentWidth}% + 3px)`;
+        }
     }
 
     private getStorageKey(key: string): string {
@@ -101,10 +133,25 @@ export class UIManager {
         document.getElementById('add-account-btn')?.addEventListener('click', () => this.showAddModal());
         document.getElementById('empty-add-btn')?.addEventListener('click', () => this.showAddModal());
 
-        // Settings Theme Toggle
-        document.getElementById('settings-theme-toggle')?.addEventListener('click', () => {
-            const nextTheme = this.currentTheme === 'light' ? 'dark' : 'light';
-            this.setTheme(nextTheme);
+        // Segmented Theme Toggle
+        document.querySelectorAll('#theme-segmented .segment').forEach(seg => {
+            seg.addEventListener('click', (e) => {
+                const target = e.currentTarget as HTMLElement;
+                const val = target.getAttribute('data-val') as 'light' | 'dark';
+                this.setTheme(val);
+                this.updateSegmentedUI('theme-segmented', val);
+            });
+        });
+
+        // Segmented Auto-Lock
+        document.querySelectorAll('#autolock-segmented .segment').forEach(seg => {
+            seg.addEventListener('click', (e) => {
+                const target = e.currentTarget as HTMLElement;
+                const val = target.getAttribute('data-val')!;
+                localStorage.setItem(this.getStorageKey('autolock'), val);
+                this.updateSegmentedUI('autolock-segmented', val);
+                this.showToast(`Vault Auto-lock: ${val === '0' ? 'Off' : val + 'm'}`, "info");
+            });
         });
         
         // Settings PIN
