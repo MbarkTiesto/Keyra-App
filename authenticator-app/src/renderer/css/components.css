@@ -1135,22 +1135,189 @@ input:checked+.slider:before {
     font-weight: 700;
 }
 
-/* Accent Color Selector */
+/* Accent Color Selector - Perfect Positioning System */
 .accent-color-selector {
     display: flex;
-    gap: 8px;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+    padding: 16px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.accent-color-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
     align-items: center;
 }
 
+/* Main Row - Original Colors */
+.accent-color-row.main {
+    gap: 14px;
+}
+
+/* Cute Colors Row */
+.accent-color-row.cute {
+    gap: 10px;
+}
+
+/* Modern Colors Row */
+.accent-color-row.modern {
+    gap: 10px;
+}
+
+/* Elegant Colors Row */
+.accent-color-row.elegant {
+    gap: 10px;
+}
+
 .accent-color-option {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: 3px solid transparent;
     cursor: pointer;
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+/* Row-specific sizing */
+.accent-color-row.main .accent-color-option {
+    width: 42px;
+    height: 42px;
+}
+
+.accent-color-row.cute .accent-color-option,
+.accent-color-row.modern .accent-color-option,
+.accent-color-row.elegant .accent-color-option {
+    width: 36px;
+    height: 36px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .accent-color-selector {
+        padding: 12px;
+        gap: 12px;
+        margin-top: 8px;
+    }
+    
+    .accent-color-row {
+        gap: 8px;
+    }
+    
+    .accent-color-row.main {
+        gap: 10px;
+    }
+    
+    .accent-color-option {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .accent-color-row.main .accent-color-option {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .accent-color-row.cute .accent-color-option,
+    .accent-color-row.modern .accent-color-option,
+    .accent-color-row.elegant .accent-color-option {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .accent-color-selector {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .accent-color-row {
+        gap: 6px;
+        justify-content: center;
+    }
+    
+    .accent-color-option {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .accent-color-row.main .accent-color-option {
+        width: 34px;
+        height: 34px;
+    }
+    
+    .accent-color-row.cute .accent-color-option,
+    .accent-color-row.modern .accent-color-option,
+    .accent-color-row.elegant .accent-color-option {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+@media (max-width: 380px) {
+    .accent-color-selector {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    .accent-color-row {
+        gap: 4px;
+    }
+    
+    .accent-color-option {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .accent-color-row.main .accent-color-option {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .accent-color-row.cute .accent-color-option,
+    .accent-color-row.modern .accent-color-option,
+    .accent-color-row.elegant .accent-color-option {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 320px) {
+    .accent-color-selector {
+        padding: 6px;
+        gap: 6px;
+    }
+    
+    .accent-color-row {
+        gap: 3px;
+    }
+    
+    .accent-color-option {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .accent-color-row.main .accent-color-option {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .accent-color-row.cute .accent-color-option,
+    .accent-color-row.modern .accent-color-option,
+    .accent-color-row.elegant .accent-color-option {
+        width: 20px;
+        height: 20px;
+    }
 }
 
 .accent-color-option:hover {
@@ -1164,6 +1331,47 @@ input:checked+.slider:before {
     box-shadow: 0 0 0 2px white, 0 0 0 4px var(--border-color), 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
+/* Responsive hover and active states */
+@media (max-width: 768px) {
+    .accent-color-option:hover {
+        transform: scale(1.08);
+    }
+    
+    .accent-color-option.active {
+        transform: scale(1.12);
+    }
+}
+
+@media (max-width: 480px) {
+    .accent-color-option:hover {
+        transform: scale(1.06);
+    }
+    
+    .accent-color-option.active {
+        transform: scale(1.1);
+    }
+}
+
+@media (max-width: 380px) {
+    .accent-color-option:hover {
+        transform: scale(1.05);
+    }
+    
+    .accent-color-option.active {
+        transform: scale(1.08);
+    }
+}
+
+@media (max-width: 320px) {
+    .accent-color-option:hover {
+        transform: scale(1.04);
+    }
+    
+    .accent-color-option.active {
+        transform: scale(1.06);
+    }
+}
+
 .accent-check {
     position: absolute;
     top: 50%;
@@ -1175,6 +1383,82 @@ input:checked+.slider:before {
     opacity: 0;
     transition: opacity 0.3s ease;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Row-specific checkmark sizing */
+.accent-color-row.main .accent-check {
+    font-size: 15px;
+}
+
+.accent-color-row.cute .accent-check,
+.accent-color-row.modern .accent-check,
+.accent-color-row.elegant .accent-check {
+    font-size: 13px;
+}
+
+/* Responsive checkmark size */
+@media (max-width: 768px) {
+    .accent-check {
+        font-size: 13px;
+    }
+    
+    .accent-color-row.main .accent-check {
+        font-size: 14px;
+    }
+    
+    .accent-color-row.cute .accent-check,
+    .accent-color-row.modern .accent-check,
+    .accent-color-row.elegant .accent-check {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .accent-check {
+        font-size: 12px;
+    }
+    
+    .accent-color-row.main .accent-check {
+        font-size: 13px;
+    }
+    
+    .accent-color-row.cute .accent-check,
+    .accent-color-row.modern .accent-check,
+    .accent-color-row.elegant .accent-check {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 380px) {
+    .accent-check {
+        font-size: 11px;
+    }
+    
+    .accent-color-row.main .accent-check {
+        font-size: 12px;
+    }
+    
+    .accent-color-row.cute .accent-check,
+    .accent-color-row.modern .accent-check,
+    .accent-color-row.elegant .accent-check {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 320px) {
+    .accent-check {
+        font-size: 10px;
+    }
+    
+    .accent-color-row.main .accent-check {
+        font-size: 11px;
+    }
+    
+    .accent-color-row.cute .accent-check,
+    .accent-color-row.modern .accent-check,
+    .accent-color-row.elegant .accent-check {
+        font-size: 9px;
+    }
 }
 
 .accent-color-option.active .accent-check {

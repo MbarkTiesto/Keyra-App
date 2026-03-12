@@ -148,7 +148,22 @@ export class UIManager {
             'royal-purple': 258,
             'electric-blue': 200,
             'emerald-green': 145,
-            'solar-orange': 15
+            'solar-orange': 15,
+            // New Modern & Cute Accent Colors
+            'rose-quartz': 330,
+            'peach-blossom': 20,
+            'lavender-dream': 270,
+            'mint-fresh': 160,
+            'sky-blue': 190,
+            'coral-sunset': 10,
+            'amethyst-glow': 280,
+            'lemon-zest': 45,
+            'ocean-teal': 175,
+            'bubblegum': 320,
+            'sage-serene': 150,
+            'golden-hour': 35,
+            'orchid-mystic': 300,
+            'turquoise-dream': 180
         };
 
         const hue = accentHues[accentColor];
