@@ -4,13 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Keyra Authenticator</title>
-    <!-- Google Fonts: Inter and JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Local Fonts -->
+    <style>
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/Inter-Regular.woff2') format('woff2');
+            font-weight: 400 800;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'JetBrains Mono';
+            src: url('fonts/JetBrainsMono-Bold.woff2') format('woff2');
+            font-weight: 700 800;
+            font-display: swap;
+        }
+    </style>
     
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide Icons (Local) -->
+    <script src="js/vendor/lucide.min.js"></script>
     
     <!-- CSS Architecture -->
     <link rel="stylesheet" href="css/themes.css">
@@ -149,6 +160,12 @@
                             <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
                         </div>
                         <span class="brand-text">Keyra</span>
+                    </div>
+                    
+                    <!-- Connectivity Indicator -->
+                    <div id="connectivity-status" class="connectivity-indicator online">
+                        <div class="status-dot"></div>
+                        <span id="status-text">Online</span>
                     </div>
                 </div>
                 

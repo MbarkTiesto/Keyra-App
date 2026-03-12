@@ -29,12 +29,35 @@ export class UIManager {
         this.initFromCloud();
         this.startLiveSync();
         this.initCaptureResults();
+        this.initConnectivityStatus();
     }
 
     private initCaptureResults() {
         (window as any).api.onCaptureResult(async (data: string) => {
             await this.handleScannedData(data);
         });
+    }
+
+    private initConnectivityStatus() {
+        this.updateConnectivityStatus();
+        window.addEventListener('online', () => this.updateConnectivityStatus());
+        window.addEventListener('offline', () => this.updateConnectivityStatus());
+    }
+
+    private updateConnectivityStatus() {
+        const isOnline = navigator.onLine;
+        const statusEl = document.getElementById('connectivity-status');
+        const textEl = document.getElementById('status-text');
+
+        if (statusEl && textEl) {
+            statusEl.classList.toggle('online', isOnline);
+            statusEl.classList.toggle('offline', !isOnline);
+            textEl.textContent = isOnline ? 'Online' : 'Offline';
+        }
+        
+        if (!isOnline) {
+            this.showToast("Working Offline", "info");
+        }
     }
 
     private getStorageKey(key: string): string {
@@ -499,6 +522,10 @@ export class UIManager {
     }
 
     private async manualSync() {
+        if (!navigator.onLine) {
+            this.showToast("Cannot sync while offline", "error");
+            return;
+        }
         this.setSyncing(true);
         const btn = document.getElementById('btn-sync-now');
         const icon = btn?.querySelector('i');
@@ -1101,6 +1128,8 @@ export class UIManager {
     }
 
     private async checkForUpdates() {
+        if (!navigator.onLine) return; // Skip background sync if offline
+
         // Don't sync if user is active in sensitive areas or typing
         if (document.activeElement?.tagName === 'INPUT' ||
             document.querySelector('.modal.show')) {
