@@ -759,28 +759,32 @@ export class UIManager {
 
     private showPinSetup() {
         const content = `
-            <div style="padding: var(--space-lg);">
+            <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel">
                         <i data-lucide="shield-check"></i>
                     </div>
                     <div class="modal-title-vessel">
-                        <h2>Core Security</h2>
-                        <p>ESTABLISH A 4-DIGIT VAULT ACCESS KEY</p>
+                        <h2>Setup Access PIN</h2>
+                        <p>ESTABLISH A 4-DIGIT VAULT KEY</p>
                     </div>
                 </div>
+                <div class="modal-divider"></div>
                 <div class="modal-body">
-                    <div class="form-group" style="text-align: center;">
-                        <label class="form-label" style="display: inline-block; margin-bottom: 12px;">Establish PIN Code</label>
-                        <input type="password" id="new-pin" maxlength="4" class="form-input" 
-                               style="font-size: 36px; text-align: center; letter-spacing: 24px; padding: 24px; height: 80px; font-family: monospace;" 
-                               placeholder="••••">
-                        <p class="modal-help-text" style="margin-top: 16px;">This PIN will be required to unlock your encrypted local vault.</p>
+                    <div class="form-group">
+                        <label class="form-label">Create PIN Code</label>
+                        <input type="password" id="new-pin" maxlength="4" class="form-input"
+                               style="font-size: clamp(22px, 5vw, 30px); text-align: center; letter-spacing: clamp(12px, 3vw, 20px); padding: 16px; height: clamp(60px, 12vw, 72px); font-family: monospace;"
+                               placeholder="••••" inputmode="numeric">
+                        <p class="modal-help-text" style="margin-top: 12px;">This PIN enables quick vault unlock and enhanced security. Keep it confidential.</p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-primary" id="save-pin">Activate Key</button>
-                    <button class="user-button" id="cancel-pin-btn">Discard</button>
+                    <button class="btn-primary" id="save-pin">
+                        <i data-lucide="shield-check"></i>
+                        Activate Key
+                    </button>
+                    <button class="user-button" id="cancel-pin-btn" style="justify-content: center;">Discard</button>
                 </div>
             </div>
         `;
@@ -800,16 +804,17 @@ export class UIManager {
 
     private showAddModal() {
         const content = `
-            <div style="padding: var(--space-lg);">
+            <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel">
                         <i data-lucide="plus-circle"></i>
                     </div>
                     <div class="modal-title-vessel">
-                        <h2>Initialize Token</h2>
-                        <p>SECURE A NEW DIGITAL IDENTITY IN YOUR VAULT</p>
+                        <h2>Add New Token</h2>
+                        <p>SECURE A DIGITAL IDENTITY IN YOUR VAULT</p>
                     </div>
                 </div>
+                <div class="modal-divider"></div>
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="form-label">Service Issuer</label>
@@ -817,16 +822,20 @@ export class UIManager {
                     </div>
                     <div class="form-group">
                         <label class="form-label">Account Identity</label>
-                        <input type="text" id="new-account" class="form-input" placeholder="name@domain.com">
+                        <input type="text" id="new-account" class="form-input" placeholder="name@domain.com" inputmode="email">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Base32 Secret</label>
-                        <input type="text" id="new-secret" class="form-input" placeholder="Enter security key">
+                        <label class="form-label">Base32 Secret Key</label>
+                        <input type="text" id="new-secret" class="form-input" placeholder="Enter TOTP secret key" autocomplete="off">
+                        <p class="modal-help-text" style="margin-top: 8px;">Found in the service's two-factor authentication setup page.</p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-primary" id="save-new-account">Verify & Secure</button>
-                    <button class="user-button" id="cancel-add-btn">Discard</button>
+                    <button class="btn-primary" id="save-new-account">
+                        <i data-lucide="shield-plus"></i>
+                        Secure Token
+                    </button>
+                    <button class="user-button" id="cancel-add-btn" style="justify-content: center;">Discard</button>
                 </div>
             </div>
         `;
@@ -848,29 +857,42 @@ export class UIManager {
 
     private showEditModal(account: any) {
         const content = `
-            <div style="padding: var(--space-lg);">
+            <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel">
                         <i data-lucide="settings-2"></i>
                     </div>
                     <div class="modal-title-vessel">
-                        <h2>Refine Metadata</h2>
+                        <h2>Edit Token</h2>
                         <p>UPDATE IDENTITY DETAILS OR SERVICE LABEL</p>
                     </div>
                 </div>
+                <div class="modal-divider"></div>
                 <div class="modal-body">
+                    <div class="modal-entity-badge">
+                        <div class="entity-icon">
+                            <i data-lucide="shield"></i>
+                        </div>
+                        <div class="entity-info">
+                            <span class="entity-name">${account.issuer}</span>
+                            <span class="entity-label">${account.account || 'No account set'}</span>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">Service Issuer</label>
                         <input type="text" id="edit-issuer" class="form-input" value="${account.issuer}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Account Identity</label>
-                        <input type="text" id="edit-account" class="form-input" value="${account.account}">
+                        <input type="text" id="edit-account" class="form-input" value="${account.account}" inputmode="email">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-primary" id="update-account">Commit Change</button>
-                    <button class="user-button" id="cancel-edit-btn">Discard</button>
+                    <button class="btn-primary" id="update-account">
+                        <i data-lucide="check"></i>
+                        Save Changes
+                    </button>
+                    <button class="user-button" id="cancel-edit-btn" style="justify-content: center;">Discard</button>
                 </div>
             </div>
         `;
@@ -891,19 +913,35 @@ export class UIManager {
 
     private showDeleteConfirm(account: any) {
         const content = `
-            <div style="padding: var(--space-xl); text-align: center;">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-icon-vessel" style="background: hsla(0, 100%, 50%, 0.1); border-color: #ff3b30; color: #ff3b30; box-shadow: 0 0 30px rgba(255, 59, 48, 0.2);">
+                    <div class="modal-icon-vessel danger">
                         <i data-lucide="trash-2"></i>
                     </div>
                     <div class="modal-title-vessel">
-                        <h2 style="color: #ff3b30;">Destroy Token?</h2>
-                        <p>THIS ACTION IS PERMANENT AND CANNOT BE REVERSED</p>
+                        <h2 class="danger">Delete Token?</h2>
+                        <p>THIS ACTION IS PERMANENT AND IRREVERSIBLE</p>
                     </div>
                 </div>
+                <div class="modal-divider"></div>
+                <div class="modal-body">
+                    <div class="modal-entity-badge">
+                        <div class="entity-icon">
+                            <i data-lucide="shield"></i>
+                        </div>
+                        <div class="entity-info">
+                            <span class="entity-name">${account.issuer}</span>
+                            <span class="entity-label">${account.account || 'No account set'}</span>
+                        </div>
+                    </div>
+                    <p class="modal-help-text">Removing this token will permanently delete it from your vault. You will lose access to OTP codes for this service unless you re-add it.</p>
+                </div>
                 <div class="modal-footer">
-                    <button class="btn-primary" id="confirm-delete" style="background: #ff3b30; box-shadow: 0 8px 32px rgba(255, 59, 48, 0.3);">Confirm Erase</button>
-                    <button class="user-button" id="cancel-delete-btn">Cancel</button>
+                    <button class="btn-danger" id="confirm-delete">
+                        <i data-lucide="trash-2"></i>
+                        Delete Token
+                    </button>
+                    <button class="user-button" id="cancel-delete-btn" style="justify-content: center;">Keep It</button>
                 </div>
             </div>
         `;
@@ -912,7 +950,7 @@ export class UIManager {
             await (window as any).api.deleteAccount(account.id);
             await this.refreshAccounts();
             this.hideModal();
-            this.showToast("Identity destroyed", "info");
+            this.showToast("Token removed", "info");
             this.updateLastActivity('Deleted token');
         });
         document.getElementById('cancel-delete-btn')?.addEventListener('click', () => this.hideModal());
@@ -920,25 +958,39 @@ export class UIManager {
 
     private showImportPasswordModal(salt: string, encryptedVaultData: string) {
         const content = `
-            <div style="padding: var(--space-lg);">
+            <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel">
-                        <i data-lucide="shield-lock"></i>
+                        <i data-lucide="upload"></i>
                     </div>
                     <div class="modal-title-vessel">
                         <h2>Restore Vault</h2>
-                        <p>VERIFY MASTER KEY TO IMPORT SECURE BACKUP</p>
+                        <p>VERIFY MASTER KEY TO IMPORT BACKUP</p>
                     </div>
                 </div>
+                <div class="modal-divider"></div>
                 <div class="modal-body">
+                    <div class="modal-entity-badge">
+                        <div class="entity-icon">
+                            <i data-lucide="hard-drive"></i>
+                        </div>
+                        <div class="entity-info">
+                            <span class="entity-name">Encrypted Backup</span>
+                            <span class="entity-label">Awaiting decryption key</span>
+                        </div>
+                    </div>
                     <div class="form-group">
-                        <label class="form-label">Backup Password</label>
-                        <input type="password" id="import-pass" class="form-input" placeholder="••••••••">
+                        <label class="form-label">Backup Master Password</label>
+                        <input type="password" id="import-pass" class="form-input" placeholder="••••••••" autocomplete="current-password">
+                        <p class="modal-help-text" style="margin-top: 8px;">Enter the master password that was used when this backup was created.</p>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-primary" id="confirm-import">Restore Identity</button>
-                    <button class="user-button" id="cancel-import">Cancel</button>
+                    <button class="btn-primary" id="confirm-import">
+                        <i data-lucide="shield-check"></i>
+                        Restore Vault
+                    </button>
+                    <button class="user-button" id="cancel-import" style="justify-content: center;">Cancel</button>
                 </div>
             </div>
         `;
@@ -948,7 +1000,7 @@ export class UIManager {
             const res = await (window as any).api.performVaultImport(salt, encryptedVaultData, pass);
             if (res.success) {
                 this.hideModal();
-                this.showToast("Restored", "success");
+                this.showToast("Vault restored", "success");
                 await this.refreshAccounts();
             } else this.showToast(res.message, "error");
         });

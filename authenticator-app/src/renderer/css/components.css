@@ -312,71 +312,281 @@ i[data-lucide] {
 }
 
 /* Modal Button Consistency */
-.modal-footer {
-    display: flex;
-    gap: var(--space-sm);
-    margin-top: var(--space-xl);
-    width: 100%;
-}
-
 .modal-header {
-    text-align: center;
-    margin-bottom: var(--space-xl);
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
+    margin-bottom: clamp(14px, 3vw, 20px);
+    gap: 12px;
 }
 
 .modal-icon-vessel {
-    width: 72px;
-    height: 72px;
-    border-radius: var(--radius-lg);
+    width: clamp(52px, 12vw, 64px);
+    height: clamp(52px, 12vw, 64px);
+    border-radius: clamp(14px, 3.5vw, 18px);
     background: var(--accent-soft);
-    border: 1.5px solid var(--accent-primary);
+    border: 1.5px solid hsla(var(--h), 100%, 68%, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: var(--space-md);
     color: var(--accent-primary);
-    box-shadow: 0 0 30px var(--accent-soft);
+    box-shadow:
+        0 0 0 5px hsla(var(--h), 100%, 68%, 0.07),
+        0 10px 28px -8px hsla(var(--h), 100%, 68%, 0.25);
+    flex-shrink: 0;
 }
 
 .modal-icon-vessel i {
-    width: 36px;
-    height: 36px;
+    width: clamp(24px, 6vw, 30px);
+    height: clamp(24px, 6vw, 30px);
+}
+
+/* Danger variant — used for delete, sign-out modals */
+.modal-icon-vessel.danger {
+    background: hsla(0, 100%, 50%, 0.08);
+    border-color: hsla(0, 100%, 50%, 0.25);
+    color: #ff3b30;
+    box-shadow:
+        0 0 0 6px hsla(0, 100%, 50%, 0.06),
+        0 12px 32px -8px rgba(255, 59, 48, 0.25);
+}
+
+.modal-title-vessel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .modal-title-vessel h2 {
-    font-size: 26px;
+    font-size: clamp(20px, 4vw, 24px);
     font-weight: 900;
-    letter-spacing: -1.2px;
-    margin-bottom: 8px;
+    letter-spacing: -0.8px;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-title-vessel h2.danger {
+    color: #ff3b30;
 }
 
 .modal-title-vessel p {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    opacity: 0.8;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 0;
+    opacity: 0.75;
+}
+
+/* Thin separator between header and body / between sections */
+.modal-divider {
+    height: 1px;
+    background: var(--glass-border);
+    margin: 12px 0;
+    border-radius: 1px;
+    flex-shrink: 0;
 }
 
 .modal-body {
-    padding: 0 var(--space-xs);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+}
+
+/* Highlighted badge showing the entity being acted on */
+.modal-entity-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    margin-bottom: clamp(16px, 3vw, 22px);
+}
+
+.modal-entity-badge .entity-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--accent-soft);
+    border: 1px solid hsla(var(--h), 100%, 68%, 0.2);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    flex-shrink: 0;
+}
+
+.modal-entity-badge .entity-icon i {
+    width: 18px;
+    height: 18px;
+}
+
+.modal-entity-badge .entity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.modal-entity-badge .entity-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-entity-badge .entity-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Footer is always pinned at the bottom of the modal-content */
+.modal-footer {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: clamp(16px, 3vw, 22px);
+    width: 100%;
+    flex-shrink: 0;
 }
 
 .modal-footer .btn-primary,
 .modal-footer .user-button,
 .modal-footer .btn-danger {
     flex: 1;
-    height: var(--btn-h-lg);
-    /* Force large height for all action buttons in modals */
-    font-size: 16px;
-    border-radius: var(--radius-md);
+    height: clamp(44px, 9vw, 52px);
+    font-size: clamp(13px, 2vw, 14px);
+    border-radius: var(--radius-lg);
+    font-weight: 800;
 }
 
 .modal-footer .btn-primary {
     flex: 2;
-    /* Primary action remains slightly larger unless specified */
+}
+
+/* Compact form inputs inside modals — tighter than global to save vertical space */
+.modal-content .form-group {
+    margin-bottom: 12px;
+}
+
+.modal-content .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.modal-content .form-input {
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.modal-content .form-label {
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+/* ── Light Mode: Ensure all modal text is crisp and readable ── */
+[data-theme="light"] .modal-title-vessel h2,
+body.light-theme .modal-title-vessel h2 {
+    color: #1a1a1a;
+}
+
+[data-theme="light"] .modal-title-vessel p,
+body.light-theme .modal-title-vessel p {
+    color: #5f6368;
+    opacity: 1;
+}
+
+[data-theme="light"] .modal-entity-badge,
+body.light-theme .modal-entity-badge {
+    background: #f1f3f4;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .modal-entity-badge .entity-name,
+body.light-theme .modal-entity-badge .entity-name {
+    color: #1a1a1a;
+}
+
+[data-theme="light"] .modal-entity-badge .entity-label,
+body.light-theme .modal-entity-badge .entity-label {
+    color: #5f6368;
+}
+
+[data-theme="light"] .modal-divider,
+body.light-theme .modal-divider {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .modal-help-text,
+body.light-theme .modal-help-text {
+    color: #5f6368;
+    opacity: 1;
+}
+
+[data-theme="light"] .modal-content .form-input,
+body.light-theme .modal-content .form-input {
+    background: #f8f9fa;
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #1a1a1a;
+}
+
+[data-theme="light"] .modal-content .form-input::placeholder,
+body.light-theme .modal-content .form-input::placeholder {
+    color: #9aa0a6;
+    opacity: 1;
+}
+
+[data-theme="light"] .modal-content .form-label,
+body.light-theme .modal-content .form-label {
+    color: #5f6368;
+}
+
+[data-theme="light"] .user-button,
+body.light-theme .user-button {
+    background: #f1f3f4;
+    border-color: rgba(0, 0, 0, 0.10);
+    color: #1a1a1a;
+}
+
+/* Danger Button — used for destructive actions */
+.btn-danger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #ff3b30;
+    color: white;
+    border: none;
+    padding: 0 var(--btn-px);
+    height: var(--btn-h-md);
+    border-radius: var(--radius-full);
+    font-weight: 850;
+    font-size: 15px;
+    letter-spacing: -0.2px;
+    box-shadow: 0 8px 24px rgba(255, 59, 48, 0.25);
+    position: relative;
+    z-index: 1;
+    transition: all var(--transition-medium);
+}
+
+.btn-danger i {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(255, 59, 48, 0.4);
+    background: #e0342a;
 }
 
 .btn-icon {

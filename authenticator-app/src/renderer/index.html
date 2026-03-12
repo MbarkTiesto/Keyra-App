@@ -494,15 +494,37 @@
 
         <!-- Logout Confirm -->
         <div id="modal-logout" class="modal-overlay">
-            <div class="modal animate-fade-in" style="padding: clamp(32px, 8vw, 48px); text-align: center;">
-                <div style="margin-bottom: 24px; color: #ff3b30;">
-                    <i data-lucide="log-out" style="width: 64px; height: 64px;"></i>
-                </div>
-                <h2 style="margin-bottom: 12px; font-weight: 850; font-size: 26px; color: var(--text-primary);">End Session?</h2>
-                <div class="modal-help-text" style="font-size: 16px; margin-bottom: 40px;">Lock your secure vault and return to the login screen.</div>
-                <div style="display: flex; gap: 16px;">
-                    <button class="btn-primary" id="btn-confirm-logout" style="flex: 1; height: 56px; background: #ff3b30; box-shadow: 0 8px 24px rgba(255, 59, 48, 0.2);">Sign Out</button>
-                    <button class="user-button" id="btn-cancel-logout" style="flex: 1; justify-content: center; height: 56px;">Discard</button>
+            <div class="modal animate-fade-in">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-icon-vessel danger">
+                            <i data-lucide="log-out"></i>
+                        </div>
+                        <div class="modal-title-vessel">
+                            <h2 class="danger">End Session?</h2>
+                            <p>VAULT WILL BE LOCKED ON SIGN OUT</p>
+                        </div>
+                    </div>
+                    <div class="modal-divider"></div>
+                    <div class="modal-body">
+                        <div class="modal-entity-badge">
+                            <div class="entity-icon">
+                                <i data-lucide="shield-check"></i>
+                            </div>
+                            <div class="entity-info">
+                                <span class="entity-name">Your Keyra Vault</span>
+                                <span class="entity-label">Active Session</span>
+                            </div>
+                        </div>
+                        <p class="modal-help-text">Signing out will lock your vault and return you to the authentication screen. All unsaved changes will remain encrypted.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-danger" id="btn-confirm-logout">
+                            <i data-lucide="log-out"></i>
+                            Sign Out
+                        </button>
+                        <button class="user-button" id="btn-cancel-logout" style="justify-content: center;">Keep Session</button>
+                    </div>
                 </div>
             </div>
         </div>
