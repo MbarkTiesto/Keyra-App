@@ -923,12 +923,21 @@ input:checked + .slider:before {
 .pin-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(8, 8, 10, 0.95);
-    backdrop-filter: blur(40px) saturate(180%);
+    background: rgba(8, 8, 10, 0.9);
+    backdrop-filter: blur(20px); /* Optimized for performance */
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2000;
+    transform: translateZ(0); /* Hardware acceleration */
+}
+
+/* Hide background animations when vault is locked or auth is visible to save GPU/CPU */
+body.vault-is-locked .aura-background,
+body.vault-is-locked .main-app-content,
+#auth-vessel.show ~ .aura-background,
+#auth-vessel.show ~ .main-app-content {
+    display: none !important;
 }
 
 .pin-vessel {
@@ -954,6 +963,7 @@ input:checked + .slider:before {
     justify-content: center;
     margin: 0 auto;
     color: var(--accent-primary);
+    transform: translateZ(0);
 }
 
 .pin-lock-icon i {
@@ -966,9 +976,10 @@ input:checked + .slider:before {
     position: absolute;
     inset: -10px;
     background: var(--accent-primary);
-    filter: blur(25px);
-    opacity: 0.15;
+    filter: blur(20px);
+    opacity: 0.1;
     animation: lockBreathe 3s ease-in-out infinite;
+    will-change: transform, opacity;
 }
 
 @keyframes lockBreathe {

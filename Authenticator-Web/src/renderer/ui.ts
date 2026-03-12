@@ -1139,6 +1139,7 @@ export class UIManager {
         const vessel = document.getElementById('lock-vessel');
         if (!vessel) return;
         vessel.classList.add('show');
+        document.body.classList.add('vault-is-locked'); // Optimize performance
         this.refreshLucide(vessel);
         const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
         if (pinIn) { pinIn.value = ''; pinIn.focus(); }
@@ -1176,6 +1177,7 @@ export class UIManager {
                 
                 setTimeout(() => {
                     document.getElementById('lock-vessel')?.classList.remove('show');
+                    document.body.classList.remove('vault-is-locked'); // Restore performance
                     pinIn.value = '';
                     progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
                 }, 800);
