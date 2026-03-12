@@ -64,8 +64,9 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     z-index: 9999;
-    background: hsla(var(--h), 20%, 5%, 0.95); /* Opaque for performance and privacy */
-    /* backdrop-filter removed */
+    background: hsla(var(--h), 20%, 5%, 0.85); /* Slightly more transparent for better blur visibility */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -77,7 +78,8 @@
 .privacy-blur-overlay.hidden {
     opacity: 0;
     pointer-events: none;
-    /* backdrop-filter removed */
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
 }
 
 .privacy-blur-content {

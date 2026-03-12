@@ -55,12 +55,29 @@ export async function setupAuthUI() {
     // Login Form
     document.getElementById('form-login')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const user = (document.getElementById('login-username') as HTMLInputElement).value;
+        const user = (document.getElementById('login-username') as HTMLInputElement).value.trim();
         const pass = (document.getElementById('login-password') as HTMLInputElement).value;
         const err = document.getElementById('login-error')!;
 
         err.classList.remove('animate-shake');
         err.style.opacity = '0';
+
+        // Local Validation
+        if (user.length < 4) {
+            err.textContent = "Identity label must be at least 4 characters.";
+            err.style.opacity = '1';
+            void (err as HTMLElement).offsetWidth; 
+            err.classList.add('animate-shake');
+            return;
+        }
+        if (pass.length < 8) {
+            err.textContent = "Master key must be at least 8 characters.";
+            err.style.opacity = '1';
+            void (err as HTMLElement).offsetWidth;
+            err.classList.add('animate-shake');
+            return;
+        }
+
         try {
             const result = await window.api.login(user, pass);
             if (result.success) {
@@ -81,13 +98,30 @@ export async function setupAuthUI() {
     // Signup Form
     document.getElementById('form-signup')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const user = (document.getElementById('signup-username') as HTMLInputElement).value;
-        const email = (document.getElementById('signup-email') as HTMLInputElement).value;
+        const user = (document.getElementById('signup-username') as HTMLInputElement).value.trim();
+        const email = (document.getElementById('signup-email') as HTMLInputElement).value.trim();
         const pass = (document.getElementById('signup-password') as HTMLInputElement).value;
         const err = document.getElementById('signup-error')!;
 
         err.classList.remove('animate-shake');
         err.style.opacity = '0';
+
+        // Local Validation
+        if (user.length < 4) {
+            err.textContent = "Full name must be at least 4 characters.";
+            err.style.opacity = '1';
+            void (err as HTMLElement).offsetWidth;
+            err.classList.add('animate-shake');
+            return;
+        }
+        if (pass.length < 8) {
+            err.textContent = "Password must be at least 8 characters.";
+            err.style.opacity = '1';
+            void (err as HTMLElement).offsetWidth;
+            err.classList.add('animate-shake');
+            return;
+        }
+
         try {
             const result = await window.api.signup(user, email, pass);
             if (result.success) {
