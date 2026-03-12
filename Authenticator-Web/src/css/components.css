@@ -1110,6 +1110,65 @@ body.vault-is-locked .main-app-content,
     color: var(--text-primary);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   PRIVACY OVERLAY (WEB SCREEN GUARDIAN)
+   ───────────────────────────────────────────────────────────────────────────── */
+.privacy-overlay {
+    background: hsla(230, 15%, 5%, 0.8) !important;
+    backdrop-filter: blur(80px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(80px) saturate(200%) !important;
+    z-index: 9999 !important; /* Above everything */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.privacy-overlay.hidden {
+    display: none !important;
+}
+
+.privacy-content {
+    text-align: center;
+    max-width: 400px;
+    padding: var(--space-xl);
+}
+
+.privacy-shield-icon {
+    width: 120px;
+    height: 120px;
+    background: var(--accent-soft);
+    border: 3px solid var(--accent-primary);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-xl);
+    color: var(--accent-primary);
+    box-shadow: 0 0 50px var(--accent-soft);
+}
+
+.privacy-shield-icon i {
+    width: 60px;
+    height: 60px;
+}
+
+.privacy-overlay h2 {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+}
+
+.privacy-overlay p {
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
 .auth-modal p {
     font-size: 15px;
     font-weight: 600;

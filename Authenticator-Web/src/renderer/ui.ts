@@ -160,8 +160,6 @@ export class UIManager {
         const toggle = document.getElementById('screen-guardian-toggle') as HTMLInputElement;
         if (toggle) {
             toggle.checked = this.screenGuardian;
-            // Content protection is an Electron-only feature
-            // (window as any).api.setContentProtection(this.screenGuardian);
         }
     }
 
@@ -377,8 +375,13 @@ export class UIManager {
             this.screenGuardian = target.checked;
             localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
             this.pushSettings();
-            // (window as any).api.setContentprotection(this.screenGuardian);
-            this.showToast(this.screenGuardian ? "Screen Guardian Active" : "Screen Guardian Disabled", "info");
+            
+            // Immediate feedback: if we just disabled it and it's blurred, hide it
+            if (!this.screenGuardian) {
+                document.getElementById('privacy-blur-overlay')?.classList.add('hidden');
+            }
+            
+            this.showToast(this.screenGuardian ? "Privacy Shield Active" : "Privacy Shield Disabled", "info");
         });
 
         // Wallpaper Presets
