@@ -38,52 +38,62 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 12px;
+    padding: 6px 14px;
     background: var(--glass-bg);
     border: 1.5px solid var(--glass-border);
     border-radius: var(--radius-full);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--text-secondary);
     transition: all var(--transition-medium);
     margin-right: 12px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .connectivity-indicator.online {
-    color: #28a745;
-    border-color: rgba(40, 167, 69, 0.2);
+    color: #34c759;
+    border-color: rgba(52, 199, 89, 0.25);
+    background: rgba(52, 199, 89, 0.05);
+    filter: drop-shadow(0 0 4px rgba(52, 199, 89, 0.3));
+    animation: breathingOnline 4s ease-in-out infinite;
 }
 
 .connectivity-indicator.offline {
     color: #ff3b30;
-    border-color: rgba(255, 59, 48, 0.2);
+    border-color: rgba(255, 59, 48, 0.25);
+    background: rgba(255, 59, 48, 0.05);
+    filter: drop-shadow(0 0 4px rgba(255, 59, 48, 0.3));
+    animation: breathingOffline 4s ease-in-out infinite;
 }
 
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: currentColor;
-    position: relative;
+.connectivity-indicator i {
+    font-size: 14px;
+    stroke-width: 2.5px;
 }
 
-.online .status-dot::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    background: inherit;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: statusPulse 2s infinite;
-    opacity: 0.5;
+/* Breathing Glow Animations */
+@keyframes breathingOnline {
+    0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0px rgba(52, 199, 89, 0); }
+    50% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 12px rgba(52, 199, 89, 0.4); }
 }
 
-@keyframes statusPulse {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+@keyframes breathingOffline {
+    0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0px rgba(255, 59, 48, 0); }
+    50% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 0 12px rgba(255, 59, 48, 0.4); }
+}
+
+/* Responsive: Hide text on narrow screens */
+@media (max-width: 600px) {
+    .connectivity-indicator #status-text {
+        display: none;
+    }
+    .connectivity-indicator {
+        padding: 8px;
+        margin-right: 8px;
+    }
 }
 
 i[data-lucide] {

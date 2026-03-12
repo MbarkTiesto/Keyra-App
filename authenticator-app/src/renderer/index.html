@@ -161,12 +161,6 @@
                         </div>
                         <span class="brand-text">Keyra</span>
                     </div>
-                    
-                    <!-- Connectivity Indicator -->
-                    <div id="connectivity-status" class="connectivity-indicator online">
-                        <div class="status-dot"></div>
-                        <span id="status-text">Online</span>
-                    </div>
                 </div>
                 
                 <div class="navbar-section navbar-center">
@@ -183,6 +177,12 @@
                 </div>
                 
                 <div class="navbar-section navbar-right">
+                    <!-- Modern Connectivity Indicator (Glass Pill) -->
+                    <div id="connectivity-status" class="connectivity-indicator online">
+                        <i data-lucide="wifi" id="connectivity-icon"></i>
+                        <span id="status-text">Online</span>
+                    </div>
+
                     <div class="user-menu">
                         <button class="user-button" id="user-dropdown-btn">
                             <div class="user-avatar" id="user-avatar">?</div>
