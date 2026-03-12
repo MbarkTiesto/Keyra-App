@@ -608,10 +608,11 @@
         <!-- Notification Feed -->
         <div id="toast-container" style="position: fixed; bottom: clamp(20px, 8vw, 40px); left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 12px; align-items: center; width: 100%; pointer-events: none;"></div>
         
-        <!-- Cloud Sync Floating Pill -->
-        <div id="cloud-sync-indicator" class="cloud-sync-indicator hidden" title="Cloud Sync Active">
-            <i data-lucide="cloud-cog" class="sync-icon"></i>
-            <span>Syncing...</span>
+        <!-- Premium Syncing Indicator (Floating Pill) -->
+        <div id="cloud-sync-indicator" class="cloud-sync-pill hidden">
+            <div class="sync-glow"></div>
+            <i data-lucide="refresh-cw" class="sync-icon"></i>
+            <span>Vault Syncing</span>
         </div>
     </div>
 
