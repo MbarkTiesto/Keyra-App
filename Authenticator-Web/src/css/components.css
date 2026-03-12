@@ -732,6 +732,10 @@ input:checked + .slider:before {
     to { transform: rotate(360deg); }
 }
 
+.sync-spin {
+    animation: rotate 1s linear infinite !important;
+}
+
 .cloud-sync-indicator.hidden {
     display: none;
 }

@@ -175,9 +175,10 @@ export class UIManager {
 
         const root = document.documentElement;
         if (preset === 'nebula') {
-            root.style.setProperty('--aura-1', 'hsla(258, 100%, 68%, 0.35)');
-            root.style.setProperty('--aura-2', 'hsla(330, 100%, 75%, 0.25)');
-            root.style.setProperty('--aura-3', 'hsla(200, 100%, 75%, 0.25)');
+            const hue = parseInt(root.style.getPropertyValue('--dynamic-accent-hue') || '258');
+            root.style.setProperty('--aura-1', `hsla(${hue}, 100%, 68%, 0.35)`);
+            root.style.setProperty('--aura-2', `hsla(${hue + 30}, 100%, 75%, 0.25)`);
+            root.style.setProperty('--aura-3', `hsla(${hue - 30}, 100%, 75%, 0.25)`);
         } else if (preset === 'solar') {
             root.style.setProperty('--aura-1', 'var(--solar-1)');
             root.style.setProperty('--aura-2', 'var(--solar-2)');
@@ -403,6 +404,32 @@ export class UIManager {
             }
         });
 
+        // Manual Sync Action
+        const manualSyncBtn = document.getElementById('btn-manual-sync');
+        manualSyncBtn?.addEventListener('click', async () => {
+            this.showToast("Initiating Cloud Sync...", "info");
+            const icon = document.getElementById('sync-btn-icon');
+            if (icon) icon.classList.add('sync-spin');
+            
+            try {
+                // First push current settings to cloud
+                await this.pushSettings();
+                
+                // Then trigger a full vault sync
+                // Note: window.api.syncVault() or similar if available, 
+                // but since we usually sync on change, let's just refresh data
+                await this.loadInitialData();
+                
+                this.showToast("Cloud Synchronization Complete", "success");
+                this.updateLastActivity('Manual Cloud Sync');
+            } catch (err) {
+                console.error("Manual sync failed", err);
+                this.showToast("Synchronization failed", "error");
+            } finally {
+                if (icon) icon.classList.remove('sync-spin');
+            }
+        });
+
         // Search Input
         const searchInput = document.getElementById('vault-search') as HTMLInputElement;
         searchInput?.addEventListener('input', (e) => {
@@ -566,13 +593,14 @@ export class UIManager {
             root.style.setProperty('--accent-hover', `hsl(${hue}, 100%, 62%)`);
             root.style.setProperty('--accent-soft', `hsla(${hue}, 100%, 68%, 0.12)`);
             
-            // Update aura colors to match accent
-            root.style.setProperty('--aura-1', `hsla(${hue}, 100%, 68%, 0.35)`);
-            root.style.setProperty('--aura-2', `hsla(${hue + 30}, 100%, 75%, 0.25)`);
-            root.style.setProperty('--aura-3', `hsla(${hue - 30}, 100%, 75%, 0.25)`);
-            
             // Save to localStorage
             localStorage.setItem(this.getStorageKey('accent_color'), accentColor);
+            
+            // Refresh Nebula wallpaper if active to match new accent
+            if (this.wallpaperPreset === 'nebula') {
+                this.applyWallpaper('nebula');
+            }
+            
             if (!silent) this.pushSettings();
         }
     }

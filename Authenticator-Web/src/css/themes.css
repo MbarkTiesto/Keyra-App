@@ -91,10 +91,6 @@
     --text-secondary: hsl(var(--h), 15%, 72%);
     --text-tertiary: hsl(var(--h), 10%, 48%);
     
-    --aura-1: hsla(var(--h), var(--s), 68%, 0.2);
-    --aura-2: hsla(330, 100%, 75%, 0.1);
-    --aura-3: hsla(200, 100%, 75%, 0.1);
-    
     --border-color: hsla(0, 0%, 100%, 0.12);
     --glass-bg: hsla(var(--h), 25%, 6%, 0.92);
     --glass-border: hsla(0, 0%, 100%, 0.15);
@@ -189,11 +185,6 @@ body.dark-theme {
     --glass-bg: rgba(10, 10, 10, 0.98); 
     --glass-border: rgba(255, 255, 255, 0.15);
     
-    /* Enhanced Aura Effects for OLED */
-    --aura-1: hsla(var(--dynamic-accent-hue, 258), 100%, 70%, 0.40);
-    --aura-2: hsla(calc(var(--dynamic-accent-hue, 258) + 30), 100%, 75%, 0.30);
-    --aura-3: hsla(calc(var(--dynamic-accent-hue, 258) - 30), 100%, 75%, 0.30);
-    
     /* Enhanced Shadows for OLED */
     --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.8);
     --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.9);
@@ -226,11 +217,6 @@ body.light-theme {
     /* Enhanced Glass Effects */
     --glass-bg: rgba(255, 255, 255, 0.95);
     --glass-border: rgba(0, 0, 0, 0.12);
-    
-    /* Refined Aura Effects */
-    --aura-1: hsla(var(--dynamic-accent-hue, 258), 85%, 58%, 0.25);
-    --aura-2: hsla(calc(var(--dynamic-accent-hue, 258) + 30), 85%, 65%, 0.20);
-    --aura-3: hsla(calc(var(--dynamic-accent-hue, 258) - 30), 85%, 65%, 0.20);
     
     /* Enhanced Shadows for Light Mode */
     --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.1);
