@@ -188,46 +188,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Search input container */
-.search-vessel {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.search-icon {
-    position: absolute;
-    left: 14px;
-    width: 16px;
-    height: 16px;
-    color: var(--text-tertiary);
-    pointer-events: none;
-    flex-shrink: 0;
-}
-
-.search-input {
-    width: clamp(160px, 20vw, 240px);
-    height: 42px;
-    padding: 0 16px 0 40px;
-    font-size: 14px;
-    border-radius: var(--radius-full);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    transition: all 0.2s ease;
-}
-
-.search-input:focus {
-    width: clamp(200px, 28vw, 300px);
-    border-color: var(--accent-primary);
-    background: var(--bg-primary);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.search-input::placeholder {
-    color: var(--text-tertiary);
-    font-size: 13px;
-}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    MODALS SYSTEM
@@ -448,12 +408,6 @@ body.light-theme .modal {
     }
 
     /* Hide title on small screens to prioritize tools */
-    .search-vessel {
-        flex: 1;
-        min-width: 0;
-        max-width: none;
-    }
-
     .btn-primary#add-account-btn {
         width: var(--btn-h-lg);
         height: var(--btn-h-lg);
