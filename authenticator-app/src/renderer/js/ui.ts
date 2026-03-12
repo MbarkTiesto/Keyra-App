@@ -9,9 +9,6 @@ export class UIManager {
     private screenGuardian: boolean = false;
     private oledMode: boolean = false;
     private wallpaperPreset: string = 'nebula';
-    private isMovingAura: boolean = false;
-    private auraX: number = 0;
-    private auraY: number = 0;
     private searchQuery: string = '';
     private syncCount: number = 0;
     private liveSyncInterval: any = null;
@@ -20,7 +17,6 @@ export class UIManager {
         this.initTheme();
         this.initPrivacyMode();
         this.initScreenGuardian();
-        this.initWallpaper();
         this.initSegmentedStates();
         this.setupEventListeners();
         this.updateLockVaultVisibility();
@@ -109,7 +105,6 @@ export class UIManager {
 
         if (settings.theme) this.setTheme(settings.theme, true);
         if (settings.accentColor) this.setAccentColor(settings.accentColor, true);
-        if (settings.wallpaperPreset) this.applyWallpaper(settings.wallpaperPreset, true);
 
         this.privacyMode = !!settings.privacyMode;
         const privacyToggle = document.getElementById('privacy-mode-toggle') as HTMLInputElement;
@@ -210,11 +205,9 @@ export class UIManager {
             root.style.setProperty('--aura-2', `hsla(${hue + 30}, 100%, 75%, 0.22)`);
             root.style.setProperty('--aura-3', `hsla(${hue - 30}, 100%, 75%, 0.18)`);
 
-            // If using nebula wallpaper (accent-following), sync background hues too
-            if (this.wallpaperPreset === 'nebula' || !this.wallpaperPreset) {
-                root.style.setProperty('--bg-hue-a', hue.toString());
-                root.style.setProperty('--bg-hue-b', (hue + 30).toString());
-            }
+            // Always sync background hues to accent color now that wallpaper system is gone
+            root.style.setProperty('--bg-hue-a', hue.toString());
+            root.style.setProperty('--bg-hue-b', (hue + 30).toString());
 
             localStorage.setItem(this.getStorageKey('accent_color'), accentColor);
 
@@ -238,69 +231,6 @@ export class UIManager {
         const toggle = document.getElementById('screen-guardian-toggle') as HTMLInputElement;
         if (toggle) toggle.checked = this.screenGuardian;
         (window as any).api.setContentProtection(this.screenGuardian);
-    }
-
-    private initWallpaper() {
-        this.wallpaperPreset = localStorage.getItem(this.getStorageKey('wallpaperPreset')) || 'nebula';
-        this.applyWallpaper(this.wallpaperPreset, true);
-        document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-    }
-
-    private applyWallpaper(preset: string, silent: boolean = false) {
-        this.wallpaperPreset = preset;
-        localStorage.setItem(this.getStorageKey('wallpaperPreset'), preset);
-
-        document.querySelectorAll('.wallpaper-card').forEach(card => {
-            card.classList.toggle('active', card.getAttribute('data-preset') === preset);
-        });
-
-        const root = document.documentElement;
-
-        // Preset definitions: [hueA, hueB, lightness%, aura opacities]
-        const presetConfig: Record<string, { hA: number; hB: number; aura: [number, number, number] }> = {
-            nebula:  { hA: -1,  hB: -1,  aura: [0.38, 0.22, 0.18] }, // uses accent hue
-            solar:   { hA: 15,  hB: 45,  aura: [0.40, 0.24, 0.18] },
-            emerald: { hA: 145, hB: 180, aura: [0.36, 0.22, 0.16] },
-            space:   { hA: 220, hB: 280, aura: [0.34, 0.20, 0.16] },
-        };
-
-        const cfg = presetConfig[preset] || presetConfig.nebula;
-        const accentHue = parseInt(root.style.getPropertyValue('--dynamic-accent-hue') || '258');
-        const hA = cfg.hA < 0 ? accentHue : cfg.hA;
-        const hB = cfg.hB < 0 ? accentHue + 30 : cfg.hB;
-
-        // Update background gradient vars used in CSS body.dark-theme
-        root.style.setProperty('--bg-hue-a', hA.toString());
-        root.style.setProperty('--bg-hue-b', hB.toString());
-
-        // Update aura blobs
-        root.style.setProperty('--aura-1', `hsla(${hA}, 100%, 68%, ${cfg.aura[0]})`);
-        root.style.setProperty('--aura-2', `hsla(${hB}, 100%, 75%, ${cfg.aura[1]})`);
-        root.style.setProperty('--aura-3', `hsla(${(hA + hB) / 2}, 100%, 72%, ${cfg.aura[2]})`);
-
-        // For non-nebula presets, also update --h so sidebar tints match
-        if (cfg.hA >= 0) root.style.setProperty('--h', hA.toString());
-
-        if (!silent) this.pushSettings();
-    }
-
-    private handleMouseMove(e: MouseEvent) {
-        this.auraX = (e.clientX / window.innerWidth - 0.5) * 40;
-        this.auraY = (e.clientY / window.innerHeight - 0.5) * 40;
-
-        if (!this.isMovingAura) {
-            this.isMovingAura = true;
-            requestAnimationFrame(() => this.updateAuraBlobs());
-        }
-    }
-
-    private updateAuraBlobs() {
-        const blobs = document.querySelectorAll('.aura-blob');
-        blobs.forEach((blob, idx) => {
-            const factor = (idx + 1) * 0.5;
-            (blob as HTMLElement).style.transform = `translate(${this.auraX * factor}px, ${this.auraY * factor}px)`;
-        });
-        this.isMovingAura = false;
     }
 
     private initSegmentedStates() {
@@ -441,18 +371,8 @@ export class UIManager {
             this.updateLastActivity(`Screen Guardian ${this.screenGuardian ? 'Enabled' : 'Disabled'}`);
         });
 
-        // Wallpaper Presets
-        document.querySelectorAll('.wallpaper-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                const target = e.currentTarget as HTMLElement;
-                const preset = target.getAttribute('data-preset')!;
-                this.applyWallpaper(preset);
-                this.showToast(`Wallpaper Switched: ${preset.charAt(0).toUpperCase() + preset.slice(1)}`, "info");
-                this.updateLastActivity(`Changed wallpaper to ${preset}`);
-            });
-        });
-
-        // Cloud Sync Controls
+        // Accent Color
+        this.setupAccentColorSelector();
         document.getElementById('btn-sync-now')?.addEventListener('click', () => this.manualSync());
 
         // Vault Maintenance
