@@ -22,6 +22,22 @@
     --accent-emerald-green: 145; /* Emerald Green */
     --accent-solar-orange: 15; /* Solar Orange */
     
+    /* New Modern & Cute Accent Colors */
+    --accent-rose-quartz: 330; /* Soft Rose Pink */
+    --accent-peach-blossom: 20; /* Warm Peach */
+    --accent-lavender-dream: 270; /* Dreamy Lavender */
+    --accent-mint-fresh: 160; /* Fresh Mint Green */
+    --accent-sky-blue: 190; /* Soft Sky Blue */
+    --accent-coral-sunset: 10; /* Coral Sunset */
+    --accent-amethyst-glow: 280; /* Deep Amethyst */
+    --accent-lemon-zest: 45; /* Bright Lemon */
+    --accent-ocean-teal: 175; /* Ocean Teal */
+    --accent-bubblegum: 320; /* Playful Bubblegum */
+    --accent-sage-serene: 150; /* Calming Sage */
+    --accent-golden-hour: 35; /* Golden Hour */
+    --accent-orchid-mystic: 300; /* Mystic Orchid */
+    --accent-turquoise-dream: 180; /* Dreamy Turquoise */
+    
     /* Dynamic Accent Colors (will be set by JavaScript) */
     --dynamic-accent-hue: var(--accent-royal-purple);
     --dynamic-accent-primary: hsl(var(--dynamic-accent-hue), 100%, 68%);
