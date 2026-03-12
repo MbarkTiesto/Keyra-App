@@ -152,29 +152,81 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: clamp(var(--space-lg), 8vw, var(--space-2xl));
+    margin-bottom: clamp(var(--space-lg), 6vw, var(--space-xl));
     gap: var(--space-md);
     flex-wrap: nowrap;
-    /* Force single row for precision alignment */
 }
 
 .header-main {
     flex: 1;
-    min-width: 200px;
+    min-width: 0;
 }
 
 .section-title {
-    font-size: clamp(28px, 5vw, 42px);
-    font-weight: 850;
-    letter-spacing: -1.8px;
+    font-size: clamp(24px, 4vw, 36px);
+    font-weight: 900;
+    letter-spacing: -1.5px;
     line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 4px;
 }
 
 .section-subtitle {
-    color: var(--text-secondary);
-    font-size: clamp(14px, 1.6vw, 16px);
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-tertiary);
     opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Search + Add group in vault header */
+.search-add-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+}
+
+/* Search input container */
+.search-vessel {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-tertiary);
+    pointer-events: none;
+    flex-shrink: 0;
+}
+
+.search-input {
+    width: clamp(160px, 20vw, 240px);
+    height: 42px;
+    padding: 0 16px 0 40px;
+    font-size: 14px;
+    border-radius: var(--radius-full);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    width: clamp(200px, 28vw, 300px);
+    border-color: var(--accent-primary);
+    background: var(--bg-primary);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.search-input::placeholder {
+    color: var(--text-tertiary);
+    font-size: 13px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

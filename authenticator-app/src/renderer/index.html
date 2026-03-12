@@ -168,6 +168,10 @@
                         </button>
                         
                         <div class="dropdown-menu" id="user-dropdown">
+                            <div class="dropdown-header">
+                                <div class="dropdown-user-name" id="dropdown-user-name">User</div>
+                                <div class="dropdown-user-email" id="dropdown-user-email">Secure Session</div>
+                            </div>
                             <div class="dropdown-item" id="lock-vault-btn">
                                 <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
                                 <span>Lock Vault</span>
@@ -176,10 +180,10 @@
                                 <i id="theme-icon-lucide" data-lucide="moon" style="width: 18px; height: 18px;"></i>
                                 <span id="theme-text">Dark Mode</span>
                             </div>
-                            <div style="height: 1px; background: var(--glass-border); margin: 8px 12px;"></div>
-                            <div class="dropdown-item" id="btn-logout-trigger">
-                                <i data-lucide="log-out" style="width: 18px; height: 18px; color: #ff3b30;"></i>
-                                <span style="color: #ff3b30; font-weight: 600;">Sign Out</span>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item danger" id="btn-logout-trigger">
+                                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+                                <span>Sign Out</span>
                             </div>
                         </div>
                     </div>
@@ -196,16 +200,16 @@
                         <h1 class="section-title">Security Vault</h1>
                         <p class="section-subtitle">PROTECTING YOUR SECURE IDENTITIES</p>
                     </div>
-                    
-                    <div class="search-vessel">
-                        <i data-lucide="search" class="search-icon"></i>
-                        <input type="text" id="vault-search" class="form-input search-input" placeholder="Search identities...">
+                    <div class="search-add-group">
+                        <div class="search-vessel">
+                            <i data-lucide="search" class="search-icon"></i>
+                            <input type="text" id="vault-search" class="search-input" placeholder="Search identities...">
+                        </div>
+                        <button class="btn-primary" id="add-account-btn" style="height: 42px; border-radius: var(--radius-full); padding: 0 20px; font-size: 14px;">
+                            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                            <span>Add Token</span>
+                        </button>
                     </div>
-
-                    <button class="btn-primary" id="add-account-btn">
-                        <i data-lucide="plus"></i>
-                        <span>Initialize Token</span>
-                    </button>
                 </div>
                 
                 <div class="accounts-grid" id="accounts-grid">
@@ -229,14 +233,154 @@
             <!-- Settings View -->
             <section id="settings-view" class="view-section hidden">
                 <div class="section-header" style="margin-bottom: var(--space-xl);">
-                    <div>
+                    <div class="header-main">
                         <h1 class="section-title">Configurations</h1>
-                        <p class="section-subtitle">VAULT CORE & INTERFACE PREFERENCES</p>
+                        <p class="section-subtitle">VAULT CORE &amp; INTERFACE PREFERENCES</p>
                     </div>
                 </div>
-                
+
                 <div class="settings-grid">
-                <!-- Data Synchronization Hub (New Feature) -->
+
+                <!-- 1. Security Enclave Card — Most Critical First -->
+                <div class="account-card bento-card">
+                    <div class="bento-header">
+                        <div class="bento-icon" style="background: var(--accent-soft); border-color: var(--accent-primary);">
+                            <i data-lucide="shield-check" style="color: var(--accent-primary);"></i>
+                        </div>
+                        <div class="bento-title-vessel">
+                            <h3 class="bento-title">Security Enclave</h3>
+                            <div class="bento-subtitle">Access &amp; Privacy Controls</div>
+                        </div>
+                    </div>
+                    <div class="bento-content">
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Access PIN</div>
+                                <div class="setting-desc">Multi-factor verification core</div>
+                            </div>
+                            <button class="user-button" id="setup-pin-btn" style="min-width: 100px; justify-content: center;">Setup PIN</button>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Auto-Lock Vault</div>
+                                <div class="setting-desc">Timeout after inactivity</div>
+                            </div>
+                            <div class="segmented-control" id="autolock-segmented">
+                                <button class="segment" data-val="0">Off</button>
+                                <button class="segment" data-val="1">1m</button>
+                                <button class="segment" data-val="5">5m</button>
+                                <button class="segment" data-val="15">15m</button>
+                                <div class="segment-indicator"></div>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Privacy Mode</div>
+                                <div class="setting-desc">Mask OTP codes until requested</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="privacy-mode-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Screen Guardian</div>
+                                <div class="setting-desc">Prevent screenshots &amp; recordings</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="screen-guardian-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Visual Interface Card -->
+                <div class="account-card bento-card">
+                    <div class="bento-header">
+                        <div class="bento-icon" style="background: hsla(280, 100%, 75%, 0.1); border-color: hsla(280, 100%, 75%, 0.3);">
+                            <i data-lucide="palette" style="color: hsl(280, 100%, 75%);"></i>
+                        </div>
+                        <div class="bento-title-vessel">
+                            <h3 class="bento-title">Visual Interface</h3>
+                            <div class="bento-subtitle">Theme &amp; Aura Layout</div>
+                        </div>
+                    </div>
+                    <div class="bento-content">
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Interface Mode</div>
+                                <div class="setting-desc">Light or dark luminosity</div>
+                            </div>
+                            <div class="segmented-control" id="theme-segmented">
+                                <button class="segment" data-val="light">Light</button>
+                                <button class="segment" data-val="dark">Dark</button>
+                                <div class="segment-indicator"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Accent Color</div>
+                                <div class="setting-desc">Choose your interface hue</div>
+                            </div>
+                            <div class="accent-color-selector">
+                                <button class="accent-color-option active" data-accent="royal-purple" style="background: hsl(258, 100%, 68%);" title="Royal Purple">
+                                    <span class="accent-check">✓</span>
+                                </button>
+                                <button class="accent-color-option" data-accent="electric-blue" style="background: hsl(200, 100%, 68%);" title="Electric Blue">
+                                    <span class="accent-check">✓</span>
+                                </button>
+                                <button class="accent-color-option" data-accent="emerald-green" style="background: hsl(145, 100%, 68%);" title="Emerald Green">
+                                    <span class="accent-check">✓</span>
+                                </button>
+                                <button class="accent-color-option" data-accent="solar-orange" style="background: hsl(15, 100%, 68%);" title="Solar Orange">
+                                    <span class="accent-check">✓</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="setting-row" id="oled-mode-row">
+                            <div class="setting-info">
+                                <div class="setting-name">OLED Optimization</div>
+                                <div class="setting-desc">Pure black for power savings</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="oled-mode-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div style="margin-top: var(--space-md);">
+                            <div class="setting-name" style="margin-bottom: 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); font-weight: 800;">Wallpaper Library</div>
+                            <div class="wallpaper-grid">
+                                <button class="wallpaper-card active" data-preset="nebula">
+                                    <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(258, 60%, 50%), hsl(330, 60%, 50%));"></div>
+                                    <div class="wallpaper-name">Nebula</div>
+                                    <div class="wallpaper-desc">Core Aura</div>
+                                </button>
+                                <button class="wallpaper-card" data-preset="solar">
+                                    <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(15, 60%, 50%), hsl(45, 60%, 50%));"></div>
+                                    <div class="wallpaper-name">Solar Storm</div>
+                                    <div class="wallpaper-desc">Ember Glow</div>
+                                </button>
+                                <button class="wallpaper-card" data-preset="emerald">
+                                    <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(145, 60%, 40%), hsl(180, 60%, 40%));"></div>
+                                    <div class="wallpaper-name">Emerald Glade</div>
+                                    <div class="wallpaper-desc">Forest Mist</div>
+                                </button>
+                                <button class="wallpaper-card" data-preset="space">
+                                    <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(220, 60%, 30%), hsl(280, 60%, 30%));"></div>
+                                    <div class="wallpaper-name">Deep Space</div>
+                                    <div class="wallpaper-desc">Void Light</div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Cloud Synchronization Card -->
                 <div class="account-card bento-card">
                     <div class="bento-header">
                         <div class="bento-icon" style="background: var(--accent-soft); border-color: var(--accent-primary);">
@@ -244,7 +388,7 @@
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Cloud Synchronization</h3>
-                            <div class="bento-subtitle">GitHub-Native Real-time Sync</div>
+                            <div class="bento-subtitle">GitHub-Native Real-Time Sync</div>
                         </div>
                     </div>
                     <div class="bento-content">
@@ -268,14 +412,14 @@
                                 ACTIVE
                             </div>
                         </div>
-                        <button class="btn-primary" id="btn-sync-now" style="margin-top: 12px; height: 48px;">
+                        <button class="btn-primary" id="btn-sync-now" style="margin-top: 12px; height: 44px;">
                             <i data-lucide="refresh-cw"></i>
-                            <span>Initialize Force Sync</span>
+                            <span>Force Sync</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Vault Maintenance Card -->
+                <!-- 4. Vault Maintenance Card -->
                 <div class="account-card bento-card">
                     <div class="bento-header">
                         <div class="bento-icon" style="background: var(--accent-soft); border-color: var(--accent-primary);">
@@ -283,10 +427,9 @@
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Vault Maintenance</h3>
-                            <div class="bento-subtitle">Backup & Recovery Hub</div>
+                            <div class="bento-subtitle">Backup &amp; Recovery Hub</div>
                         </div>
                     </div>
-
                     <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
                         <button class="btn-primary btn-maintenance" id="btn-export-vault">
                             <i data-lucide="download"></i>
@@ -297,192 +440,54 @@
                             <span>Restore from Backup</span>
                         </button>
                     </div>
-                    <div style="margin-top: 16px; font-size: 11.5px; opacity: 0.6; font-weight: 600; line-height: 1.5;">
+                    <div style="margin-top: 12px; font-size: 11.5px; opacity: 0.6; font-weight: 600; line-height: 1.5;">
                         <i data-lucide="alert-circle" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 4px;"></i>
                         Backups are encrypted using your master password.
                     </div>
                 </div>
 
-                <!-- Security Enclave Card -->
-                    <div class="account-card bento-card">
-                        <div class="bento-header">
-                            <div class="bento-icon" style="background: var(--accent-soft); border-color: var(--accent-primary);">
-                                <i data-lucide="shield-check" style="color: var(--accent-primary);"></i>
+                <!-- 5. About & Support Card — Least Critical Last -->
+                <div class="account-card bento-card">
+                    <div class="bento-header">
+                        <div class="bento-icon" style="background: hsla(145, 100%, 45%, 0.1); border-color: hsla(145, 100%, 45%, 0.3);">
+                            <i data-lucide="info" style="color: #28a745;"></i>
+                        </div>
+                        <div class="bento-title-vessel">
+                            <h3 class="bento-title">About Keyra</h3>
+                            <div class="bento-subtitle">Version &amp; System Health</div>
+                        </div>
+                    </div>
+                    <div class="bento-content">
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">System Version</div>
+                                <div class="setting-desc">Stable v1.0.0-PRO</div>
                             </div>
-                            <div class="bento-title-vessel">
-                                <h3 class="bento-title">Security Enclave</h3>
-                                <div class="bento-subtitle">Access & Privacy Controls</div>
+                            <div class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">LATEST</div>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Last Activity</div>
+                                <div class="setting-desc" id="last-action-display">No activity</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 13px; font-weight: 700;">
+                                <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
+                                <span id="last-activity-display">Never</span>
                             </div>
                         </div>
-                        <div class="bento-content">
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">Privacy Mode</div>
-                                    <div class="setting-desc">Mask OTP codes until requested</div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" id="privacy-mode-toggle">
-                                    <span class="slider round"></span>
-                                </label>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Vault Analytics</div>
+                                <div class="setting-desc">Security state</div>
                             </div>
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">Auto-Lock Vault</div>
-                                    <div class="setting-desc">Timeout after inactivity</div>
-                                </div>
-                                <div class="segmented-control" id="autolock-segmented">
-                                    <button class="segment" data-val="0">Off</button>
-                                    <button class="segment" data-val="1">1m</button>
-                                    <button class="segment" data-val="5">5m</button>
-                                    <button class="segment" data-val="15">15m</button>
-                                    <div class="segment-indicator"></div>
-                                </div>
-                            </div>
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">Access PIN</div>
-                                    <div class="setting-desc">Multi-factor verification core</div>
-                                </div>
-                                <button class="user-button" id="setup-pin-btn" style="min-width: 100px; justify-content: center;">Setup PIN</button>
-                            </div>
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">Screen Guardian</div>
-                                    <div class="setting-desc">Prevent screenshots & recordings</div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" id="screen-guardian-toggle">
-                                    <span class="slider round"></span>
-                                </label>
+                            <div style="display: flex; align-items: center; gap: 6px; color: #28a745; font-size: 13px; font-weight: 800;">
+                                <i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i>
+                                OPERATIONAL
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Visual Interface Card -->
-                    <div class="account-card bento-card">
-                        <div class="bento-header">
-                            <div class="bento-icon" style="background: hsla(280, 100%, 75%, 0.1); border-color: hsla(280, 100%, 75%, 0.3);">
-                                <i data-lucide="palette" style="color: hsl(280, 100%, 75%);"></i>
-                            </div>
-                            <div class="bento-title-vessel">
-                                <h3 class="bento-title">Visual Interface</h3>
-                                <div class="bento-subtitle">Theme & Aura Layout</div>
-                            </div>
-                        </div>
-                        <div class="bento-content">
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">Accent Color</div>
-                                    <div class="setting-desc">Choose your interface theme</div>
-                                </div>
-                                <div class="accent-color-selector">
-                                    <button class="accent-color-option active" data-accent="royal-purple" style="background: hsl(258, 100%, 68%);" title="Royal Purple">
-                                        <span class="accent-check">✓</span>
-                                    </button>
-                                    <button class="accent-color-option" data-accent="electric-blue" style="background: hsl(200, 100%, 68%);" title="Electric Blue">
-                                        <span class="accent-check">✓</span>
-                                    </button>
-                                    <button class="accent-color-option" data-accent="emerald-green" style="background: hsl(145, 100%, 68%);" title="Emerald Green">
-                                        <span class="accent-check">✓</span>
-                                    </button>
-                                    <button class="accent-color-option" data-accent="solar-orange" style="background: hsl(15, 100%, 68%);" title="Solar Orange">
-                                        <span class="accent-check">✓</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">Interface Mode</div>
-                                    <div class="setting-desc">Universal Aura luminosity</div>
-                                </div>
-                                <div class="segmented-control" id="theme-segmented">
-                                    <button class="segment" data-val="light">Light</button>
-                                    <button class="segment" data-val="dark">Dark</button>
-                                    <div class="segment-indicator"></div>
-                                </div>
-                            </div>
-
-                            <div class="setting-row" id="oled-mode-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">OLED Optimization</div>
-                                    <div class="setting-desc">Pure black for power savings</div>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" id="oled-mode-toggle">
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-
-                            <div style="margin-top: var(--space-lg);">
-                                <div class="setting-name" style="margin-bottom: 12px;">Wallpaper Library</div>
-                                <div class="wallpaper-grid">
-                                    <button class="wallpaper-card active" data-preset="nebula">
-                                        <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(258, 60%, 50%), hsl(330, 60%, 50%));"></div>
-                                        <div class="wallpaper-name">Nebula</div>
-                                        <div class="wallpaper-desc">Core Aura</div>
-                                    </button>
-                                    <button class="wallpaper-card" data-preset="solar">
-                                        <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(15, 60%, 50%), hsl(45, 60%, 50%));"></div>
-                                        <div class="wallpaper-name">Solar Storm</div>
-                                        <div class="wallpaper-desc">Ember Glow</div>
-                                    </button>
-                                    <button class="wallpaper-card" data-preset="emerald">
-                                        <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(145, 60%, 40%), hsl(180, 60%, 40%));"></div>
-                                        <div class="wallpaper-name">Emerald Glade</div>
-                                        <div class="wallpaper-desc">Forest Mist</div>
-                                    </button>
-                                    <button class="wallpaper-card" data-preset="space">
-                                        <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(220, 60%, 30%), hsl(280, 60%, 30%));"></div>
-                                        <div class="wallpaper-name">Deep Space</div>
-                                        <div class="wallpaper-desc">Void Light</div>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- About & Support Card -->
-                    <div class="account-card bento-card">
-                        <div class="bento-header">
-                            <div class="bento-icon" style="background: hsla(145, 100%, 45%, 0.1); border-color: hsla(145, 100%, 45%, 0.3);">
-                                <i data-lucide="info" style="color: #28a745;"></i>
-                            </div>
-                            <div class="bento-title-vessel">
-                                <h3 class="bento-title">About Keyra</h3>
-                                <div class="bento-subtitle">Version & System Health</div>
-                            </div>
-                        </div>
-                        <div class="bento-content">
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">System Version</div>
-                                    <div class="setting-desc">Stable v1.0.0-PRO</div>
-                                </div>
-                                <div class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">LATEST</div>
-                            </div>
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">Last Activity</div>
-                                    <div class="setting-desc" id="last-action-display">No activity</div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 13px; font-weight: 700;">
-                                    <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
-                                    <span id="last-activity-display">Never</span>
-                                </div>
-                            </div>
-                            <div class="setting-row">
-                                <div class="setting-info">
-                                    <div class="setting-name">Vault Analytics</div>
-                                    <div class="setting-desc">Optimized security state</div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 6px; color: #28a745; font-size: 13px; font-weight: 800;">
-                                    <i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i>
-                                    OPERATIONAL
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
         </main>

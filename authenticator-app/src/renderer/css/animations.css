@@ -1,9 +1,8 @@
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(8px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -17,67 +16,71 @@
 }
 
 @keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    50% {
-        transform: scale(1.05);
-        opacity: 0.8;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60%  { transform: translateX(-6px); }
+    40%, 80%  { transform: translateX(6px); }
+}
 
-    0%,
-    100% {
-        transform: translateX(0);
+/* Premium card stagger entrance */
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
     }
-
-    20%,
-    60% {
-        transform: translateX(-6px);
-    }
-
-    40%,
-    80% {
-        transform: translateX(6px);
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }
 
-/* Animations Classes */
+/* Toast slide-up from bottom */
+@keyframes toastSlideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px) scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+/* Shimmer for CTA buttons */
+@keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+/* Glow pulse for active badge */
+@keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 0 0 hsla(var(--h), 100%, 68%, 0.3); }
+    50%       { box-shadow: 0 0 0 6px hsla(var(--h), 100%, 68%, 0); }
+}
+
+/* ── Animation Utility Classes ── */
 .animate-fade-in {
-    animation: fadeIn var(--transition-medium) forwards;
+    animation: fadeIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.animate-card-entrance {
+    animation: cardEntrance 0.4s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+    opacity: 0;
 }
 
 .animate-shake {

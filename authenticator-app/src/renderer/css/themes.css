@@ -162,80 +162,100 @@ input {
     50% { opacity: 0.7; }
 }
 
-/* OLED-Optimized Dark Mode - Pure Black for Power Savings */
+/* ── Premium Dark Mode — Rich Deep Navy Glassmorphic ── */
 body.dark-theme {
-    /* Pure Black OLED Backgrounds */
-    --bg-primary: #000000; /* Pure black for maximum OLED efficiency */
-    --bg-secondary: #0a0a0a; /* Near-black for depth */
-    --bg-tertiary: #141414; /* Dark gray for subtle layers */
-    
-    /* Enhanced Text Contrast for OLED */
-    --text-primary: #ffffff; /* Pure white for maximum contrast */
-    --text-secondary: #e0e0e0; /* Light gray for secondary text */
-    --text-tertiary: #b0b0b0; /* Medium gray for tertiary text */
-    
-    /* Enhanced Accent Colors for OLED */
-    --accent-primary: hsl(var(--dynamic-accent-hue, 258), 100%, 70%); /* Brighter accent */
+    /* Background hue vars — set by JS per wallpaper preset */
+    --bg-hue-a: 258;
+    --bg-hue-b: 288;
+
+    /* Deep Navy backgrounds */
+    --bg-primary: hsl(var(--h, 258), 28%, 5%);
+    --bg-secondary: hsl(var(--h, 258), 24%, 8%);
+    --bg-tertiary: hsl(var(--h, 258), 20%, 12%);
+
+    /* High contrast text */
+    --text-primary: hsl(0, 0%, 96%);
+    --text-secondary: hsl(var(--h, 258), 15%, 68%);
+    --text-tertiary: hsl(var(--h, 258), 10%, 45%);
+
+    /* Vibrant accent for dark surfaces */
+    --accent-primary: hsl(var(--dynamic-accent-hue, 258), 100%, 72%);
     --accent-secondary: hsl(calc(var(--dynamic-accent-hue, 258) + 20), 100%, 78%);
-    --accent-hover: hsl(var(--dynamic-accent-hue, 258), 100%, 65%);
-    --accent-soft: hsla(var(--dynamic-accent-hue, 258), 100%, 70%, 0.15); /* Stronger soft background */
-    
-    /* Enhanced Borders for OLED */
-    --border-color: rgba(255, 255, 255, 0.08); /* Subtle white borders */
-    --border-secondary: rgba(255, 255, 255, 0.12);
-    --border-primary: rgba(255, 255, 255, 0.15);
-    
-    /* Enhanced Glass Effects for OLED */
-    --glass-bg: rgba(0, 0, 0, 0.60); /* Darker glass for better contrast */
-    --glass-border: rgba(255, 255, 255, 0.10);
-    
-    /* Enhanced Aura Effects for OLED */
-    --aura-1: hsla(var(--dynamic-accent-hue, 258), 100%, 70%, 0.40);
-    --aura-2: hsla(calc(var(--dynamic-accent-hue, 258) + 30), 100%, 75%, 0.30);
-    --aura-3: hsla(calc(var(--dynamic-accent-hue, 258) - 30), 100%, 75%, 0.30);
-    
-    /* Enhanced Shadows for OLED */
-    --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.8);
-    --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.9);
-    --shadow-hard: 0 32px 80px rgba(0, 0, 0, 1.0);
+    --accent-hover: hsl(var(--dynamic-accent-hue, 258), 100%, 66%);
+    --accent-soft: hsla(var(--dynamic-accent-hue, 258), 100%, 72%, 0.14);
+
+    /* Borders */
+    --border-color: hsla(0, 0%, 100%, 0.07);
+    --glass-border: hsla(0, 0%, 100%, 0.10);
+
+    /* Glassmorphic panels */
+    --glass-bg: hsla(var(--h, 258), 28%, 8%, 0.80);
+
+    /* Aura blobs — dialled in for deeper background */
+    --aura-1: hsla(var(--dynamic-accent-hue, 258), 100%, 68%, 0.30);
+    --aura-2: hsla(calc(var(--dynamic-accent-hue, 258) + 30), 100%, 75%, 0.18);
+    --aura-3: hsla(calc(var(--dynamic-accent-hue, 258) - 30), 100%, 75%, 0.14);
+
+    /* Deep shadows */
+    --shadow-soft:   0 4px 24px rgba(0, 0, 0, 0.4);
+    --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.6);
+    --shadow-hard:   0 32px 80px rgba(0, 0, 0, 0.8);
+
+    /*
+     * Reactive Multi-Radial Mesh Background
+     * --bg-hue-a/b updated by applyWallpaper() per preset.
+     * Glow lightness set high enough (22-25%) to be clearly visible
+     * against the deep 3% base floor.
+     */
+    background:
+        radial-gradient(
+            ellipse 90% 55% at 50% -5%,
+            hsla(var(--bg-hue-a, 258), 60%, 22%, 0.85) 0%,
+            transparent 65%
+        ),
+        radial-gradient(
+            ellipse 55% 40% at 95% 100%,
+            hsla(var(--bg-hue-b, 288), 55%, 18%, 0.65) 0%,
+            transparent 60%
+        ),
+        radial-gradient(
+            ellipse 42% 32% at 3% 85%,
+            hsla(var(--bg-hue-a, 258), 50%, 14%, 0.45) 0%,
+            transparent 58%
+        ),
+        hsl(var(--h, 258), 20%, 3%);
+
+    transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Enhanced Light Mode for Better Balance */
+/* Enhanced Light Mode */
 body.light-theme {
     /* Crisp Light Backgrounds */
-    --bg-primary: #ffffff; /* Pure white */
-    --bg-secondary: #f8f9fa; /* Very light gray */
-    --bg-tertiary: #f1f3f4; /* Light gray */
-    
-    /* Enhanced Text Contrast */
-    --text-primary: #1a1a1a; /* Near-black for maximum contrast */
-    --text-secondary: #5f6368; /* Material Design gray */
-    --text-tertiary: #9aa0a6; /* Lighter gray */
-    
-    /* Refined Accent Colors */
-    --accent-primary: hsl(var(--dynamic-accent-hue, 258), 85%, 58%); /* Slightly muted for light mode */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #f1f3f4;
+
+    --text-primary: #1a1a1a;
+    --text-secondary: #5f6368;
+    --text-tertiary: #9aa0a6;
+
+    /* Muted accent for light surfaces */
+    --accent-primary: hsl(var(--dynamic-accent-hue, 258), 85%, 58%);
     --accent-secondary: hsl(calc(var(--dynamic-accent-hue, 258) + 20), 85%, 65%);
     --accent-hover: hsl(var(--dynamic-accent-hue, 258), 85%, 52%);
     --accent-soft: hsla(var(--dynamic-accent-hue, 258), 85%, 58%, 0.08);
-    
-    /* Subtle Borders */
+
     --border-color: rgba(0, 0, 0, 0.06);
-    --border-secondary: rgba(0, 0, 0, 0.08);
-    --border-primary: rgba(0, 0, 0, 0.10);
-    
-    /* Enhanced Glass Effects */
-    --glass-bg: rgba(255, 255, 255, 0.80);
-    --glass-border: rgba(0, 0, 0, 0.08);
-    
-    /* Refined Aura Effects */
-    --aura-1: hsla(var(--dynamic-accent-hue, 258), 85%, 58%, 0.25);
-    --aura-2: hsla(calc(var(--dynamic-accent-hue, 258) + 30), 85%, 65%, 0.20);
-    --aura-3: hsla(calc(var(--dynamic-accent-hue, 258) - 30), 85%, 65%, 0.20);
-    
-    /* Enhanced Shadows for Light Mode */
-    --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.1);
-    --shadow-medium: 0 16px 48px rgba(0, 0, 0, 0.15);
-    --shadow-hard: 0 32px 80px rgba(0, 0, 0, 0.2);
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(0, 0, 0, 0.07);
+
+    --aura-1: hsla(var(--dynamic-accent-hue, 258), 80%, 55%, 0.22);
+    --aura-2: hsla(calc(var(--dynamic-accent-hue, 258) + 30), 80%, 62%, 0.16);
+    --aura-3: hsla(calc(var(--dynamic-accent-hue, 258) - 30), 80%, 62%, 0.14);
+
+    --shadow-soft:   0 2px 12px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.10);
+    --shadow-hard:   0 20px 60px rgba(0, 0, 0, 0.16);
 }
 
 /* OLED Optimization Classes */

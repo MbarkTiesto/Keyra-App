@@ -153,15 +153,23 @@ export class UIManager {
 
         const hue = accentHues[accentColor];
         if (hue) {
+            // Update --h so dark/light body class backgrounds tint with the accent color
+            root.style.setProperty('--h', hue.toString());
             root.style.setProperty('--dynamic-accent-hue', hue.toString());
             root.style.setProperty('--accent-primary', `hsl(${hue}, 100%, 68%)`);
             root.style.setProperty('--accent-secondary', `hsl(${hue + 20}, 100%, 75%)`);
             root.style.setProperty('--accent-hover', `hsl(${hue}, 100%, 62%)`);
             root.style.setProperty('--accent-soft', `hsla(${hue}, 100%, 68%, 0.12)`);
 
-            root.style.setProperty('--aura-1', `hsla(${hue}, 100%, 68%, 0.35)`);
-            root.style.setProperty('--aura-2', `hsla(${hue + 30}, 100%, 75%, 0.25)`);
-            root.style.setProperty('--aura-3', `hsla(${hue - 30}, 100%, 75%, 0.25)`);
+            root.style.setProperty('--aura-1', `hsla(${hue}, 100%, 68%, 0.38)`);
+            root.style.setProperty('--aura-2', `hsla(${hue + 30}, 100%, 75%, 0.22)`);
+            root.style.setProperty('--aura-3', `hsla(${hue - 30}, 100%, 75%, 0.18)`);
+
+            // If using nebula wallpaper (accent-following), sync background hues too
+            if (this.wallpaperPreset === 'nebula' || !this.wallpaperPreset) {
+                root.style.setProperty('--bg-hue-a', hue.toString());
+                root.style.setProperty('--bg-hue-b', (hue + 30).toString());
+            }
 
             localStorage.setItem(this.getStorageKey('accent_color'), accentColor);
 
@@ -202,16 +210,31 @@ export class UIManager {
         });
 
         const root = document.documentElement;
-        if (preset === 'nebula') {
-            const hue = parseInt(root.style.getPropertyValue('--dynamic-accent-hue') || '258');
-            root.style.setProperty('--aura-1', `hsla(${hue}, 100%, 68%, 0.35)`);
-            root.style.setProperty('--aura-2', `hsla(${hue + 30}, 100%, 75%, 0.25)`);
-            root.style.setProperty('--aura-3', `hsla(${hue - 30}, 100%, 75%, 0.25)`);
-        } else {
-            root.style.setProperty('--aura-1', `var(--${preset}-1)`);
-            root.style.setProperty('--aura-2', `var(--${preset}-2)`);
-            root.style.setProperty('--aura-3', `var(--${preset}-3)`);
-        }
+
+        // Preset definitions: [hueA, hueB, lightness%, aura opacities]
+        const presetConfig: Record<string, { hA: number; hB: number; aura: [number, number, number] }> = {
+            nebula:  { hA: -1,  hB: -1,  aura: [0.38, 0.22, 0.18] }, // uses accent hue
+            solar:   { hA: 15,  hB: 45,  aura: [0.40, 0.24, 0.18] },
+            emerald: { hA: 145, hB: 180, aura: [0.36, 0.22, 0.16] },
+            space:   { hA: 220, hB: 280, aura: [0.34, 0.20, 0.16] },
+        };
+
+        const cfg = presetConfig[preset] || presetConfig.nebula;
+        const accentHue = parseInt(root.style.getPropertyValue('--dynamic-accent-hue') || '258');
+        const hA = cfg.hA < 0 ? accentHue : cfg.hA;
+        const hB = cfg.hB < 0 ? accentHue + 30 : cfg.hB;
+
+        // Update background gradient vars used in CSS body.dark-theme
+        root.style.setProperty('--bg-hue-a', hA.toString());
+        root.style.setProperty('--bg-hue-b', hB.toString());
+
+        // Update aura blobs
+        root.style.setProperty('--aura-1', `hsla(${hA}, 100%, 68%, ${cfg.aura[0]})`);
+        root.style.setProperty('--aura-2', `hsla(${hB}, 100%, 75%, ${cfg.aura[1]})`);
+        root.style.setProperty('--aura-3', `hsla(${(hA + hB) / 2}, 100%, 72%, ${cfg.aura[2]})`);
+
+        // For non-nebula presets, also update --h so sidebar tints match
+        if (cfg.hA >= 0) root.style.setProperty('--h', hA.toString());
 
         if (!silent) this.pushSettings();
     }
@@ -670,15 +693,19 @@ export class UIManager {
     public showToast(message: string, type: 'info' | 'success' | 'error' = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
+        const iconMap = { success: 'check-circle', error: 'alert-circle', info: 'bell' };
         const toast = document.createElement('div');
         toast.className = 'toast animate-fade-in ' + type;
-        toast.innerHTML = `<span>${message}</span>`;
+        toast.innerHTML = `<i class="toast-icon" data-lucide="${iconMap[type]}"></i><span>${message}</span>`;
         container.appendChild(toast);
+        this.refreshLucide();
         setTimeout(() => {
             toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 400);
-        }, 3000);
+            toast.style.transform = 'translateX(-50%) translateY(8px) scale(0.95)';
+            setTimeout(() => toast.remove(), 350);
+        }, 2800);
     }
+
 
     private showCopyFeedback(element: HTMLElement) {
         const original = element.textContent;
@@ -1053,6 +1080,11 @@ export class UIManager {
                 if (nameDisplay) nameDisplay.textContent = user.username;
                 const avatar = document.getElementById('user-avatar');
                 if (avatar) avatar.textContent = user.username.charAt(0).toUpperCase();
+                // Populate dropdown header
+                const dropdownName = document.getElementById('dropdown-user-name');
+                const dropdownEmail = document.getElementById('dropdown-user-email');
+                if (dropdownName) dropdownName.textContent = user.username;
+                if (dropdownEmail) dropdownEmail.textContent = user.email || 'Keyra Secure Vault';
             }
             await this.refreshAccounts();
         } catch (err) {
