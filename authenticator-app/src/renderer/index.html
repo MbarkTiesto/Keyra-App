@@ -53,7 +53,7 @@
                     <i data-lucide="shield-check" style="width: clamp(64px, 12vw, 88px); height: clamp(64px, 12vw, 88px);"></i>
                 </div>
                 <h1 style="font-size: clamp(36px, 8vw, 48px); font-weight: 900; letter-spacing: -2.5px; line-height: 1;">Keyra</h1>
-                <p style="color: var(--text-secondary); margin-top: 12px; font-weight: 700; font-size: 16px; opacity: 0.8; letter-spacing: 0.5px;">SECURE DIGITAL IDENTITY</p>
+                <p style="color: var(--text-secondary); margin-top: 12px; font-weight: 700; font-size: 16px; opacity: 0.8; letter-spacing: 0.5px;">IDENTITY PROTECTED</p>
             </div>
 
             <!-- Login Box -->
@@ -90,7 +90,7 @@
                         <label class="form-label">Master Password</label>
                         <input type="password" id="signup-password" class="form-input" placeholder="Min 8 characters" required>
                     </div>
-                    <button type="submit" class="btn-primary" style="width: 100%; height: 56px;">Initialize Registry</button>
+                    <button type="submit" class="btn-primary" style="width: 100%; height: 56px;">Create Vault</button>
                     <div id="signup-error" style="color: #ff3b30; font-size: 13px; margin-top: 16px; text-align: center; opacity: 0; font-weight: 700;"></div>
                 </form>
                 <div style="text-align: center; margin-top: 32px;">
@@ -101,7 +101,7 @@
             <!-- Verify Box -->
             <div id="auth-verify-box" class="hidden">
                 <h2 style="font-size: 26px; font-weight: 850; margin-bottom: 12px; text-align: center;">Verify Identity</h2>
-                <p style="color: var(--text-secondary); font-size: 15px; text-align: center; margin-bottom: 32px;">We've sent a 6-digit code to your email.</p>
+                <p style="color: var(--text-secondary); font-size: 15px; text-align: center; margin-bottom: 32px;">Enter 6-digit code from your email.</p>
                 <form id="form-verify">
                     <input type="hidden" id="verify-email-field">
                     <div style="display: flex; gap: clamp(6px, 2vw, 12px); justify-content: center; margin-bottom: 32px;">
@@ -112,7 +112,7 @@
                         <input type="text" maxlength="1" class="verify-digit form-input" style="width: clamp(40px, 10vw, 56px); height: clamp(52px, 12vw, 68px); text-align: center; font-size: 26px; padding: 0;">
                         <input type="text" maxlength="1" class="verify-digit form-input" style="width: clamp(40px, 10vw, 56px); height: clamp(52px, 12vw, 68px); text-align: center; font-size: 26px; padding: 0;">
                     </div>
-                    <button type="submit" class="btn-primary" style="width: 100%; height: 56px;">Verify & Access</button>
+                    <button type="submit" class="btn-primary" style="width: 100%; height: 56px;">Unlock</button>
                     <div id="verify-error" style="color: #ff3b30; font-size: 13px; margin-top: 16px; text-align: center; opacity: 0; font-weight: 700;"></div>
                 </form>
                 <div style="text-align: center; margin-top: 32px;">
@@ -197,8 +197,8 @@
             <section id="vault-view" class="view-section">
                 <div class="section-header">
                     <div class="header-main">
-                        <h1 class="section-title">Security Vault</h1>
-                        <p class="section-subtitle">PROTECTING YOUR SECURE IDENTITIES</p>
+                        <h1 class="section-title">Vault</h1>
+                        <p class="section-subtitle">ACTIVE SECURITY TOKENS</p>
                     </div>
                     <div class="search-add-group">
                         <div class="search-vessel">
@@ -220,11 +220,11 @@
                 <div id="empty-state" class="hidden">
                     <div class="empty-state-vessel">
                         <i data-lucide="fingerprint" style="width: 100px; height: 100px; opacity: 0.8;"></i>
-                        <h2>Vault is Synchronized</h2>
-                        <p>No active tokens detected. Secure your first digital identity to activate real-time vault protection.</p>
+                        <h2>Vault Synced</h2>
+                        <p>No active tokens detected. Secure your first identity to activate protection.</p>
                         <button class="btn-primary" id="empty-add-btn" style="padding: 0 48px; min-width: 240px; height: var(--btn-h-lg);">
                             <i data-lucide="plus" style="width: 24px; height: 24px;"></i>
-                            <span>Initialize Security</span>
+                            <span>Add Token</span>
                         </button>
                     </div>
                 </div>
@@ -234,8 +234,8 @@
             <section id="settings-view" class="view-section hidden">
                 <div class="section-header" style="margin-bottom: var(--space-xl);">
                     <div class="header-main">
-                        <h1 class="section-title">Configurations</h1>
-                        <p class="section-subtitle">VAULT CORE &amp; INTERFACE PREFERENCES</p>
+                        <h1 class="section-title">Settings</h1>
+                        <p class="section-subtitle">CORE SYSTEM & INTERFACE</p>
                     </div>
                 </div>
 
@@ -248,8 +248,8 @@
                             <i data-lucide="shield-check" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
-                            <h3 class="bento-title">Security Enclave</h3>
-                            <div class="bento-subtitle">Access &amp; Privacy Controls</div>
+                            <h3 class="bento-title">Security</h3>
+                            <div class="bento-subtitle">Vault Privacy & Access</div>
                         </div>
                     </div>
                     <div class="bento-content">
@@ -303,15 +303,15 @@
                             <i data-lucide="palette" style="color: hsl(280, 100%, 75%);"></i>
                         </div>
                         <div class="bento-title-vessel">
-                            <h3 class="bento-title">Visual Interface</h3>
-                            <div class="bento-subtitle">Theme &amp; Aura Layout</div>
+                            <h3 class="bento-title">Appearance</h3>
+                            <div class="bento-subtitle">Theme & Interface Aura</div>
                         </div>
                     </div>
                     <div class="bento-content">
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Interface Mode</div>
-                                <div class="setting-desc">Light or dark luminosity</div>
+                                <div class="setting-name">Theme</div>
+                                <div class="setting-desc">Adjust interface luminosity</div>
                             </div>
                             <div class="segmented-control" id="theme-segmented">
                                 <button class="segment" data-val="light">Light</button>
@@ -387,8 +387,8 @@
                             <i data-lucide="cloud" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
-                            <h3 class="bento-title">Cloud Synchronization</h3>
-                            <div class="bento-subtitle">GitHub-Native Real-Time Sync</div>
+                            <h3 class="bento-title">Cloud Sync</h3>
+                            <div class="bento-subtitle">GitHub Real-Time Vault Sync</div>
                         </div>
                     </div>
                     <div class="bento-content">
@@ -414,7 +414,7 @@
                         </div>
                         <button class="btn-primary" id="btn-sync-now" style="margin-top: 12px; height: 44px;">
                             <i data-lucide="refresh-cw"></i>
-                            <span>Force Sync</span>
+                            <span>Sync Now</span>
                         </button>
                     </div>
                 </div>
@@ -426,18 +426,18 @@
                             <i data-lucide="shield" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
-                            <h3 class="bento-title">Vault Maintenance</h3>
-                            <div class="bento-subtitle">Backup &amp; Recovery Hub</div>
+                            <h3 class="bento-title">System Tools</h3>
+                            <div class="bento-subtitle">Backup & Recovery Hub</div>
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
                         <button class="btn-primary btn-maintenance" id="btn-export-vault">
                             <i data-lucide="download"></i>
-                            <span>Export Encrypted Backup</span>
+                            <span>Export Vault</span>
                         </button>
                         <button class="btn-primary btn-maintenance" id="btn-import-vault">
                             <i data-lucide="upload"></i>
-                            <span>Restore from Backup</span>
+                            <span>Restore Vault</span>
                         </button>
                     </div>
                     <div style="margin-top: 12px; font-size: 11.5px; opacity: 0.6; font-weight: 600; line-height: 1.5;">
@@ -453,15 +453,15 @@
                             <i data-lucide="info" style="color: #28a745;"></i>
                         </div>
                         <div class="bento-title-vessel">
-                            <h3 class="bento-title">About Keyra</h3>
-                            <div class="bento-subtitle">Version &amp; System Health</div>
+                            <h3 class="bento-title">About</h3>
+                            <div class="bento-subtitle">Version & System Health</div>
                         </div>
                     </div>
                     <div class="bento-content">
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">System Version</div>
-                                <div class="setting-desc">Stable v1.0.0-PRO</div>
+                                <div class="setting-name">Version</div>
+                                <div class="setting-desc">v1.0.0 Stable</div>
                             </div>
                             <div class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">LATEST</div>
                         </div>

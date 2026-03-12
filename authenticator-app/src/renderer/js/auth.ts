@@ -81,7 +81,7 @@ export async function setupAuthUI() {
 
         // Local Validation
         if (user.length < 4) {
-            err.textContent = "Identity label must be at least 4 characters.";
+            err.textContent = "Identity must be at least 4 characters.";
             err.style.opacity = '1';
             void (err as HTMLElement).offsetWidth; 
             err.classList.add('animate-shake');
@@ -153,7 +153,7 @@ export async function setupAuthUI() {
                 err.classList.add('animate-shake');
             }
         } catch (error: any) {
-            err.textContent = "Registry expansion failed.";
+            err.textContent = "Registration failed.";
             err.style.opacity = '1';
             err.classList.add('animate-shake');
         }

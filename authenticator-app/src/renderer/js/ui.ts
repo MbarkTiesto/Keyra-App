@@ -792,18 +792,18 @@ export class UIManager {
                         <i data-lucide="shield-check"></i>
                     </div>
                     <div class="modal-title-vessel">
-                        <h2>Setup Access PIN</h2>
-                        <p>ESTABLISH A 4-DIGIT VAULT KEY</p>
+                        <h2>Set PIN</h2>
+                        <p>SET 4-DIGIT MASTER CODE</p>
                     </div>
                 </div>
                 <div class="modal-divider"></div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Create PIN Code</label>
+                        <label class="form-label">New PIN</label>
                         <input type="password" id="new-pin" maxlength="4" class="form-input"
                                style="font-size: clamp(22px, 5vw, 30px); text-align: center; letter-spacing: clamp(12px, 3vw, 20px); padding: 16px; height: clamp(60px, 12vw, 72px); font-family: monospace;"
                                placeholder="••••" inputmode="numeric">
-                        <p class="modal-help-text" style="margin-top: 12px;">This PIN enables quick vault unlock and enhanced security. Keep it confidential.</p>
+                        <p class="modal-help-text" style="margin-top: 12px;">This PIN enables quick vault unlock. Keep it confidential.</p>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -811,7 +811,7 @@ export class UIManager {
                         <i data-lucide="shield-check"></i>
                         Activate Key
                     </button>
-                    <button class="user-button" id="cancel-pin-btn" style="justify-content: center;">Discard</button>
+                    <button class="user-button" id="cancel-pin-btn" style="justify-content: center;">Cancel</button>
                 </div>
             </div>
         `;
@@ -837,32 +837,31 @@ export class UIManager {
                         <i data-lucide="plus-circle"></i>
                     </div>
                     <div class="modal-title-vessel">
-                        <h2>Add New Token</h2>
-                        <p>SECURE A DIGITAL IDENTITY IN YOUR VAULT</p>
+                        <h2>Add Token</h2>
+                        <p>SAVE DIGITAL IDENTITY</p>
                     </div>
                 </div>
                 <div class="modal-divider"></div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Service Issuer</label>
+                        <label class="form-label">Service</label>
                         <input type="text" id="new-issuer" class="form-input" placeholder="e.g. GitHub, Google">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Account Identity</label>
+                        <label class="form-label">Account</label>
                         <input type="text" id="new-account" class="form-input" placeholder="name@domain.com" inputmode="email">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Base32 Secret Key</label>
-                        <input type="text" id="new-secret" class="form-input" placeholder="Enter TOTP secret key" autocomplete="off">
-                        <p class="modal-help-text" style="margin-top: 8px;">Found in the service's two-factor authentication setup page.</p>
+                        <label class="form-label">TOTP Secret</label>
+                        <input type="text" id="new-secret" class="form-input" placeholder="Enter secret key" autocomplete="off">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn-primary" id="save-new-account">
                         <i data-lucide="shield-plus"></i>
-                        Secure Token
+                        Save Token
                     </button>
-                    <button class="user-button" id="cancel-add-btn" style="justify-content: center;">Discard</button>
+                    <button class="user-button" id="cancel-add-btn" style="justify-content: center;">Cancel</button>
                 </div>
             </div>
         `;
@@ -875,8 +874,8 @@ export class UIManager {
                 await (window as any).api.saveAccount({ id: Date.now().toString(), issuer, account, secret });
                 await this.refreshAccounts();
                 this.hideModal();
-                this.showToast("Identity secured", "success");
-                this.updateLastActivity('Added new token');
+                this.showToast("Token Saved", "success");
+                this.updateLastActivity('Added token');
             }
         });
         document.getElementById('cancel-add-btn')?.addEventListener('click', () => this.hideModal());
@@ -890,8 +889,8 @@ export class UIManager {
                         <i data-lucide="settings-2"></i>
                     </div>
                     <div class="modal-title-vessel">
-                        <h2>Edit Token</h2>
-                        <p>UPDATE IDENTITY DETAILS OR SERVICE LABEL</p>
+                        <h2>Edit Identity</h2>
+                        <p>UPDATE SERVICE DETAILS</p>
                     </div>
                 </div>
                 <div class="modal-divider"></div>
@@ -902,15 +901,15 @@ export class UIManager {
                         </div>
                         <div class="entity-info">
                             <span class="entity-name">${account.issuer}</span>
-                            <span class="entity-label">${account.account || 'No account set'}</span>
+                            <span class="entity-label">${account.account || 'Vault Token'}</span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Service Issuer</label>
+                        <label class="form-label">Service</label>
                         <input type="text" id="edit-issuer" class="form-input" value="${account.issuer}">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Account Identity</label>
+                        <label class="form-label">Account</label>
                         <input type="text" id="edit-account" class="form-input" value="${account.account}" inputmode="email">
                     </div>
                 </div>
@@ -919,7 +918,7 @@ export class UIManager {
                         <i data-lucide="check"></i>
                         Save Changes
                     </button>
-                    <button class="user-button" id="cancel-edit-btn" style="justify-content: center;">Discard</button>
+                    <button class="user-button" id="cancel-edit-btn" style="justify-content: center;">Cancel</button>
                 </div>
             </div>
         `;
@@ -947,7 +946,7 @@ export class UIManager {
                     </div>
                     <div class="modal-title-vessel">
                         <h2 class="danger">Delete Token?</h2>
-                        <p>THIS ACTION IS PERMANENT AND IRREVERSIBLE</p>
+                        <p>PERMANENT ACTION</p>
                     </div>
                 </div>
                 <div class="modal-divider"></div>
@@ -958,17 +957,17 @@ export class UIManager {
                         </div>
                         <div class="entity-info">
                             <span class="entity-name">${account.issuer}</span>
-                            <span class="entity-label">${account.account || 'No account set'}</span>
+                            <span class="entity-label">${account.account || 'Vault Token'}</span>
                         </div>
                     </div>
-                    <p class="modal-help-text">Removing this token will permanently delete it from your vault. You will lose access to OTP codes for this service unless you re-add it.</p>
+                    <p class="modal-help-text">Removing this token is permanent. You will lose access to its OTP codes.</p>
                 </div>
                 <div class="modal-footer">
                     <button class="btn-danger" id="confirm-delete">
                         <i data-lucide="trash-2"></i>
                         Delete Token
                     </button>
-                    <button class="user-button" id="cancel-delete-btn" style="justify-content: center;">Keep It</button>
+                    <button class="user-button" id="cancel-delete-btn" style="justify-content: center;">Keep Token</button>
                 </div>
             </div>
         `;
@@ -992,7 +991,7 @@ export class UIManager {
                     </div>
                     <div class="modal-title-vessel">
                         <h2>Restore Vault</h2>
-                        <p>VERIFY MASTER KEY TO IMPORT BACKUP</p>
+                        <p>VERIFY MASTER KEY TO IMPORT</p>
                     </div>
                 </div>
                 <div class="modal-divider"></div>
