@@ -1,4 +1,4 @@
-import { getUsers, saveUsers } from './storage';
+import { getUsers, saveUsers, getUserData, syncUserData } from './storage';
 import type { UserRecord } from './storage';
 import { hashPassword, verifyPassword, deriveKey, encryptVault, decryptVault } from './crypto';
 import type { AuthenticatorAccount } from './crypto';
@@ -30,8 +30,8 @@ export function getCurrentUser() {
     };
 }
 
-export function signup(username: string, email: string, password: string): { success: boolean, message: string, code?: string } {
-    const users = getUsers();
+export async function signup(username: string, email: string, password: string): Promise<{ success: boolean, message: string, code?: string }> {
+    const users = await getUsers();
     if (users.find(u => u.username === username || u.email === email)) {
         return { success: false, message: "Username or email already exists." };
     }
@@ -55,29 +55,32 @@ export function signup(username: string, email: string, password: string): { suc
     };
 
     users.push(newUser);
-    saveUsers(users);
+    await saveUsers(users);
+    
+    // Also create user-specific data folder in cloud
+    await syncUserData(username, newUser);
 
     deliverActivationCode(email, activationCode);
 
     return { success: true, message: "Account created. Check your email.", code: activationCode };
 }
 
-export function resendCode(email: string): { success: boolean, message: string, code?: string } {
-    const users = getUsers();
+export async function resendCode(email: string): Promise<{ success: boolean, message: string, code?: string }> {
+    const users = await getUsers();
     const userIndex = users.findIndex(u => u.email === email);
     if (userIndex === -1) return { success: false, message: "User not found." };
     if (users[userIndex].isActivated) return { success: false, message: "Account already activated." };
 
     const newCode = Math.floor(100000 + Math.random() * 900000).toString();
     users[userIndex].activationCode = newCode;
-    saveUsers(users);
+    await saveUsers(users);
 
     deliverActivationCode(email, newCode);
     return { success: true, message: "Verification code sent.", code: newCode };
 }
 
-export function verifyEmail(email: string, code: string): { success: boolean, message: string } {
-    const users = getUsers();
+export async function verifyEmail(email: string, code: string): Promise<{ success: boolean, message: string }> {
+    const users = await getUsers();
     const userIndex = users.findIndex(u => u.email === email);
     if (userIndex === -1) return { success: false, message: "User not found." };
 
@@ -86,16 +89,32 @@ export function verifyEmail(email: string, code: string): { success: boolean, me
     if (users[userIndex].activationCode === code) {
         users[userIndex].isActivated = true;
         delete users[userIndex].activationCode;
-        saveUsers(users);
+        await saveUsers(users);
+        
+        // Update specialized data folder too
+        await syncUserData(users[userIndex].username, users[userIndex]);
+
         return { success: true, message: "Account activated successfully." };
     }
 
     return { success: false, message: "Invalid activation code." };
 }
 
-export function login(username: string, password: string): { success: boolean, message: string } {
-    const users = getUsers();
-    const user = users.find(u => u.username === username);
+export async function login(username: string, password: string): Promise<{ success: boolean, message: string }> {
+    const users = await getUsers();
+    let user = users.find(u => u.username === username);
+    
+    // If not found in main list, try to fetch from cloud directly (specific user data)
+    if (!user) {
+        const cloudData = await getUserData(username);
+        if (cloudData) {
+            user = cloudData;
+            // Add to local list and save
+            users.push(user!);
+            await saveUsers(users);
+        }
+    }
+
     if (!user) return { success: false, message: "Invalid credentials." };
 
     if (!user.isActivated) return { success: false, message: "Please verify your email first." };
@@ -124,10 +143,10 @@ export function logout(): void {
     currentKey = null;
 }
 
-export function getActiveAccounts(): AuthenticatorAccount[] {
+export async function getActiveAccounts(): Promise<AuthenticatorAccount[]> {
     if (!currentUser || !currentKey) throw new Error("No active user session.");
     try {
-        const users = getUsers();
+        const users = await getUsers();
         const freshUser = users.find(u => u.id === currentUser!.id);
         if (!freshUser) throw new Error("User missing from storage");
 
@@ -139,17 +158,34 @@ export function getActiveAccounts(): AuthenticatorAccount[] {
     }
 }
 
-export function saveActiveAccounts(accounts: AuthenticatorAccount[]): void {
+export async function saveActiveAccounts(accounts: AuthenticatorAccount[]): Promise<void> {
     if (!currentUser || !currentKey) throw new Error("No active user session.");
 
-    const users = getUsers();
+    const users = await getUsers();
     const userIndex = users.findIndex(u => u.id === currentUser!.id);
     if (userIndex === -1) throw new Error("User missing from storage.");
 
     const newEncryptedVault = encryptVault(JSON.stringify(accounts), currentKey);
     users[userIndex].encryptedVaultData = newEncryptedVault;
 
-    saveUsers(users);
+    await saveUsers(users);
+    
+    // Sync specifically this user's data folder
+    await syncUserData(currentUser.username, users[userIndex]);
+}
+
+export async function updateUserSettings(settings: any): Promise<void> {
+    if (!currentUser) throw new Error("No active user session.");
+
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    users[userIndex].settings = settings;
+    currentUser.settings = settings; // Update local session too
+
+    await saveUsers(users);
+    await syncUserData(currentUser.username, users[userIndex]);
 }
 
 export function getBackupData(): { salt: string, encryptedVaultData: string } {
@@ -160,7 +196,7 @@ export function getBackupData(): { salt: string, encryptedVaultData: string } {
     };
 }
 
-export function importVaultData(salt: string, encryptedVaultData: string, password: string): { success: boolean, message: string } {
+export async function importVaultData(salt: string, encryptedVaultData: string, password: string): Promise<{ success: boolean, message: string }> {
     if (!currentUser || !currentKey) throw new Error("No active user session.");
 
     try {
@@ -168,7 +204,7 @@ export function importVaultData(salt: string, encryptedVaultData: string, passwo
         const decryptedJson = decryptVault(encryptedVaultData, key);
         const accounts = JSON.parse(decryptedJson) as AuthenticatorAccount[];
 
-        saveActiveAccounts(accounts);
+        await saveActiveAccounts(accounts);
         return { success: true, message: "Vault successfully merged." };
     } catch (err) {
         console.error("Vault Import Error:", err);

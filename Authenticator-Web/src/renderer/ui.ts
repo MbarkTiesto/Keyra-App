@@ -12,6 +12,17 @@ export class UIManager {
     private auraX: number = 0;
     private auraY: number = 0;
     private searchQuery: string = '';
+    private syncCount: number = 0;
+
+    public setSyncing(isSyncing: boolean) {
+        if (isSyncing) this.syncCount++;
+        else this.syncCount = Math.max(0, this.syncCount - 1);
+
+        const indicator = document.getElementById('cloud-sync-indicator');
+        if (indicator) {
+            indicator.classList.toggle('hidden', this.syncCount === 0);
+        }
+    }
 
     public userId: string;
 
@@ -26,6 +37,73 @@ export class UIManager {
         this.updateLockVaultVisibility(); // Check PIN on startup
         this.startTimer();
         this.loadInitialData();
+    }
+
+    private async initFromCloud() {
+        const user = await (window as any).api.getCurrentUser();
+        if (user && user.settings) {
+            this.applySettings(user.settings, false); // Don't push back to cloud during init
+        }
+    }
+
+    private getSettingsObject(): any {
+        return {
+            theme: this.currentTheme,
+            accentColor: localStorage.getItem('keyra_accent_color') || 'royal-purple',
+            wallpaperPreset: this.wallpaperPreset,
+            privacyMode: this.privacyMode,
+            screenGuardian: this.screenGuardian,
+            autolock: localStorage.getItem(this.getStorageKey('autolock')) || '0',
+            oledMode: localStorage.getItem('keyra_oled_mode') === 'true',
+            vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
+        };
+    }
+
+    public async pushSettings() {
+        const settings = this.getSettingsObject();
+        await (window as any).api.updateUserSettings(settings);
+    }
+
+    public applySettings(settings: any, saveLocal: boolean = true) {
+        if (!settings) return;
+
+        // Apply to local variables & DOM
+        if (settings.theme) this.setTheme(settings.theme, true);
+        if (settings.accentColor) this.setAccentColor(settings.accentColor, true);
+        if (settings.wallpaperPreset) this.applyWallpaper(settings.wallpaperPreset);
+        
+        this.privacyMode = !!settings.privacyMode;
+        const privacyToggle = document.getElementById('privacy-mode-toggle') as HTMLInputElement;
+        if (privacyToggle) privacyToggle.checked = this.privacyMode;
+
+        this.screenGuardian = !!settings.screenGuardian;
+        const guardianToggle = document.getElementById('screen-guardian-toggle') as HTMLInputElement;
+        if (guardianToggle) guardianToggle.checked = this.screenGuardian;
+
+        if (settings.autolock !== undefined) {
+            this.updateSegmentedUI('autolock-segmented', String(settings.autolock));
+        }
+
+        const oledToggle = document.getElementById('oled-mode-toggle') as HTMLInputElement;
+        if (oledToggle && settings.oledMode !== undefined) {
+            oledToggle.checked = settings.oledMode;
+            document.body.classList.toggle('oled-optimized', settings.oledMode);
+        }
+
+        // Apply to localStorage if requested (e.g. on initial sync from cloud)
+        if (saveLocal) {
+            if (settings.theme) localStorage.setItem(this.getStorageKey('theme'), settings.theme);
+            if (settings.accentColor) localStorage.setItem('keyra_accent_color', settings.accentColor);
+            if (settings.wallpaperPreset) localStorage.setItem(this.getStorageKey('wallpaperPreset'), settings.wallpaperPreset);
+            localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacyMode));
+            localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
+            if (settings.autolock !== undefined) localStorage.setItem(this.getStorageKey('autolock'), String(settings.autolock));
+            if (settings.oledMode !== undefined) localStorage.setItem('keyra_oled_mode', String(settings.oledMode));
+            if (settings.vaultPin) localStorage.setItem(this.getStorageKey('vault_pin'), settings.vaultPin);
+        }
+        
+        this.updateLockVaultVisibility();
+        this.renderAccounts();
     }
 
     private initSegmentedStates() {
@@ -147,7 +225,7 @@ export class UIManager {
         this.setTheme(savedTheme);
     }
 
-    public setTheme(theme: 'light' | 'dark') {
+    public setTheme(theme: 'light' | 'dark', silent: boolean = false) {
         this.currentTheme = theme;
         
         // Update body classes for new theme system
@@ -195,6 +273,7 @@ export class UIManager {
         }
         
         this.refreshLucide();
+        if (!silent) this.pushSettings();
     }
 
     private refreshLucide(root?: HTMLElement) {
@@ -266,6 +345,7 @@ export class UIManager {
                 const val = target.getAttribute('data-val')!;
                 localStorage.setItem(this.getStorageKey('autolock'), val);
                 this.updateSegmentedUI('autolock-segmented', val);
+                this.pushSettings();
                 this.showToast(`Vault Auto-lock: ${val === '0' ? 'Off' : val + 'm'}`, "info");
             });
         });
@@ -278,6 +358,7 @@ export class UIManager {
             const target = e.target as HTMLInputElement;
             this.privacyMode = target.checked;
             localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacyMode));
+            this.pushSettings();
             this.renderAccounts(); // Re-render to apply/remove masking
             this.showToast(this.privacyMode ? "Privacy Mode Enabled" : "Privacy Mode Disabled", "info");
         });
@@ -287,7 +368,8 @@ export class UIManager {
             const target = e.target as HTMLInputElement;
             this.screenGuardian = target.checked;
             localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
-            // (window as any).api.setContentProtection(this.screenGuardian);
+            this.pushSettings();
+            // (window as any).api.setContentprotection(this.screenGuardian);
             this.showToast(this.screenGuardian ? "Screen Guardian Active" : "Screen Guardian Disabled", "info");
         });
 
@@ -297,6 +379,7 @@ export class UIManager {
                 const target = e.currentTarget as HTMLElement;
                 const preset = target.getAttribute('data-preset')!;
                 this.applyWallpaper(preset);
+                this.pushSettings();
                 this.showToast(`Wallpaper Switched: ${preset.charAt(0).toUpperCase() + preset.slice(1)}`, "info");
             });
         });
@@ -466,7 +549,7 @@ export class UIManager {
         });
     }
 
-    private setAccentColor(accentColor: string) {
+    private setAccentColor(accentColor: string, silent: boolean = false) {
         const root = document.documentElement;
         const accentHues: Record<string, number> = {
             'royal-purple': 258,
@@ -491,6 +574,7 @@ export class UIManager {
             
             // Save to localStorage
             localStorage.setItem('keyra_accent_color', accentColor);
+            if (!silent) this.pushSettings();
         }
     }
 
@@ -561,6 +645,7 @@ export class UIManager {
             oledToggle.addEventListener('change', () => {
                 const isEnabled = oledToggle.checked;
                 localStorage.setItem('keyra_oled_mode', isEnabled.toString());
+                this.pushSettings();
                 
                 if (isEnabled) {
                     document.body.classList.add('oled-optimized');
@@ -615,6 +700,12 @@ export class UIManager {
     private async loadInitialData() {
         try {
             const user = await (window as any).api.getCurrentUser();
+            
+            // Apply cloud settings first if they exist
+            if (user && user.settings) {
+                this.applySettings(user.settings, true);
+            }
+
             const userNameDisplay = document.getElementById('user-name-display');
             const userAvatar = document.getElementById('user-avatar');
             
@@ -1028,8 +1119,7 @@ export class UIManager {
 
     private validateAndAutoUnlock(pinValue: string) {
         const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
-        const uid = (window as any).currentUserId || 'default';
-        const saved = localStorage.getItem(`${uid}_vault_pin`);
+        const saved = localStorage.getItem(this.getStorageKey('vault_pin'));
         const progressDots = document.querySelectorAll('.pin-dot');
         
         // Update progress dots based on input length
@@ -1144,7 +1234,8 @@ export class UIManager {
         document.getElementById('save-pin')?.addEventListener('click', () => {
             const pin = (document.getElementById('new-pin') as HTMLInputElement).value;
             if (pin.length === 4) {
-                localStorage.setItem(`${this.userId}_vault_pin`, pin);
+                localStorage.setItem(this.getStorageKey('vault_pin'), pin);
+                this.pushSettings();
                 this.updateLockVaultVisibility(); // Update visibility immediately
                 this.showToast("PIN established successfully", "success");
                 this.hideModal();

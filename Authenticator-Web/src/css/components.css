@@ -674,3 +674,44 @@ input:checked + .slider:before {
     color: var(--text-tertiary);
     text-transform: uppercase;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CLOUD SYNC INDICATOR
+   ───────────────────────────────────────────────────────────────────────────── */
+.cloud-sync-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    height: var(--btn-h-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--accent-primary);
+    margin-right: 12px;
+    animation: fadeIn 0.3s ease;
+}
+
+.cloud-sync-indicator span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+}
+
+.sync-icon {
+    width: 16px;
+    height: 16px;
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.cloud-sync-indicator.hidden {
+    display: none;
+}

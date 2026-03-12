@@ -2,32 +2,45 @@ import * as auth from '../core/auth';
 import * as totp from '../core/totp';
 import { parseOTPAuthURI } from '../core/otpauth';
 
+const syncWrapper = async <T>(fn: () => Promise<T>): Promise<T> => {
+    const ui = (window as any).ui;
+    if (ui) ui.setSyncing(true);
+    try {
+        return await fn();
+    } finally {
+        if (ui) setTimeout(() => ui.setSyncing(false), 500); // 500ms min show time to avoid flicker
+    }
+};
+
 export const bridge = {
     // Auth System
-    signup: async (user: string, email: string, pass: string) => auth.signup(user, email, pass),
-    resendCode: async (email: string) => auth.resendCode(email),
-    verifyEmail: async (email: string, code: string) => auth.verifyEmail(email, code),
-    login: async (user: string, pass: string) => auth.login(user, pass),
+    signup: async (user: string, email: string, pass: string) => syncWrapper(() => auth.signup(user, email, pass)),
+    resendCode: async (email: string) => syncWrapper(() => auth.resendCode(email)),
+    verifyEmail: async (email: string, code: string) => syncWrapper(() => auth.verifyEmail(email, code)),
+    login: async (user: string, pass: string) => syncWrapper(() => auth.login(user, pass)),
     checkSession: async () => ({ success: false, message: "Session auto-login disabled in web" }),
     logout: async () => auth.logout(),
     getCurrentUser: async () => auth.getCurrentUser(),
+    updateUserSettings: async (settings: any) => syncWrapper(() => auth.updateUserSettings(settings)),
 
     // Operations
     getAccounts: async () => {
-        try { return auth.getActiveAccounts(); }
+        try { return await syncWrapper(() => auth.getActiveAccounts()); }
         catch (err) { return []; }
     },
     saveAccount: async (account: any) => {
         try {
-            const accounts = auth.getActiveAccounts();
-            const existingIndex = accounts.findIndex((a: any) => a.id === account.id);
-            if (existingIndex >= 0) {
-                accounts[existingIndex] = account;
-            } else {
-                accounts.push(account);
-            }
-            auth.saveActiveAccounts(accounts);
-            return accounts;
+            return await syncWrapper(async () => {
+                const accounts = await auth.getActiveAccounts();
+                const existingIndex = accounts.findIndex((a: any) => a.id === account.id);
+                if (existingIndex >= 0) {
+                    accounts[existingIndex] = account;
+                } else {
+                    accounts.push(account);
+                }
+                await auth.saveActiveAccounts(accounts);
+                return accounts;
+            });
         } catch (err) {
             console.error("Save Account Error:", err);
             return [];
@@ -35,10 +48,12 @@ export const bridge = {
     },
     deleteAccount: async (id: string) => {
         try {
-            let accounts = auth.getActiveAccounts();
-            accounts = accounts.filter((a: any) => a.id !== id);
-            auth.saveActiveAccounts(accounts);
-            return accounts;
+            return await syncWrapper(async () => {
+                let accounts = await auth.getActiveAccounts();
+                accounts = accounts.filter((a: any) => a.id !== id);
+                await auth.saveActiveAccounts(accounts);
+                return accounts;
+            });
         } catch (err) {
             return [];
         }
@@ -91,7 +106,7 @@ export const bridge = {
         });
     },
     performVaultImport: async (salt: string, encryptedVaultData: string, pass: string) => 
-        auth.importVaultData(salt, encryptedVaultData, pass),
+        syncWrapper(() => auth.importVaultData(salt, encryptedVaultData, pass)),
     
     setContentProtection: async (enabled: boolean) => {
         console.log("Content protection requested:", enabled);
