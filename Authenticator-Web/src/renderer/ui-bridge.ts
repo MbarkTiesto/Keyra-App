@@ -18,7 +18,7 @@ export const bridge = {
     resendCode: async (email: string) => syncWrapper(() => auth.resendCode(email)),
     verifyEmail: async (email: string, code: string) => syncWrapper(() => auth.verifyEmail(email, code)),
     login: async (user: string, pass: string) => syncWrapper(() => auth.login(user, pass)),
-    checkSession: async () => ({ success: false, message: "Session auto-login disabled in web" }),
+    checkSession: async () => syncWrapper(() => auth.checkSession()),
     logout: async () => auth.logout(),
     getCurrentUser: async () => auth.getCurrentUser(),
     updateUserSettings: async (settings: any) => syncWrapper(() => auth.updateUserSettings(settings)),

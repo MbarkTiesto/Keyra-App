@@ -1,8 +1,8 @@
 import { UIManager } from './ui';
 
-let appInitCallback: (() => void | Promise<void>) | null = null;
+let appInitCallback: ((resumed: boolean) => void | Promise<void>) | null = null;
 
-export function setAppInitCallback(cb: () => void | Promise<void>) {
+export function setAppInitCallback(cb: (resumed: boolean) => void | Promise<void>) {
     appInitCallback = cb;
 }
 
@@ -16,17 +16,17 @@ export async function setupAuthUI() {
     try {
         const auto = await window.api.checkSession();
         if (auto.success) {
-            completeLogin();
+            completeLogin(true);
         }
     } catch (e) { console.error("Session resume failed", e); }
 
-    async function completeLogin() {
+    async function completeLogin(resumed: boolean = false) {
         if (vessel) {
             vessel.classList.remove('show');
             setTimeout(() => vessel.classList.add('hidden'), 500);
         }
         
-        if (appInitCallback) await appInitCallback();
+        if (appInitCallback) await appInitCallback(resumed);
 
         // Let UIManager handle initial data loading
         if ((window as any).ui) {

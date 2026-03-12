@@ -131,6 +131,10 @@ export async function login(username: string, password: string): Promise<{ succe
         currentUser = user;
         currentKey = key;
 
+        // Persist session for "Remember Me"
+        localStorage.setItem('active_session_user', user.username);
+        localStorage.setItem('active_session_key', key.toString('base64'));
+
         return { success: true, message: "Login successful." };
     } catch (err) {
         console.error("Login Decryption Error:", err);
@@ -138,9 +142,31 @@ export async function login(username: string, password: string): Promise<{ succe
     }
 }
 
+export async function checkSession(): Promise<{ success: boolean, message: string }> {
+    const savedUser = localStorage.getItem('active_session_user');
+    const savedKey = localStorage.getItem('active_session_key');
+
+    if (savedUser && savedKey) {
+        try {
+            const users = await getUsers();
+            const user = users.find(u => u.username === savedUser);
+            if (user) {
+                currentUser = user;
+                currentKey = Buffer.from(savedKey, 'base64');
+                return { success: true, message: "Session resumed." };
+            }
+        } catch (e) {
+            console.error("Session resume failed:", e);
+        }
+    }
+    return { success: false, message: "No active session." };
+}
+
 export function logout(): void {
     currentUser = null;
     currentKey = null;
+    localStorage.removeItem('active_session_user');
+    localStorage.removeItem('active_session_key');
 }
 
 export async function getActiveAccounts(): Promise<AuthenticatorAccount[]> {

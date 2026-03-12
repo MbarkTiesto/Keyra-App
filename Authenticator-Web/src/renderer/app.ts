@@ -27,7 +27,7 @@ function initAutoLock() {
 async function init() {
     setupAuthUI();
 
-    setAppInitCallback(async () => {
+    setAppInitCallback(async (resumed: boolean) => {
         // 0. Fetch Identity Context
         try {
             const user = await (window as any).api.getCurrentUser();
@@ -43,7 +43,7 @@ async function init() {
         // 2. Setup UI Components (Now User-Aware)
         (window as any).ui = new UIManager(uid);
         
-        if (hasPin) (window as any).ui.lockVault();
+        if (resumed && hasPin) (window as any).ui.lockVault();
 
         // 5. Initialize Security Logic
         initAutoLock();
