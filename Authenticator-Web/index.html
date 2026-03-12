@@ -143,10 +143,6 @@
                 
                 <div class="navbar-section navbar-right">
                     <div class="user-menu">
-                        <div id="cloud-sync-indicator" class="cloud-sync-indicator hidden" title="Cloud Sync Active">
-                            <i data-lucide="cloud-cog" class="sync-icon"></i>
-                            <span>Syncing...</span>
-                        </div>
                         <button class="user-button" id="user-dropdown-btn">
                             <div class="user-avatar" id="user-avatar">?</div>
                             <span class="user-name" id="user-name-display">User</span>
@@ -362,7 +358,13 @@
                             </div>
 
                             <div style="margin-top: var(--space-lg);">
-                                <div class="setting-name" style="margin-bottom: 12px;">Wallpaper Library</div>
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px;">
+                                    <div class="setting-name">Wallpaper Library</div>
+                                    <div style="font-size: 10px; font-weight: 800; color: var(--accent-primary); opacity: 0.8; letter-spacing: 0.5px; text-transform: uppercase;">
+                                        <i data-lucide="mouse-pointer-2" style="width: 10px; height: 10px; vertical-align: middle; margin-right: 2px;"></i>
+                                        Interactive Aura
+                                    </div>
+                                </div>
                                 <div class="wallpaper-grid">
                                     <button class="wallpaper-card active" data-preset="nebula">
                                         <div class="wallpaper-preview" style="background: linear-gradient(135deg, hsl(258, 60%, 50%), hsl(330, 60%, 50%));"></div>
@@ -489,7 +491,13 @@
         <div id="toast-container" style="position: fixed; bottom: clamp(20px, 8vw, 40px); left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 12px; align-items: center; width: 100%; pointer-events: none;"></div>
     </div>
 
-    <!-- Lucide Icons (Deferred) -->
+    <!-- Cloud Sync Floating Pill -->
+    <div id="cloud-sync-indicator" class="cloud-sync-indicator hidden" title="Cloud Sync Active">
+        <i data-lucide="cloud-cog" class="sync-icon"></i>
+        <span>Syncing...</span>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script type="module" src="/src/renderer/app.ts"></script>
     <script>

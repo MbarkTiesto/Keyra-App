@@ -114,7 +114,13 @@ body {
 
 .header-main { flex: 1; min-width: 200px; }
 
-.section-title { font-size: clamp(28px, 5vw, 42px); font-weight: 850; letter-spacing: -1.8px; line-height: 1.1; }
+.section-title { 
+    font-size: clamp(28px, 5vw, 42px); 
+    font-weight: 850; 
+    letter-spacing: -1.2px; 
+    line-height: 1.1; 
+    margin: 0;
+}
 .section-subtitle { color: var(--text-secondary); font-size: clamp(14px, 1.6vw, 16px); font-weight: 600; opacity: 0.8; }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -343,6 +349,15 @@ body {
         to { transform: translateY(0); }
     }
 
+    /* Mobile Sync Pill Adjustment */
+    .cloud-sync-indicator {
+        bottom: 16px; 
+        right: 16px;
+        height: 40px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
     #auth-vessel h1 { font-size: 38px !important; letter-spacing: -2px !important; }
     .auth-modal .form-input { padding: 16px 20px !important; font-size: 16px !important; }
 }
@@ -362,7 +377,7 @@ body {
     .user-name, .user-button i[data-lucide="chevron-down"] { display: none !important; }
     .user-avatar { width: 32px; height: 32px; font-size: 13px; }
 
-    .section-title { font-size: 22px; }
+    .section-title { font-size: 24px; letter-spacing: -0.8px; }
 }
 
 @media (max-width: 300px) {

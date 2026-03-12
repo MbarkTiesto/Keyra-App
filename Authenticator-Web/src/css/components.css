@@ -586,7 +586,7 @@ input:checked + .slider:before {
     font-size: clamp(18px, 4vw, 22px);
     color: var(--text-primary);
     margin: 0;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.8px;
 }
 
 .bento-subtitle {
@@ -687,19 +687,31 @@ input:checked + .slider:before {
    CLOUD SYNC INDICATOR
    ───────────────────────────────────────────────────────────────────────────── */
 .cloud-sync-indicator {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 2000;
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 0 16px;
-    height: var(--btn-h-sm);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    height: 48px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid var(--accent-soft);
     border-radius: var(--radius-full);
     font-size: 13px;
     font-weight: 800;
     color: var(--accent-primary);
-    margin-right: 12px;
-    animation: fadeIn 0.3s ease;
+    box-shadow: 0 12px 32px var(--accent-soft), 
+                inset 0 0 0 1px hsla(0, 0%, 100%, 0.1);
+    animation: pillFloat 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes pillFloat {
+    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .cloud-sync-indicator span {
