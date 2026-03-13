@@ -39,7 +39,17 @@ export interface UserRecord {
     activationCode?: string;
     encryptedVaultData: string;
     settings?: UserSettings;
+    "Desktop Settings"?: UserSettings;
 }
+
+/*
+ * Task: Separate User Settings
+ * - [x] Create implementation plan
+ * - [/] Update data structure and storage logic
+ * - [ ] Update sync logic to handle separate settings sections
+ * - [ ] Update UI to read/write to the correct settings section
+ * - [ ] Verify the separation and sync functionality
+ */
 
 async function githubRequest(filePath: string, method: string = 'GET', body: any = null) {
     if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {

@@ -34,8 +34,7 @@ export function getCurrentUser() {
     return {
         id: currentUser.id,
         username: currentUser.username,
-        email: currentUser.email,
-        settings: currentUser.settings
+        settings: currentUser["Desktop Settings"]
     };
 }
 
@@ -231,8 +230,8 @@ export async function updateUserSettings(settings: any): Promise<void> {
     const userIndex = users.findIndex(u => u.id === currentUser!.id);
     if (userIndex === -1) throw new Error("User missing from storage.");
 
-    users[userIndex].settings = settings;
-    currentUser.settings = settings;
+    users[userIndex]["Desktop Settings"] = settings;
+    currentUser["Desktop Settings"] = settings;
 
     await saveUsers(users);
     await syncUserData(currentUser.username, users[userIndex]);
@@ -268,8 +267,9 @@ export async function pollForUpdates(): Promise<{ changed: boolean, settings?: a
     
     if (result.dataChanged && result.userData) {
         // Update local session state if it exists in the fetched data
-        if (result.userData.settings) {
-            currentUser.settings = result.userData.settings;
+        if (result.userData["Desktop Settings"] || result.userData.settings) {
+            currentUser["Desktop Settings"] = result.userData["Desktop Settings"] || result.userData.settings;
+            currentUser.settings = result.userData.settings; // Keep legacy for ref
         }
 
         // If vault data changed, decrypt it
@@ -285,7 +285,7 @@ export async function pollForUpdates(): Promise<{ changed: boolean, settings?: a
 
         return { 
             changed: true, 
-            settings: result.userData.settings,
+            settings: currentUser["Desktop Settings"],
             accounts
         };
     }
