@@ -122,8 +122,10 @@ export class UIManager {
         try {
             const settings = this.getSettingsObject();
             await (window as any).api.updateUserSettings(settings);
+            localStorage.setItem(this.getStorageKey('last_sync'), new Date().toISOString());
         } finally {
             this.setSyncing(false);
+            this.updateLastActivityDisplay();
         }
     }
 
@@ -598,6 +600,45 @@ export class UIManager {
         this.setAccentColor(savedAccent, true);
 
         window.addEventListener('resize', this.debounce(() => this.refreshLucide(), 250));
+
+        // About Modal
+        const brandBtn = document.getElementById('navbar-brand');
+        const closeAboutBtn = document.getElementById('btn-close-about');
+        const aboutModal = document.getElementById('about-modal');
+
+        if (brandBtn) {
+            brandBtn.addEventListener('click', () => this.showAboutModal());
+        }
+
+        if (closeAboutBtn) {
+            closeAboutBtn.addEventListener('click', () => this.hideAboutModal());
+        }
+
+        if (aboutModal) {
+            aboutModal.addEventListener('click', (e) => {
+                if (e.target === aboutModal) this.hideAboutModal();
+            });
+        }
+    }
+
+    private showAboutModal() {
+        const modal = document.getElementById('about-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('show');
+            this.updateLastActivityDisplay();
+            this.refreshLucide();
+        }
+    }
+
+    private hideAboutModal() {
+        const modal = document.getElementById('about-modal');
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
     }
 
     private setupAccentColorSelector() {
@@ -630,6 +671,7 @@ export class UIManager {
             await this.pushSettings();
             await this.refreshAccounts();
             this.showToast("Cloud Vault Synchronized", "success");
+            localStorage.setItem(this.getStorageKey('last_sync'), new Date().toISOString());
             this.updateLastActivity('Manual Cloud Sync');
             if (statusDesc) statusDesc.textContent = 'Synchronized';
         } catch (err) {
@@ -638,6 +680,7 @@ export class UIManager {
         } finally {
             if (icon) icon.classList.remove('sync-spin');
             this.setSyncing(false);
+            this.updateLastActivityDisplay();
         }
     }
 
@@ -667,7 +710,34 @@ export class UIManager {
 
             lastActivityElement.textContent = timeAgo;
         }
-        if (lastActionElement) lastActionElement.textContent = lastAction;
+        // Sync About Modal (if open or for next time)
+        const aboutActivity = document.getElementById('about-last-activity');
+        const aboutAction = document.getElementById('about-last-action');
+        const aboutSync = document.getElementById('about-last-sync');
+
+        if (aboutActivity) aboutActivity.textContent = lastActivity ? lastActivityElement.textContent : 'Never';
+        if (aboutAction) aboutAction.textContent = lastAction;
+
+        if (aboutSync) {
+            const lastSync = localStorage.getItem(this.getStorageKey('last_sync'));
+            aboutSync.textContent = lastSync ? this.formatSyncTime(new Date(lastSync)) : 'Never Secured';
+        }
+    }
+
+    private formatSyncTime(date: Date): string {
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const isToday = date.toDateString() === now.toDateString();
+        
+        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        
+        if (isToday) return `Today, ${timeStr}`;
+        
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        if (date.toDateString() === yesterday.toDateString()) return `Yesterday, ${timeStr}`;
+        
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + `, ${timeStr}`;
     }
 
     private switchTab(tab: 'vault' | 'settings') {

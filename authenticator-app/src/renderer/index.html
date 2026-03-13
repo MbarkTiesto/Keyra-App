@@ -154,12 +154,66 @@
             </div>
         </div>
 
+        <!-- Crystalline Bento About Modal -->
+        <div id="about-modal" class="modal-overlay hidden">
+            <div class="modal about-bento-container animate-crystalline-in">
+                <div class="about-bento-header">
+                    <div class="about-bento-logo">
+                        <i data-lucide="shield-check"></i>
+                        <div class="logo-glow"></div>
+                    </div>
+                    <h2 class="about-bento-title">Keyra Authenticator</h2>
+                    <p class="about-bento-mission">Unbreakable Security & Elite Aesthetics</p>
+                </div>
+
+                <div class="about-bento-grid">
+                    <!-- Version Block -->
+                    <div class="bento-item bento-version">
+                        <div class="bento-item-label">IDENTITY</div>
+                        <div class="bento-item-value">v1.2.0 <span class="pro-tag">PRO</span></div>
+                        <div class="bento-item-hint">LATEST STABLE</div>
+                    </div>
+
+                    <!-- Sync Status Block -->
+                    <div class="bento-item bento-status">
+                        <div class="bento-item-label">SYSTEM HEALTH</div>
+                        <div class="bento-item-value success-text">
+                            <i data-lucide="check-circle-2"></i>
+                            OPERATIONAL
+                        </div>
+                        <div class="bento-item-hint">PROTECTION ACTIVE</div>
+                    </div>
+
+                    <!-- Activity Block (Full Width on small, 2-col on large) -->
+                    <div class="bento-item bento-activity">
+                        <div class="bento-item-label">LAST ACTION</div>
+                        <div class="bento-item-value" id="about-last-action">No activity</div>
+                        <div class="bento-item-hint" id="about-last-activity">Never recorded</div>
+                    </div>
+
+                    <!-- Sync Block (Replaces Tech) -->
+                    <div class="bento-item bento-sync">
+                        <div class="bento-item-label">VAULT SYNCHRONIZATION</div>
+                        <div class="bento-item-value" id="about-last-sync">Calculating...</div>
+                        <div class="bento-item-hint">CLOUD BACKUP SECURED</div>
+                    </div>
+                </div>
+
+                <div class="about-bento-footer">
+                    <button class="btn-primary bento-close-btn" id="btn-close-about">
+                        <span>Great, Thanks!</span>
+                        <i data-lucide="arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
     <div class="app-container">
         <!-- Modern Top Navigation Bar -->
         <header class="navbar">
             <div class="navbar-wrapper">
                 <div class="navbar-section navbar-left">
-                    <div class="navbar-brand">
+                    <div class="navbar-brand" id="navbar-brand">
                         <div class="brand-icon">
                             <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
                         </div>
