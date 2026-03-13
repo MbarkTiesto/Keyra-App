@@ -23,6 +23,8 @@ export interface UserSettings {
     screenGuardian: boolean;
     autolock: string;
     oledMode: boolean;
+    performanceMode: boolean;
+    menuExitIntegration: boolean;
     vaultPin?: string;
 }
 

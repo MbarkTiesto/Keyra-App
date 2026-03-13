@@ -9,6 +9,7 @@ export class UIManager {
     private screenGuardian: boolean = false;
     private oledMode: boolean = false;
     private performanceMode: boolean = false;
+    private menuExitIntegration: boolean = false;
     private wallpaperPreset: string = 'nebula';
     private searchQuery: string = '';
     private syncCount: number = 0;
@@ -19,6 +20,7 @@ export class UIManager {
         this.initPrivacyMode();
         this.initScreenGuardian();
         this.initPerformanceMode();
+        this.initMenuExitIntegration();
         this.initSegmentedStates();
         this.setupEventListeners();
         this.updateLockVaultVisibility();
@@ -92,6 +94,7 @@ export class UIManager {
             autolock: localStorage.getItem(this.getStorageKey('autolock')) || '0',
             oledMode: this.oledMode,
             performanceMode: this.performanceMode,
+            menuExitIntegration: this.menuExitIntegration,
             vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
         };
     }
@@ -139,6 +142,13 @@ export class UIManager {
             document.body.classList.toggle('performance-mode', this.performanceMode);
         }
 
+        if (settings.menuExitIntegration !== undefined) {
+            this.menuExitIntegration = !!settings.menuExitIntegration;
+            const menuExitToggle = document.getElementById('menu-exit-toggle') as HTMLInputElement;
+            if (menuExitToggle) menuExitToggle.checked = this.menuExitIntegration;
+            this.updateCloseButtonVisibility();
+        }
+
         if (saveLocal) {
             if (settings.theme) localStorage.setItem(this.getStorageKey('theme'), settings.theme);
             if (settings.accentColor) localStorage.setItem(this.getStorageKey('accent_color'), settings.accentColor);
@@ -148,6 +158,7 @@ export class UIManager {
             if (settings.autolock !== undefined) localStorage.setItem(this.getStorageKey('autolock'), String(settings.autolock));
             localStorage.setItem(this.getStorageKey('oled_mode'), String(this.oledMode));
             localStorage.setItem(this.getStorageKey('performance_mode'), String(this.performanceMode));
+            localStorage.setItem(this.getStorageKey('menu_exit_integration'), String(this.menuExitIntegration));
             if (settings.vaultPin) localStorage.setItem(this.getStorageKey('vault_pin'), settings.vaultPin);
         }
 
@@ -254,6 +265,23 @@ export class UIManager {
         document.body.classList.toggle('performance-mode', this.performanceMode);
     }
 
+    private initMenuExitIntegration() {
+        this.menuExitIntegration = localStorage.getItem(this.getStorageKey('menu_exit_integration')) === 'true';
+        const toggle = document.getElementById('menu-exit-toggle') as HTMLInputElement;
+        if (toggle) toggle.checked = this.menuExitIntegration;
+        this.updateCloseButtonVisibility();
+    }
+
+    private updateCloseButtonVisibility() {
+        const navBtn = document.getElementById('btn-close-app');
+        const menuBtn = document.getElementById('menu-close-app-btn');
+        if (navBtn) navBtn.classList.toggle('hidden', this.menuExitIntegration);
+        if (menuBtn) {
+            menuBtn.classList.toggle('hidden', !this.menuExitIntegration);
+            this.refreshLucide(); // Re-render icon if it was hidden
+        }
+    }
+
     private initSegmentedStates() {
         const theme = localStorage.getItem(this.getStorageKey('theme')) || 'light';
         this.updateSegmentedUI('theme-segmented', theme);
@@ -317,6 +345,10 @@ export class UIManager {
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
             const nextTheme = this.currentTheme === 'light' ? 'dark' : 'light';
             this.setTheme(nextTheme);
+        });
+
+        document.getElementById('menu-close-app-btn')?.addEventListener('click', () => {
+            (window as any).api.close();
         });
         document.getElementById('btn-logout-trigger')?.addEventListener('click', () => {
             document.getElementById('modal-logout')?.classList.add('show');
@@ -382,6 +414,17 @@ export class UIManager {
             this.pushSettings();
             this.showToast(this.performanceMode ? "Ultra Performance Active" : "Visual Effects Restored", "info");
             this.updateLastActivity(`Performance Mode ${this.performanceMode ? 'Enabled' : 'Disabled'}`);
+        });
+
+        // Menu Exit Toggle
+        document.getElementById('menu-exit-toggle')?.addEventListener('change', (e) => {
+            const target = e.target as HTMLInputElement;
+            this.menuExitIntegration = target.checked;
+            localStorage.setItem(this.getStorageKey('menu_exit_integration'), String(this.menuExitIntegration));
+            this.updateCloseButtonVisibility();
+            this.pushSettings();
+            this.showToast(this.menuExitIntegration ? "Close Button moved to Menu" : "Close Button moved to Navbar", "info");
+            this.updateLastActivity(`Menu Exit ${this.menuExitIntegration ? 'Enabled' : 'Disabled'}`);
         });
 
         // Settings PIN

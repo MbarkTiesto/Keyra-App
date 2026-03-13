@@ -203,6 +203,10 @@
                                 <i id="theme-icon-lucide" data-lucide="moon" style="width: 18px; height: 18px;"></i>
                                 <span id="theme-text">Dark Mode</span>
                             </div>
+                            <div class="dropdown-item hidden" id="menu-close-app-btn">
+                                <i data-lucide="x-circle" style="width: 18px; height: 18px;"></i>
+                                <span>Close App</span>
+                            </div>
                             <div class="dropdown-divider"></div>
                             <div class="dropdown-item danger" id="btn-logout-trigger">
                                 <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
@@ -329,6 +333,16 @@
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="screen-guardian-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Menu Exit Item</div>
+                                <div class="setting-desc">Add Close App to user menu</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="menu-exit-toggle">
                                 <span class="slider round"></span>
                             </label>
                         </div>
