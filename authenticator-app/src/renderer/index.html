@@ -357,6 +357,7 @@
                                 <div class="setting-name">Access PIN</div>
                                 <div class="setting-desc">Multi-factor verification core</div>
                             </div>
+                            <div id="pin-status-badge"></div>
                             <button class="user-button" id="setup-pin-btn" style="min-width: 100px; justify-content: center;">Setup PIN</button>
                         </div>
                         <div class="setting-row">
@@ -592,47 +593,6 @@
                     </div>
                 </div>
 
-                <!-- 5. About & Support Card — Least Critical Last -->
-                <div class="account-card bento-card">
-                    <div class="bento-header">
-                        <div class="bento-icon">
-                            <i data-lucide="info" style="color: #28a745;"></i>
-                        </div>
-                        <div class="bento-title-vessel">
-                            <h3 class="bento-title">About</h3>
-                            <div class="bento-subtitle">Version & System Health</div>
-                        </div>
-                    </div>
-                    <div class="bento-content">
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <div class="setting-name">Version</div>
-                                <div class="setting-desc">v1.0.0 Stable</div>
-                            </div>
-                            <div class="badge" style="background: var(--bg-tertiary); color: var(--text-secondary); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800;">LATEST</div>
-                        </div>
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <div class="setting-name">Last Activity</div>
-                                <div class="setting-desc" id="last-action-display">No activity</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 13px; font-weight: 700;">
-                                <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
-                                <span id="last-activity-display">Never</span>
-                            </div>
-                        </div>
-                        <div class="setting-row">
-                            <div class="setting-info">
-                                <div class="setting-name">Vault Analytics</div>
-                                <div class="setting-desc">Security state</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 6px; color: #28a745; font-size: 13px; font-weight: 800;">
-                                <i data-lucide="check-circle-2" style="width: 16px; height: 16px;"></i>
-                                OPERATIONAL
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 </div>
             </section>
@@ -732,6 +692,18 @@
                     Confirm Identity
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- Global Loading Overlay (Premium Neuomorphic) -->
+    <div id="loading-overlay" class="modal-overlay hidden" style="z-index: 99999;">
+        <div class="loading-content">
+            <div class="nm-spinner-vessel">
+                <div class="nm-spinner"></div>
+                <div class="nm-spinner-inner"></div>
+            </div>
+            <h2 id="loading-title" class="loading-title">Processing</h2>
+            <p id="loading-subtitle" class="loading-subtitle">VAULT SECURITY SYNCHRONIZATION</p>
         </div>
     </div>
 

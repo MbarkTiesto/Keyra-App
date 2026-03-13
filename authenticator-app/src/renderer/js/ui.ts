@@ -32,6 +32,7 @@ export class UIManager {
         this.startLiveSync();
         this.initCaptureResults();
         this.initConnectivityStatus();
+        this.updatePinStatus();
     }
 
     private initCaptureResults() {
@@ -91,6 +92,25 @@ export class UIManager {
         const indicator = document.getElementById('cloud-sync-indicator');
         if (indicator) {
             indicator.classList.toggle('hidden', this.syncCount === 0);
+        }
+    }
+
+    public setLoading(show: boolean, title: string = "Processing", subtitle: string = "VAULT SECURITY SYNCHRONIZATION") {
+        const overlay = document.getElementById('loading-overlay');
+        const titleEl = document.getElementById('loading-title');
+        const subtitleEl = document.getElementById('loading-subtitle');
+
+        if (overlay) {
+            if (show) {
+                if (titleEl) titleEl.textContent = title;
+                if (subtitleEl) subtitleEl.textContent = subtitle;
+                overlay.classList.remove('hidden');
+                // Small delay to ensure display: block is processed before opacity starts
+                setTimeout(() => overlay.classList.add('show'), 10);
+            } else {
+                overlay.classList.remove('show');
+                setTimeout(() => overlay.classList.add('hidden'), 400); // Match CSS transition duration
+            }
         }
     }
 
@@ -1009,6 +1029,37 @@ export class UIManager {
         if (lockBtn) lockBtn.classList.toggle('hidden', !localStorage.getItem(this.getStorageKey('vault_pin')));
     }
 
+    private updatePinStatus() {
+        const hasPin = !!localStorage.getItem(this.getStorageKey('vault_pin'));
+        const badge = document.getElementById('pin-status-badge');
+        const setupBtn = document.getElementById('setup-pin-btn');
+
+        if (badge) {
+            badge.className = 'badge ' + (hasPin ? 'success' : 'danger');
+            badge.style.display = 'block';
+            badge.style.marginRight = '12px';
+            badge.style.fontSize = '10px';
+            badge.style.fontWeight = '850';
+            badge.style.padding = '4px 10px';
+            badge.style.borderRadius = '20px';
+            badge.textContent = hasPin ? 'ACTIVE' : 'NOT SECURED';
+
+            if (hasPin) {
+                badge.style.background = 'rgba(40, 167, 69, 0.1)';
+                badge.style.color = '#28a745';
+                badge.style.border = '1px solid rgba(40, 167, 69, 0.2)';
+            } else {
+                badge.style.background = 'rgba(255, 59, 48, 0.1)';
+                badge.style.color = '#ff3b30';
+                badge.style.border = '1px solid rgba(255, 59, 48, 0.2)';
+            }
+        }
+
+        if (setupBtn) {
+            setupBtn.textContent = hasPin ? 'Change PIN' : 'Setup PIN';
+        }
+    }
+
     private refreshLucide() {
         if ((window as any).lucide) (window as any).lucide.createIcons();
     }
@@ -1022,48 +1073,92 @@ export class UIManager {
     }
 
     private showPinSetup() {
-        const content = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-icon-vessel">
-                        <i data-lucide="shield-check"></i>
+        let firstEntry = '';
+        let phase: 'entry' | 'confirm' = 'entry';
+
+        const renderModal = () => {
+            const isEntry = phase === 'entry';
+            const content = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-icon-vessel">
+                            <i data-lucide="${isEntry ? 'shield-check' : 'check-circle'}"></i>
+                        </div>
+                        <div class="modal-title-vessel">
+                            <h2>${isEntry ? 'Set Master PIN' : 'Verify PIN'}</h2>
+                            <p>${isEntry ? 'ESTABLISH 4-DIGIT VAULT KEY' : 'RE-ENTER KEY TO CONFIRM'}</p>
+                        </div>
                     </div>
-                    <div class="modal-title-vessel">
-                        <h2>Set PIN</h2>
-                        <p>SET 4-DIGIT MASTER CODE</p>
+                    <div class="modal-divider"></div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">${isEntry ? 'Choose New PIN' : 'Confirm New PIN'}</label>
+                            <div class="pin-input-vessel" style="margin: 20px 0;">
+                                <input type="password" id="setup-pin-field" maxlength="4" class="pin-field" 
+                                       style="opacity: 0; position: absolute;" autocomplete="off" autofocus>
+                                <div class="pin-indicators" style="justify-content: center;">
+                                    <div class="pin-dot" data-digit="1"></div>
+                                    <div class="pin-dot" data-digit="2"></div>
+                                    <div class="pin-dot" data-digit="3"></div>
+                                    <div class="pin-dot" data-digit="4"></div>
+                                </div>
+                            </div>
+                            <p class="modal-help-text" style="text-align: center;">
+                                ${isEntry ? 'Keep this code safe. It is required to unlock your identities.' : 'Passwords must match exactly to synchronize security.'}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-primary" id="btn-next-step" disabled>
+                            <i data-lucide="${isEntry ? 'arrow-right' : 'shield-check'}"></i>
+                            ${isEntry ? 'Next Phase' : 'Activate Vault'}
+                        </button>
+                        <button class="user-button" id="cancel-pin-btn" style="justify-content: center;">Cancel</button>
                     </div>
                 </div>
-                <div class="modal-divider"></div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">New PIN</label>
-                        <input type="password" id="new-pin" maxlength="4" class="form-input"
-                               style="font-size: clamp(22px, 5vw, 30px); text-align: center; letter-spacing: clamp(12px, 3vw, 20px); padding: 16px; height: clamp(60px, 12vw, 72px); font-family: monospace;"
-                               placeholder="••••" inputmode="numeric">
-                        <p class="modal-help-text" style="margin-top: 12px;">This PIN enables quick vault unlock. Keep it confidential.</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn-primary" id="save-pin">
-                        <i data-lucide="shield-check"></i>
-                        Activate Key
-                    </button>
-                    <button class="user-button" id="cancel-pin-btn" style="justify-content: center;">Cancel</button>
-                </div>
-            </div>
-        `;
-        this.showModal(content);
-        document.getElementById('save-pin')?.addEventListener('click', () => {
-            const pin = (document.getElementById('new-pin') as HTMLInputElement).value;
-            if (pin.length === 4) {
-                localStorage.setItem(this.getStorageKey('vault_pin'), pin);
-                this.pushSettings();
-                this.updateLockVaultVisibility();
-                this.showToast("PIN established", "success");
-                this.hideModal();
-            } else this.showToast("4 digits required", "error");
-        });
-        document.getElementById('cancel-pin-btn')?.addEventListener('click', () => this.hideModal());
+            `;
+            this.showModal(content);
+            this.refreshLucide();
+
+            const input = document.getElementById('setup-pin-field') as HTMLInputElement;
+            const dots = document.querySelectorAll('.pin-dot');
+            const nextBtn = document.getElementById('btn-next-step') as HTMLButtonElement;
+
+            input?.focus();
+            
+            input?.addEventListener('input', (e) => {
+                const val = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, '');
+                input.value = val;
+                dots.forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
+                if (nextBtn) nextBtn.disabled = val.length !== 4;
+            });
+
+            nextBtn?.addEventListener('click', () => {
+                if (phase === 'entry') {
+                    firstEntry = input.value;
+                    phase = 'confirm';
+                    renderModal();
+                } else {
+                    if (input.value === firstEntry) {
+                        localStorage.setItem(this.getStorageKey('vault_pin'), input.value);
+                        this.pushSettings();
+                        this.updateLockVaultVisibility();
+                        this.updatePinStatus();
+                        this.showToast("PIN Activated", "success");
+                        this.hideModal();
+                    } else {
+                        this.showToast("PIN Matching Failed", "error");
+                        phase = 'entry';
+                        firstEntry = '';
+                        renderModal();
+                    }
+                }
+            });
+
+            document.getElementById('cancel-pin-btn')?.addEventListener('click', () => this.hideModal());
+        };
+
+        renderModal();
     }
 
     private showAddModal() {
