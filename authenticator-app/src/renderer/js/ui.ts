@@ -66,14 +66,11 @@ export class UIManager {
         const isOnline = navigator.onLine;
         const statusEl = document.getElementById('connectivity-status');
         const textEl = document.getElementById('status-text');
-        const iconEl = document.getElementById('connectivity-icon');
 
-        if (statusEl && textEl && iconEl) {
+        if (statusEl && textEl) {
             statusEl.classList.toggle('online', isOnline);
             statusEl.classList.toggle('offline', !isOnline);
             textEl.textContent = isOnline ? 'Online' : 'Offline';
-            iconEl.setAttribute('data-lucide', isOnline ? 'wifi' : 'wifi-off');
-            this.refreshLucide();
         }
         
         if (!isOnline) {

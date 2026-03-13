@@ -235,7 +235,7 @@
                 <div class="navbar-section navbar-right">
                     <!-- Modern Connectivity Indicator (Glass Pill) -->
                     <div id="connectivity-status" class="connectivity-indicator online">
-                        <i data-lucide="wifi" id="connectivity-icon"></i>
+                        <span class="status-dot"></span>
                         <span id="status-text">Online</span>
                     </div>
 
@@ -321,8 +321,10 @@
 
                 <!-- Search Empty State (No Results) -->
                 <div id="search-empty-state" class="hidden">
-                    <div class="empty-state-vessel">
-                        <i data-lucide="search-x" style="width: 80px; height: 80px; opacity: 0.6;"></i>
+                    <div class="empty-state-vessel nm-search-empty-state">
+                        <div class="nm-search-icon-vessel">
+                            <i data-lucide="search-x"></i>
+                        </div>
                         <h2>Identity Not Found</h2>
                         <p>We couldn't find a match for your search. Try refining your keywords.</p>
                     </div>
