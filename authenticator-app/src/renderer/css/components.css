@@ -1428,45 +1428,19 @@ input:checked+.slider:before {
     font-weight: 700;
 }
 
-/* Accent Color Selector - Perfect Positioning System */
+/* Accent Color Selector - Optimized Grid System */
 .accent-color-selector {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap: 10px;
     margin-top: 12px;
-    padding: 16px;
+    padding: 12px;
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
     position: relative;
-}
-
-.accent-color-row {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-/* Main Row - Original Colors */
-.accent-color-row.main {
-    gap: 14px;
-}
-
-/* Cute Colors Row */
-.accent-color-row.cute {
-    gap: 10px;
-}
-
-/* Modern Colors Row */
-.accent-color-row.modern {
-    gap: 10px;
-}
-
-/* Elegant Colors Row */
-.accent-color-row.elegant {
-    gap: 10px;
+    max-width: 100%;
+    justify-items: center;
 }
 
 .accent-color-option {
