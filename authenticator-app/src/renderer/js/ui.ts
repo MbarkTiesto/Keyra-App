@@ -911,14 +911,13 @@ export class UIManager {
             const parsed = await (window as any).api.parseURI(data);
             await (window as any).api.generateTOTP(parsed.secret);
 
-            await (window as any).api.saveAccount({
+            this.accounts = await (window as any).api.saveAccount({
                 id: Date.now().toString(),
                 issuer: parsed.issuer,
                 account: parsed.account,
                 secret: parsed.secret
             });
-
-            await this.refreshAccounts();
+            this.renderAccounts();
             this.showToast(`Added ${parsed.issuer} account!`, "success");
             this.updateLastActivity('Added token via Scan');
         } catch (err) {
@@ -1308,8 +1307,8 @@ export class UIManager {
             const account = (document.getElementById('new-account') as HTMLInputElement).value;
             const secret = (document.getElementById('new-secret') as HTMLInputElement).value;
             if (issuer && secret) {
-                await (window as any).api.saveAccount({ id: Date.now().toString(), issuer, account, secret });
-                await this.refreshAccounts();
+                this.accounts = await (window as any).api.saveAccount({ id: Date.now().toString(), issuer, account, secret });
+                this.renderAccounts();
                 this.hideModal();
                 this.showToast("Token Saved", "success");
                 this.updateLastActivity('Added token');
@@ -1364,8 +1363,8 @@ export class UIManager {
             const issuer = (document.getElementById('edit-issuer') as HTMLInputElement).value;
             const accName = (document.getElementById('edit-account') as HTMLInputElement).value;
             if (issuer) {
-                await (window as any).api.saveAccount({ ...account, issuer, account: accName });
-                await this.refreshAccounts();
+                this.accounts = await (window as any).api.saveAccount({ ...account, issuer, account: accName });
+                this.renderAccounts();
                 this.hideModal();
                 this.showToast("Updated", "success");
                 this.updateLastActivity('Edited token');
@@ -1410,8 +1409,8 @@ export class UIManager {
         `;
         this.showModal(content);
         document.getElementById('confirm-delete')?.addEventListener('click', async () => {
-            await (window as any).api.deleteAccount(account.id);
-            await this.refreshAccounts();
+            this.accounts = await (window as any).api.deleteAccount(account.id);
+            this.renderAccounts();
             this.hideModal();
             this.showToast("Token removed", "info");
             this.updateLastActivity('Deleted token');

@@ -117,14 +117,6 @@ export async function getUsers(): Promise<UserRecord[]> {
         console.error("Local storage read failed", e);
     }
 
-    // 2. Cloud Sync (Async background)
-    callSync('get', 'users.json').then((res: any) => {
-        if (res.success && res.data) {
-            fs.writeFileSync(STORE_PATH, JSON.stringify(res.data, null, 2));
-            lastUsersSHA = res.sha;
-        }
-    }).catch(e => console.error("Cloud users fetch failed", e));
-
     return localUsers;
 }
 
