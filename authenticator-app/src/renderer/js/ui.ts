@@ -308,6 +308,12 @@ export class UIManager {
             this.lockVault();
             this.updateLastActivity('Vault locked');
         });
+
+        // Close App Logic
+        document.getElementById('btn-close-app')?.addEventListener('click', () => {
+            (window as any).api.close();
+        });
+
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
             const nextTheme = this.currentTheme === 'light' ? 'dark' : 'light';
             this.setTheme(nextTheme);

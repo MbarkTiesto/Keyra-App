@@ -2384,3 +2384,90 @@ body.light-theme .cloud-sync-pill {
     pointer-events: none;
     visibility: hidden;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCIENTIFIC & CUTE WINDOW CONTROLS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.window-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: 16px;
+    padding-left: 20px;
+    border-left: 1px solid var(--glass-border);
+}
+
+.btn-control {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1.5px solid transparent;
+    background: var(--glass-bg);
+    color: var(--text-secondary);
+    -webkit-app-region: no-drag;
+}
+
+.btn-close {
+    color: hsl(330, 95%, 65%); /* Cute Rose Quartz Base */
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+}
+
+.btn-close::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, hsla(330, 95%, 65%, 0.25) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.btn-close:hover {
+    background: hsla(330, 95%, 65%, 0.15);
+    color: hsl(330, 100%, 75%);
+    transform: scale(1.1) rotate(90deg);
+    border-color: hsla(330, 95%, 65%, 0.3);
+    box-shadow: 0 0 15px hsla(330, 95%, 65%, 0.35);
+}
+
+.btn-close:hover::before {
+    width: 100px;
+    height: 100px;
+}
+
+.btn-close:active {
+    transform: scale(0.92) rotate(90deg);
+    background: hsla(330, 95%, 65%, 0.25);
+    transition: all 0.1s ease;
+}
+
+.btn-close i {
+    width: 16px !important;
+    height: 16px !important;
+    stroke-width: 3.5px !important;
+}
+
+/* Responsive visibility */
+@media (max-width: 500px) {
+    .window-controls {
+        gap: 8px;
+        margin-left: 10px;
+        padding-left: 10px;
+    }
+    .btn-control {
+        width: 30px;
+        height: 30px;
+    }
+}
