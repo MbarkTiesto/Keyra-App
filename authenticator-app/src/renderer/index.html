@@ -139,14 +139,18 @@
             <div id="selection-box" class="selection-box"></div>
         </div>
 
-        <!-- Privacy Guard Blur Overlay (Web Screen Guardian) -->
-        <div id="privacy-blur-overlay" class="modal-overlay privacy-overlay hidden">
-            <div class="privacy-content animate-fade-in">
-                <div class="privacy-shield-icon">
-                    <i data-lucide="shield-off"></i>
+        <!-- Dynamic Privacy Blur Overlay -->
+        <div id="privacy-blur-overlay" class="modal-overlay privacy-overlay">
+            <div class="privacy-content">
+                <div class="privacy-shield-vessel">
+                    <div class="privacy-shield-icon">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <div class="privacy-scan-line"></div>
                 </div>
-                <h2>Vault Protected</h2>
-                <p>Screen Guardian is active. Refocus Keyra to resume your secure session.</p>
+                <h2>Secured State</h2>
+                <p>Application UI is hidden for your privacy.</p>
+                <div class="privacy-hint">Focus window to resume session</div>
             </div>
         </div>
 
@@ -343,6 +347,16 @@
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="menu-exit-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-info">
+                                <div class="setting-name">Interactive Privacy</div>
+                                <div class="setting-desc">Blur UI when mouse leaves window</div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="privacy-blur-toggle">
                                 <span class="slider round"></span>
                             </label>
                         </div>

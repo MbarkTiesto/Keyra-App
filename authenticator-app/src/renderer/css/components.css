@@ -2062,19 +2062,37 @@ body.light-theme .setting-row:hover {
    PRIVACY OVERLAY (WEB SCREEN GUARDIAN)
    ───────────────────────────────────────────────────────────────────────────── */
 .privacy-overlay {
-    background: hsla(230, 15%, 5%, 0.8) !important;
-    backdrop-filter: blur(80px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(80px) saturate(200%) !important;
+    background: hsla(230, 15%, 5%, 0.4) !important;
+    backdrop-filter: blur(50px) saturate(220%) !important;
+    -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
     z-index: 9999 !important;
-    /* Above everything */
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.privacy-overlay.hidden {
-    display: none !important;
+[data-theme="light"] .privacy-overlay {
+    background: hsla(0, 0%, 100%, 0.4) !important;
+    backdrop-filter: blur(40px) saturate(180%) !important;
+}
+
+.privacy-overlay {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    display: flex !important;
+    transform: scale(1.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.privacy-overlay.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: scale(1) !important;
+    z-index: 99999 !important;
 }
 
 .privacy-content {
@@ -2083,40 +2101,95 @@ body.light-theme .setting-row:hover {
     padding: var(--space-xl);
 }
 
+.privacy-shield-vessel {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 32px;
+}
+
 .privacy-shield-icon {
-    width: 120px;
-    height: 120px;
+    width: 100%;
+    height: 100%;
     background: var(--accent-soft);
-    border: 3px solid var(--accent-primary);
+    border: 3.5px solid var(--accent-primary);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto var(--space-xl);
     color: var(--accent-primary);
-    box-shadow: 0 0 50px var(--accent-soft);
+    box-shadow: 
+        0 0 40px var(--accent-soft),
+        inset 0 0 20px var(--accent-soft);
+    animation: shieldPulse 3s ease-in-out infinite;
+}
+
+@keyframes shieldPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 40px var(--accent-soft); }
+    50% { transform: scale(1.05); box-shadow: 0 0 60px var(--accent-soft); }
+}
+
+.privacy-scan-line {
+    position: absolute;
+    top: 0;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    box-shadow: 0 0 15px var(--accent-primary);
+    border-radius: 10px;
+    animation: scanLineMove 2.5s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes scanLineMove {
+    0% { top: 20%; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 80%; opacity: 0; }
 }
 
 .privacy-shield-icon i {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
+    filter: drop-shadow(0 0 10px var(--accent-primary));
 }
 
 .privacy-overlay h2 {
-    font-size: 32px;
-    font-weight: 900;
-    color: #fff;
-    margin-bottom: 12px;
-    letter-spacing: -1px;
+    font-size: 36px;
+    font-weight: 950;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
 }
 
 .privacy-overlay p {
     color: var(--text-secondary);
     font-size: 16px;
-    line-height: 1.5;
     font-weight: 600;
-    opacity: 0.9;
+    margin-bottom: 24px;
+    opacity: 0.8;
 }
+
+.privacy-hint {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    background: var(--accent-soft);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--accent-primary);
+    animation: fadeInOut 2s infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.5; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-4px); }
+}
+
 
 .bento-subtitle {
     font-size: 11px;

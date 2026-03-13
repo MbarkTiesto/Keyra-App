@@ -25,6 +25,7 @@ export interface UserSettings {
     oledMode: boolean;
     performanceMode: boolean;
     menuExitIntegration: boolean;
+    privacyBlur: boolean;
     vaultPin?: string;
 }
 

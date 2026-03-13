@@ -445,7 +445,7 @@ body.performance-mode .pin-overlay {
     visibility: visible !important;
 }
 
-/* Ensure hidden elements STAY hidden in performance mode */
+/* Ensure hidden elements STAY hidden in performance mode (excluding our privacy overlay when active) */
 body.performance-mode .modal-overlay:not(.show),
 body.performance-mode .dropdown-menu:not(.show),
 body.performance-mode .hidden {
@@ -491,7 +491,25 @@ body.performance-mode .splash-screen {
 body.performance-mode .glass,
 body.performance-mode .account-card,
 body.performance-mode .modal,
+body.performance-mode .privacy-overlay,
 body.performance-mode .dropdown-menu {
     background: var(--bg-secondary) !important;
     border: 1px solid var(--border-color) !important;
+}
+
+body.performance-mode .privacy-overlay.show {
+    background-color: hsl(var(--h), 45%, 4%) !important;
+    background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 10px, hsla(var(--h), 100%, 80%, 0.02) 10px, hsla(var(--h), 100%, 80%, 0.02) 11px),
+        radial-gradient(circle at center, hsla(var(--h), 100%, 70%, 0.05) 0%, transparent 80%) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 99999 !important;
+    display: flex !important;
+}
+
+[data-theme="light"] body.performance-mode .privacy-overlay.show {
+    background-color: hsl(var(--h), 20%, 94%) !important;
+    background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 10px, hsla(var(--h), 100%, 20%, 0.02) 10px, hsla(var(--h), 100%, 20%, 0.02) 11px) !important;
 }

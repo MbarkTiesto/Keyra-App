@@ -10,6 +10,7 @@ export class UIManager {
     private oledMode: boolean = false;
     private performanceMode: boolean = false;
     private menuExitIntegration: boolean = false;
+    private privacyBlur: boolean = false;
     private wallpaperPreset: string = 'nebula';
     private searchQuery: string = '';
     private syncCount: number = 0;
@@ -21,6 +22,7 @@ export class UIManager {
         this.initScreenGuardian();
         this.initPerformanceMode();
         this.initMenuExitIntegration();
+        this.initInteractivePrivacy();
         this.initSegmentedStates();
         this.setupEventListeners();
         this.updateLockVaultVisibility();
@@ -95,6 +97,7 @@ export class UIManager {
             oledMode: this.oledMode,
             performanceMode: this.performanceMode,
             menuExitIntegration: this.menuExitIntegration,
+            privacyBlur: this.privacyBlur,
             vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
         };
     }
@@ -149,6 +152,12 @@ export class UIManager {
             this.updateCloseButtonVisibility();
         }
 
+        if (settings.privacyBlur !== undefined) {
+            this.privacyBlur = !!settings.privacyBlur;
+            const blurToggle = document.getElementById('privacy-blur-toggle') as HTMLInputElement;
+            if (blurToggle) blurToggle.checked = this.privacyBlur;
+        }
+
         if (saveLocal) {
             if (settings.theme) localStorage.setItem(this.getStorageKey('theme'), settings.theme);
             if (settings.accentColor) localStorage.setItem(this.getStorageKey('accent_color'), settings.accentColor);
@@ -159,6 +168,7 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('oled_mode'), String(this.oledMode));
             localStorage.setItem(this.getStorageKey('performance_mode'), String(this.performanceMode));
             localStorage.setItem(this.getStorageKey('menu_exit_integration'), String(this.menuExitIntegration));
+            localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacyBlur));
             if (settings.vaultPin) localStorage.setItem(this.getStorageKey('vault_pin'), settings.vaultPin);
         }
 
@@ -280,6 +290,62 @@ export class UIManager {
             menuBtn.classList.toggle('hidden', !this.menuExitIntegration);
             this.refreshLucide(); // Re-render icon if it was hidden
         }
+    }
+
+    private initInteractivePrivacy() {
+        this.privacyBlur = localStorage.getItem(this.getStorageKey('privacy_blur')) === 'true';
+        const toggle = document.getElementById('privacy-blur-toggle') as HTMLInputElement;
+        if (toggle) toggle.checked = this.privacyBlur;
+
+        // Mouse Sensors for Privacy (Document level is often more stable for viewport exit)
+        document.documentElement.addEventListener('mouseleave', (e) => {
+            // Check if it's actually leaving the window (not just a child element)
+            if (!e.relatedTarget) {
+                console.log("[Privacy] Mouse left window viewport");
+                if (this.privacyBlur) this.showPrivacyOverlay();
+            }
+        });
+
+        document.documentElement.addEventListener('mouseenter', () => {
+            console.log("[Privacy] Mouse entered window viewport");
+            if (this.privacyBlur) this.hidePrivacyOverlay();
+        });
+
+        // Unified Focus logic
+        window.addEventListener('blur', () => {
+            console.log("[Privacy] App blurred (lost focus)");
+            if (this.privacyBlur || this.screenGuardian) this.showPrivacyOverlay();
+        });
+
+        window.addEventListener('focus', () => {
+            console.log("[Privacy] App focused");
+            this.hidePrivacyOverlay();
+        });
+    }
+
+    private showPrivacyOverlay() {
+        // Don't show if we are on the auth screen
+        const authVessel = document.getElementById('auth-vessel');
+        const isAuthActive = authVessel && (authVessel.classList.contains('show'));
+        
+        if (!isAuthActive) {
+            const overlay = document.getElementById('privacy-blur-overlay');
+            if (overlay) {
+                console.log("[Privacy] Adding .show class to overlay");
+                overlay.classList.add('show');
+                this.refreshLucide();
+            } else {
+                console.error("[Privacy] Overlay element NOT FOUND");
+            }
+        } else {
+            console.log("[Privacy] Suppression: Auth Screen is active");
+        }
+    }
+
+    private hidePrivacyOverlay() {
+        const overlay = document.getElementById('privacy-blur-overlay');
+        console.log("[Privacy] Removing .show class from overlay");
+        overlay?.classList.remove('show');
     }
 
     private initSegmentedStates() {
@@ -450,6 +516,16 @@ export class UIManager {
             this.pushSettings();
             this.showToast(this.screenGuardian ? "Screen Guardian Active" : "Screen Guardian Disabled", "info");
             this.updateLastActivity(`Screen Guardian ${this.screenGuardian ? 'Enabled' : 'Disabled'}`);
+        });
+
+        // Interactive Privacy Toggle
+        document.getElementById('privacy-blur-toggle')?.addEventListener('change', (e) => {
+            const target = e.target as HTMLInputElement;
+            this.privacyBlur = target.checked;
+            localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacyBlur));
+            this.pushSettings();
+            this.showToast(this.privacyBlur ? "Interactive Privacy Enabled" : "Interactive Privacy Disabled", "info");
+            this.updateLastActivity(`Interactive Privacy ${this.privacyBlur ? 'Enabled' : 'Disabled'}`);
         });
 
         // Accent Color
