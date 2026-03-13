@@ -111,6 +111,29 @@
     --btn-h-md: 48px;   /* Standard Interaction */
     --btn-h-sm: 36px;   /* Compact / Tertiary */
     --btn-px: clamp(16px, 4vw, 32px);
+
+    /* Typography System - Premium Modular Scale */
+    --font-main: 'Nunito', 'Inter', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --font-size-2xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
+    --font-size-xs:  clamp(0.8rem, 0.75rem + 0.25vw, 0.85rem);
+    --font-size-sm:  clamp(0.9rem, 0.85rem + 0.25vw, 0.95rem);
+    --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.05rem);
+    --font-size-md:   clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
+    --font-size-lg:   clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+    --font-size-xl:   clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
+    --font-size-2xl:  clamp(2rem, 1.75rem + 1.25vw, 2.75rem);
+    --font-size-3xl:  clamp(2.75rem, 2.25rem + 2.5vw, 4rem);
+
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+    --weight-black: 900;
+
+    --ls-tight: -0.015em;
+    --ls-normal: 0.01em;
+    --ls-wide: 0.03em;
 }
 
 [data-theme="dark"] {
@@ -158,13 +181,14 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-main);
     background-color: var(--bg-primary);
     color: var(--text-primary);
     overflow: hidden;
     height: 100vh;
     width: 100vw;
-    line-height: 1.5;
+    line-height: 1.65;
+    letter-spacing: var(--ls-normal);
 }
 
 button {
@@ -179,6 +203,28 @@ button {
 input {
     font-family: inherit;
     outline: none;
+}
+
+/* Base Headings - Premium Hierarchy */
+h1, h2, h3, h4 {
+    font-family: var(--font-main);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--ls-tight);
+    line-height: 1.25;
+    color: var(--text-primary);
+}
+
+h1 { font-size: var(--font-size-2xl); }
+h2 { font-size: var(--font-size-xl); }
+h3 { font-size: var(--font-size-lg); }
+h4 { font-size: var(--font-size-md); }
+
+.bento-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--weight-black);
+    letter-spacing: var(--ls-tight);
+    color: var(--text-primary);
+    margin-bottom: 2px;
 }
 
 /* Hidden Utility */

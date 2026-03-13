@@ -29,14 +29,15 @@
 }
 
 .brand-text {
-    font-weight: 950;
-    font-size: clamp(23px, 3.2vw, 29px);
-    letter-spacing: -2.5px;
+    font-size: var(--font-size-xl);
+    font-weight: var(--weight-black);
+    letter-spacing: var(--ls-tight);
     background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    text-transform: uppercase;
 }
 
 /* Connectivity Indicator - Cute & Modern */
@@ -159,8 +160,9 @@ i[data-lucide] {
     padding: 10px 24px;
     border-radius: var(--radius-full);
     color: var(--text-secondary);
-    font-size: 14px;
-    font-weight: 800;
+    font-size: var(--font-size-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--ls-normal);
     transition: all var(--transition-fast);
     white-space: nowrap;
     background: transparent;
@@ -383,10 +385,10 @@ body.light-theme .dropdown-menu {
 }
 
 .service-name {
-    font-weight: 800;
-    font-size: 16px;
+    font-size: var(--font-size-md);
+    font-weight: var(--weight-bold);
     color: var(--text-primary);
-    letter-spacing: -0.4px;
+    letter-spacing: var(--ls-tight);
     margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
@@ -394,9 +396,11 @@ body.light-theme .dropdown-menu {
 }
 
 .account-identity {
-    font-size: 12.5px;
+    font-size: var(--font-size-xs);
     color: var(--text-secondary);
-    font-weight: 600;
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--ls-normal);
+    opacity: 0.8;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1367,10 +1371,11 @@ input:checked+.slider:before {
 }
 
 .pin-title {
-    font-size: 28px;
-    font-weight: 850;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--weight-black);
     margin-bottom: 8px;
-    letter-spacing: -0.5px;
+    letter-spacing: var(--ls-tight);
+    line-height: 1.2;
 }
 
 .pin-subtitle {
@@ -1541,21 +1546,41 @@ input:checked+.slider:before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px var(--space-lg);
+    padding: 18px var(--space-lg);
     background: var(--nm-surface);
     border-radius: var(--radius-md);
-    border: none;
+    border: 1px solid transparent;
     margin-bottom: 20px;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
-    box-shadow: var(--nm-shadow-in-sm);
+    box-shadow: var(--nm-shadow-out-sm);
+    cursor: default;
 }
 
 .setting-row:hover {
-    box-shadow: 
-        inset 6px 6px 12px var(--nm-shadow-dark), 
-        inset -6px -6px 12px var(--nm-shadow-light);
+    transform: translateX(6px);
+    box-shadow: var(--nm-shadow-out);
+    border-color: hsla(var(--h), 100%, 68%, 0.15);
     background: var(--nm-surface);
+}
+
+.setting-row::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) scaleY(0);
+    width: 4px;
+    height: 60%;
+    background: var(--accent-primary);
+    border-radius: 0 4px 4px 0;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.setting-row:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -1805,11 +1830,22 @@ body.light-theme .setting-row:hover {
     }
 }
 
+.splash-title {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--weight-black);
+    letter-spacing: var(--ls-tight);
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.1;
+    text-transform: uppercase;
+    text-align: center;
+}
+
 .splash-status {
     color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 2px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--ls-wide);
     text-transform: uppercase;
     opacity: 0.6;
 }
@@ -1845,8 +1881,12 @@ body.light-theme .setting-row:hover {
 }
 
 .privacy-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    max-width: 400px;
+    max-width: 480px;
     padding: var(--space-xl);
 }
 
@@ -1906,13 +1946,15 @@ body.light-theme .setting-row:hover {
 }
 
 .privacy-overlay h2 {
-    font-size: clamp(32px, 8vw, 42px);
-    font-weight: 950;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--weight-black);
     color: var(--text-primary);
     margin-bottom: 12px;
-    letter-spacing: -2px;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-align: center;
 }
 
 .privacy-overlay p {
@@ -1921,20 +1963,25 @@ body.light-theme .setting-row:hover {
     font-weight: 600;
     margin-bottom: 24px;
     opacity: 0.8;
+    text-align: center;
 }
 
 .privacy-hint {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     color: var(--accent-primary);
     text-transform: uppercase;
-    letter-spacing: 2px;
-    padding: 10px 24px;
+    letter-spacing: 1.5px;
+    padding: 10px 20px;
     background: var(--nm-surface);
     box-shadow: var(--nm-shadow-out-sm);
     border-radius: var(--radius-full);
     border: none;
     animation: fadeInOut 2s infinite;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 @keyframes fadeInOut {

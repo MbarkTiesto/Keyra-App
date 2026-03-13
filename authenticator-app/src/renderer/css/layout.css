@@ -137,6 +137,7 @@ body {
 
 .navbar-center {
     flex: 1;
+    display: flex; /* Added display: flex for alignment */
     justify-content: center;
     min-width: 0;
 }
@@ -194,7 +195,7 @@ body {
     font-size: clamp(24px, 4vw, 36px);
     font-weight: 900;
     letter-spacing: -1.5px;
-    line-height: 1.1;
+    line-height: 1.25;
     color: var(--text-primary);
     margin-bottom: 4px;
 }
