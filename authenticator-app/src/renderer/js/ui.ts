@@ -728,12 +728,11 @@ export class UIManager {
     private updateLastActivityDisplay() {
         const lastActivityElement = document.getElementById('last-activity-display');
         const lastActionElement = document.getElementById('last-action-display');
-        if (!lastActivityElement) return;
-
+        
         const lastActivity = localStorage.getItem(this.getStorageKey('last_activity'));
         const lastAction = localStorage.getItem(this.getStorageKey('last_action')) || 'No activity';
 
-        if (lastActivity) {
+        if (lastActivity && lastActivityElement) {
             const date = new Date(lastActivity);
             const diffMins = Math.floor((new Date().getTime() - date.getTime()) / 60000);
 
@@ -744,12 +743,20 @@ export class UIManager {
 
             lastActivityElement.textContent = timeAgo;
         }
+
+        if (lastActionElement) {
+            lastActionElement.textContent = lastAction;
+        }
+
         // Sync About Modal (if open or for next time)
         const aboutActivity = document.getElementById('about-last-activity');
         const aboutAction = document.getElementById('about-last-action');
         const aboutSync = document.getElementById('about-last-sync');
 
-        if (aboutActivity) aboutActivity.textContent = lastActivity ? lastActivityElement.textContent : 'Never';
+        if (aboutActivity) {
+            const lastActivityVal = lastActivity ? this.formatSyncTime(new Date(lastActivity)) : 'Never';
+            aboutActivity.textContent = lastActivityVal;
+        }
         if (aboutAction) aboutAction.textContent = lastAction;
 
         if (aboutSync) {
