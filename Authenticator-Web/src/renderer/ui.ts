@@ -2,7 +2,7 @@
 
 export class UIManager {
     private currentTheme: 'light' | 'dark' = 'light';
-    private currentTab: 'vault' | 'settings' = 'vault';
+    private currentTab: 'vault' | 'settings' | 'account' = 'vault';
     private accounts: any[] = [];
     private timerInterval: any = null;
     private privacyMode: boolean = false;
@@ -510,6 +510,9 @@ export class UIManager {
         // Setup accent color selector
         this.setupAccentColorSelector();
 
+        // Setup Account specific listeners
+        this.setupAccountEvents();
+
         // Initialize activity tracking
         this.updateLastActivity('Vault opened');
         this.updateLastActivityDisplay();
@@ -629,9 +632,9 @@ export class UIManager {
                     item.classList.add('active');
 
                     // Update current accent display
-                    const color = item.style.background;
+                    const color = (item as HTMLElement).style.background;
                     if (currentAccent) {
-                        currentAccent.style.background = color;
+                        (currentAccent as HTMLElement).style.background = color;
                     }
                     if (accentLabel) {
                         accentLabel.textContent = this.getAccentDisplayName(accent);
@@ -843,18 +846,25 @@ export class UIManager {
         this.renderAccounts();
     }
 
-    private switchTab(tab: 'vault' | 'settings') {
+    private switchTab(tab: 'vault' | 'settings' | 'account') {
         this.currentTab = tab;
         document.querySelectorAll('.nav-tab').forEach(t => {
             t.classList.toggle('active', t.getAttribute('data-tab') === tab);
         });
         const vaultView = document.getElementById('vault-view');
         const settingsView = document.getElementById('settings-view');
+        const accountView = document.getElementById('account-view');
+
         vaultView?.classList.toggle('hidden', tab !== 'vault');
         settingsView?.classList.toggle('hidden', tab !== 'settings');
+        accountView?.classList.toggle('hidden', tab !== 'account');
 
         if (tab === 'vault') this.refreshLucide(vaultView || undefined);
         else if (tab === 'settings') this.refreshLucide(settingsView || undefined);
+        else if (tab === 'account') {
+            this.refreshLucide(accountView || undefined);
+            this.loadAccountInfo();
+        }
     }
 
     private renderAccounts() {
@@ -1318,6 +1328,196 @@ export class UIManager {
                 this.showToast("Verification Failed", "error");
             }
         }
+    }
+
+    private async loadAccountInfo() {
+        const user = await (window as any).api.getCurrentUser();
+        if (!user) return;
+
+        const nameDisplay = document.getElementById('acc-display-username');
+        const emailDisplay = document.getElementById('acc-display-email');
+        const pendingContainer = document.getElementById('pending-email-container');
+        const pendingEmailDisplay = document.getElementById('acc-display-pending-email');
+        const emailCard = document.getElementById('card-change-email');
+
+        if (nameDisplay) nameDisplay.textContent = user.username;
+        if (emailDisplay) emailDisplay.textContent = user.email;
+
+        if (user.pendingEmail) {
+            if (pendingContainer) pendingContainer.classList.remove('hidden');
+            if (pendingEmailDisplay) pendingEmailDisplay.textContent = user.pendingEmail;
+            if (emailCard) {
+                emailCard.style.opacity = '0.5';
+                emailCard.style.pointerEvents = 'none';
+                (emailCard.querySelector('button[type="submit"]') as HTMLButtonElement).disabled = true;
+            }
+        } else {
+            if (pendingContainer) pendingContainer.classList.add('hidden');
+            if (emailCard) {
+                emailCard.style.opacity = '1';
+                emailCard.style.pointerEvents = 'auto';
+                (emailCard.querySelector('button[type="submit"]') as HTMLButtonElement).disabled = false;
+            }
+        }
+    }
+
+    private setupAccountEvents() {
+        document.getElementById('account-settings-btn')?.addEventListener('click', () => {
+            this.switchTab('account');
+        });
+
+        document.getElementById('form-change-name')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = (document.getElementById('change-name-input') as HTMLInputElement).value;
+            const res = await (window as any).api.changeUsername(newName);
+            if (res.success) {
+                this.showToast(res.message, "success");
+                (e.target as HTMLFormElement).reset();
+                this.loadAccountInfo();
+            } else {
+                this.showToast(res.message, "error");
+            }
+        });
+
+        document.getElementById('form-change-password')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pass = (document.getElementById('change-pass-input') as HTMLInputElement).value;
+            const confirm = (document.getElementById('change-pass-confirm') as HTMLInputElement).value;
+
+            if (pass !== confirm) {
+                this.showToast("Passwords do not match.", "error");
+                return;
+            }
+            
+            if (pass.length < 8) {
+                this.showToast("Password must be at least 8 characters.", "error");
+                return;
+            }
+
+            const res = await (window as any).api.changePassword(pass);
+            if (res.success) {
+                this.showToast(res.message, "success");
+                (e.target as HTMLFormElement).reset();
+            } else {
+                this.showToast(res.message, "error");
+            }
+        });
+
+        document.getElementById('form-change-email')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = (document.getElementById('change-email-input') as HTMLInputElement).value;
+            const res = await (window as any).api.requestEmailChange(email);
+            if (res.success) {
+                this.showToast(res.message, "success");
+                (e.target as HTMLFormElement).reset();
+                this.loadAccountInfo();
+                this.showEmailVerificationModal(email);
+            } else {
+                this.showToast(res.message, "error");
+            }
+        });
+
+        document.getElementById('btn-verify-new-email')?.addEventListener('click', async () => {
+            const user = await (window as any).api.getCurrentUser();
+            if (user && user.pendingEmail) {
+                this.showEmailVerificationModal(user.pendingEmail);
+            }
+        });
+
+        document.getElementById('btn-remove-pending-email')?.addEventListener('click', async () => {
+            if (confirm("Are you sure you want to cancel the pending email change?")) {
+                const res = await (window as any).api.cancelEmailChange();
+                if (res.success) {
+                    this.showToast(res.message, "success");
+                    this.loadAccountInfo();
+                } else {
+                    this.showToast(res.message, "error");
+                }
+            }
+        });
+    }
+
+    private showEmailVerificationModal(email: string) {
+        let resendTimer = 30;
+        let timerInterval: any;
+
+        const updateTimerText = () => {
+            const btn = document.getElementById('btn-resend-verify-email');
+            const timerSpan = document.getElementById('verify-email-resend-timer');
+            if (timerSpan) timerSpan.textContent = resendTimer > 0 ? `(${resendTimer}s)` : '';
+            if (btn) (btn as HTMLButtonElement).disabled = resendTimer > 0;
+        };
+
+        const content = `
+            <div style="padding: clamp(var(--space-md), 8vw, var(--space-xl)); text-align: center;">
+                <div class="nm-icon-large" style="margin: 0 auto 24px;">
+                    <i data-lucide="mail-check"></i>
+                </div>
+                <h2 style="font-weight: 900; font-size: 26px; margin-bottom: 8px;">Verify New Email</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 32px; font-weight: 600;">We've sent a 6-digit code to <strong>${email}</strong></p>
+                
+                <div class="form-group">
+                    <input type="text" id="email-verify-code" class="form-input" placeholder="000000" maxlength="6" style="text-align: center; font-size: 32px; letter-spacing: 8px; font-family: 'JetBrains Mono'; height: 70px;">
+                </div>
+
+                <div style="display: flex; gap: 16px; margin-top: 32px;">
+                    <button class="btn-primary" id="btn-submit-email-verify" style="flex: 2; height: 56px;">Confirm Change</button>
+                    <button class="user-button" id="btn-cancel-email-verify" style="flex: 1; height: 56px;">Discard</button>
+                </div>
+
+                <button id="btn-resend-verify-email" style="margin-top: 24px; background: none; border: none; font-weight: 800; color: var(--accent-primary); cursor: pointer; transition: opacity 0.2s;" disabled>
+                    Resend Code <span id="verify-email-resend-timer">(30s)</span>
+                </button>
+            </div>
+        `;
+
+        this.showModal(content);
+        this.refreshLucide();
+
+        timerInterval = setInterval(() => {
+            resendTimer--;
+            updateTimerText();
+            if (resendTimer <= 0) clearInterval(timerInterval);
+        }, 1000);
+
+        document.getElementById('btn-submit-email-verify')?.addEventListener('click', async () => {
+            const code = (document.getElementById('email-verify-code') as HTMLInputElement).value;
+            if (code.length !== 6) {
+                this.showToast("Enter 6-digit code.", "error");
+                return;
+            }
+
+            const res = await (window as any).api.confirmEmailChange(code);
+            if (res.success) {
+                this.showToast(res.message, "success");
+                this.hideModal();
+                this.loadAccountInfo();
+                clearInterval(timerInterval);
+            } else {
+                this.showToast(res.message, "error");
+            }
+        });
+
+        document.getElementById('btn-resend-verify-email')?.addEventListener('click', async () => {
+            const res = await (window as any).api.resendEmailChangeCode();
+            if (res.success) {
+                this.showToast("New code sent.", "success");
+                resendTimer = 30;
+                updateTimerText();
+                timerInterval = setInterval(() => {
+                    resendTimer--;
+                    updateTimerText();
+                    if (resendTimer <= 0) clearInterval(timerInterval);
+                }, 1000);
+            } else {
+                this.showToast(res.message, "error");
+            }
+        });
+
+        document.getElementById('btn-cancel-email-verify')?.addEventListener('click', () => {
+            this.hideModal();
+            clearInterval(timerInterval);
+        });
     }
 
     private clearPinInput() {

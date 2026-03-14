@@ -10,7 +10,16 @@ declare global {
             login(user: string, pass: string): Promise<{ success: boolean, message: string }>;
             checkSession(): Promise<{ success: boolean, message: string }>;
             logout(): Promise<void>;
-            getCurrentUser(): Promise<{ id: string, username: string, email: string } | null>;
+            getCurrentUser(): Promise<{ id: string, username: string, email: string, pendingEmail?: string } | null>;
+            updateUserSettings(settings: any): Promise<void>;
+
+            // Account Management
+            changeUsername(newName: string): Promise<{ success: boolean, message: string }>;
+            changePassword(newPassword: string): Promise<{ success: boolean, message: string }>;
+            requestEmailChange(newEmail: string): Promise<{ success: boolean, message: string, code?: string }>;
+            confirmEmailChange(code: string): Promise<{ success: boolean, message: string }>;
+            cancelEmailChange(): Promise<{ success: boolean, message: string }>;
+            resendEmailChangeCode(): Promise<{ success: boolean, message: string, code?: string }>;
 
             generateTOTP(secret: string): Promise<string>;
             saveAccount(acc: any): Promise<void>;

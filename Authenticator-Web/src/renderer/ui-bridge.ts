@@ -23,6 +23,14 @@ export const bridge = {
     getCurrentUser: async () => auth.getCurrentUser(),
     updateUserSettings: async (settings: any) => syncWrapper(() => auth.updateUserSettings(settings)),
 
+    // Account Management
+    changeUsername: async (newName: string) => syncWrapper(() => auth.changeUsername(newName)),
+    changePassword: async (newPassword: string) => syncWrapper(() => auth.changePassword(newPassword)),
+    requestEmailChange: async (newEmail: string) => syncWrapper(() => auth.requestEmailChange(newEmail)),
+    confirmEmailChange: async (code: string) => syncWrapper(() => auth.confirmEmailChange(code)),
+    cancelEmailChange: async () => syncWrapper(() => auth.cancelEmailChange()),
+    resendEmailChangeCode: async () => syncWrapper(() => auth.resendEmailChangeCode()),
+
     // Operations
     getAccounts: async () => {
         try { return await syncWrapper(() => auth.getActiveAccounts()); }

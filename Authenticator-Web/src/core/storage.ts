@@ -26,6 +26,8 @@ export interface UserRecord {
     salt: string;
     isActivated: boolean;
     activationCode?: string;
+    pendingEmail?: string;
+    emailChangeCode?: string;
     encryptedVaultData: string;
     settings?: UserSettings;
 }

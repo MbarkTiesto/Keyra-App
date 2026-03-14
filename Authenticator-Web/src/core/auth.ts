@@ -27,8 +27,28 @@ export function getCurrentUser() {
         id: currentUser.id,
         username: currentUser.username,
         email: currentUser.email,
+        pendingEmail: currentUser.pendingEmail,
         settings: currentUser.settings
     };
+}
+
+export async function cancelEmailChange(): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    delete user.pendingEmail;
+    delete user.emailChangeCode;
+    
+    delete currentUser.pendingEmail; // Sync local session
+
+    await saveUsers(users);
+    await syncUserData(currentUser.username, users[userIndex]);
+
+    return { success: true, message: "Pending email change cancelled." };
 }
 
 export async function signup(username: string, email: string, password: string): Promise<{ success: boolean, message: string, code?: string }> {
@@ -237,4 +257,147 @@ export async function importVaultData(salt: string, encryptedVaultData: string, 
         console.error("Vault Import Error:", err);
         return { success: false, message: "Decryption failed." };
     }
+}
+
+export async function changePassword(newPassword: string): Promise<{ success: boolean, message: string }> {
+    if (!currentUser || !currentKey) throw new Error("No active user session.");
+    if (newPassword.length < 8) return { success: false, message: "Password must be at least 8 characters." };
+
+    try {
+        const users = await getUsers();
+        const userIndex = users.findIndex(u => u.id === currentUser!.id);
+        if (userIndex === -1) throw new Error("User missing from storage.");
+
+        // 1. Decrypt current vault
+        const accounts = await getActiveAccounts();
+
+        // 2. Hash new password and derive new salt/key
+        const { hash, salt } = hashPassword(newPassword);
+        const newKey = deriveKey(newPassword, salt);
+
+        // 3. Re-encrypt vault with new key
+        const newEncryptedVault = encryptVault(JSON.stringify(accounts), newKey);
+
+        // 4. Update user record
+        users[userIndex].hash = hash;
+        users[userIndex].salt = salt;
+        users[userIndex].encryptedVaultData = newEncryptedVault;
+
+        // 5. Update session
+        currentUser.hash = hash;
+        currentUser.salt = salt;
+        currentUser.encryptedVaultData = newEncryptedVault;
+        currentKey = newKey;
+
+        // 6. Save and Sync
+        await saveUsers(users);
+        await syncUserData(currentUser.username, users[userIndex]);
+
+        // 7. Update local session storage
+        localStorage.setItem('active_session_key', newKey.toString('base64'));
+
+        return { success: true, message: "Password changed successfully." };
+    } catch (err) {
+        console.error("Password change failed:", err);
+        return { success: false, message: "Failed to change password." };
+    }
+}
+
+export async function changeUsername(newUsername: string): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    if (users.find(u => u.username === newUsername)) {
+        return { success: false, message: "Username already in use." };
+    }
+
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    users[userIndex].username = newUsername;
+    currentUser.username = newUsername; // Sync local session
+
+    await saveUsers(users);
+    await syncUserData(newUsername, users[userIndex]);
+
+    // Update local storage session
+    localStorage.setItem('active_session_user', newUsername);
+
+    return { success: true, message: "Display name updated." };
+}
+
+export async function requestEmailChange(newEmail: string): Promise<{ success: boolean, message: string, code?: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    if (user.pendingEmail) {
+        return { success: false, message: "A change is already pending. Please confirm or cancel it first." };
+    }
+
+    if (users.find(u => u.email === newEmail)) {
+        return { success: false, message: "Email already in use." };
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.pendingEmail = newEmail;
+    user.emailChangeCode = code;
+
+    await saveUsers(users);
+    await syncUserData(currentUser.username, user);
+
+    deliverActivationCode(newEmail, code);
+
+    return { success: true, message: "Verification code sent to new email.", code };
+}
+
+export async function confirmEmailChange(code: string): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    if (!user.pendingEmail || !user.emailChangeCode) {
+        return { success: false, message: "No pending email change." };
+    }
+
+    if (user.emailChangeCode !== code) {
+        return { success: false, message: "Invalid verification code." };
+    }
+
+    user.email = user.pendingEmail;
+    delete user.pendingEmail;
+    delete user.emailChangeCode;
+    
+    currentUser.email = user.email; // Sync local session
+
+    await saveUsers(users);
+    await syncUserData(currentUser.username, users[userIndex]);
+
+    return { success: true, message: "Email changed successfully." };
+}
+
+export async function resendEmailChangeCode(): Promise<{ success: boolean, message: string, code?: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    if (!user.pendingEmail) return { success: false, message: "No pending email change." };
+
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    user.emailChangeCode = newCode;
+    
+    await saveUsers(users);
+    await syncUserData(currentUser.username, users[userIndex]);
+
+    deliverActivationCode(user.pendingEmail, newCode);
+    return { success: true, message: "New verification code sent.", code: newCode };
 }
