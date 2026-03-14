@@ -2,6 +2,22 @@
    SCIENTIFIC BASE COMPONENTS (GLASS 3.0)
    ───────────────────────────────────────────────────────────────────────────── */
 
+/* Security: Hide sensitive content when vault is locked */
+.vault-is-locked .otp-code {
+    content: '••••••' !important;
+}
+
+.vault-is-locked .account-card {
+    pointer-events: none;
+}
+
+.vault-is-locked .copy-btn,
+.vault-is-locked .edit-btn,
+.vault-is-locked .delete-btn {
+    opacity: 0.3;
+    cursor: not-allowed !important;
+}
+
 .navbar-brand { display: flex; align-items: center; gap: var(--space-xs); transition: transform var(--transition-fast); }
 .navbar-brand:hover { transform: scale(1.02); }
 

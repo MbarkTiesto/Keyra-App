@@ -252,8 +252,22 @@ export class UIManager {
         });
 
         // Main Add Account
-        document.getElementById('add-account-btn')?.addEventListener('click', () => this.showAddModal());
-        document.getElementById('empty-add-btn')?.addEventListener('click', () => this.showAddModal());
+        document.getElementById('add-account-btn')?.addEventListener('click', () => {
+            // Security: Prevent adding accounts if vault is locked
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
+            this.showAddModal();
+        });
+        document.getElementById('empty-add-btn')?.addEventListener('click', () => {
+            // Security: Prevent adding accounts if vault is locked
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
+            this.showAddModal();
+        });
 
         // Segmented Theme Toggle
         document.querySelectorAll('#theme-segmented .segment').forEach(seg => {
@@ -309,6 +323,11 @@ export class UIManager {
 
         // -- Vault Maintenance --
         document.getElementById('btn-export-vault')?.addEventListener('click', async () => {
+            // Security: Prevent export if vault is locked
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
             const res = await (window as any).api.exportVault();
             if (res.success) {
                 this.showToast("Vault backup exported successfully", "success");
@@ -318,6 +337,11 @@ export class UIManager {
         });
 
         document.getElementById('btn-import-vault')?.addEventListener('click', async () => {
+            // Security: Prevent import if vault is locked
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
             const res = await (window as any).api.importVault();
             if (res.success && res.data) {
                 // Show a modal to ask for the password of that backup
@@ -494,8 +518,12 @@ export class UIManager {
         }
         
         // Remove existing listeners to avoid duplicates
-        toggle.removeEventListener('click', this.handleToggleClick);
-        document.removeEventListener('click', this.handleDocumentClick);
+        if (this.handleToggleClick) {
+            toggle.removeEventListener('click', this.handleToggleClick);
+        }
+        if (this.handleDocumentClick) {
+            document.removeEventListener('click', this.handleDocumentClick);
+        }
         
         // Bind methods to maintain context
         this.handleToggleClick = (e: Event) => {
@@ -518,7 +546,7 @@ export class UIManager {
         this.handleDocumentClick = (e: Event) => {
             if (!toggle.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
                 dropdown.classList.remove('show');
-                toggle.classList.remove('active');
+                (toggle as HTMLElement).classList.remove('active');
                 toggle.parentElement?.classList.remove('open');
             }
         };
@@ -794,6 +822,11 @@ export class UIManager {
             });
             this.refreshLucide(grid);
         }
+
+        // Security: Clear OTP codes if vault is locked
+        if (document.body.classList.contains('vault-is-locked')) {
+            this.clearAllOTPCodes();
+        }
     }
 
     private createAccountCard(account: any, index: number): HTMLElement {
@@ -842,12 +875,22 @@ export class UIManager {
 
         const codeElement = card.querySelector('.otp-code') as HTMLElement;
         codeElement.addEventListener('click', async () => {
+            // Security: Prevent OTP access if vault is locked
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
              const otp = await (window as any).api.generateTOTP(account.secret);
              this.copyOTPToClipboard(otp, codeElement);
         });
 
         const copyBtn = card.querySelector('.copy-btn') as HTMLElement;
         copyBtn.onclick = async () => {
+            // Security: Prevent OTP access if vault is locked
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
             const otpCode = await (window as any).api.generateTOTP(account.secret);
             await navigator.clipboard.writeText(otpCode);
             this.showToast("OTP Copied to Clipboard", "success");
@@ -855,11 +898,21 @@ export class UIManager {
 
         card.querySelector('.edit-btn')?.addEventListener('click', (e) => {
             e.stopPropagation();
+            // Security: Prevent editing if vault is locked
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
             this.showEditModal(account);
         });
         
         card.querySelector('.delete-btn')?.addEventListener('click', (e) => {
             e.stopPropagation();
+            // Security: Prevent deletion if vault is locked
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
             this.showDeleteConfirm(account);
         });
 
@@ -870,6 +923,12 @@ export class UIManager {
     private async updateCardOTP(card: HTMLElement, secret: string, remainingSeconds: number) {
         const codeElement = card.querySelector('.otp-code');
         if (!codeElement) return;
+
+        // Security: Don't generate or display OTP codes if vault is locked
+        if (document.body.classList.contains('vault-is-locked')) {
+            codeElement.textContent = '••••••';
+            return;
+        }
 
         if (this.privacyMode) {
             if (codeElement.textContent !== '••••••') {
@@ -1129,11 +1188,23 @@ export class UIManager {
         }, 3500);
     }
 
+    private clearAllOTPCodes() {
+        // Security: Clear all OTP codes from DOM when vault is locked
+        const otpElements = document.querySelectorAll('.otp-code');
+        otpElements.forEach(element => {
+            element.textContent = '••••••';
+        });
+    }
+
     public lockVault() {
         const vessel = document.getElementById('lock-vessel');
         if (!vessel) return;
         vessel.classList.add('show');
         document.body.classList.add('vault-is-locked'); // Optimize performance
+        
+        // Security: Clear all OTP codes immediately when vault is locked
+        this.clearAllOTPCodes();
+        
         this.refreshLucide(vessel);
         const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
         if (pinIn) { pinIn.value = ''; pinIn.focus(); }
@@ -1174,6 +1245,9 @@ export class UIManager {
                     document.body.classList.remove('vault-is-locked'); // Restore performance
                     pinIn.value = '';
                     progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
+                    
+                    // Security: Restore OTP codes after successful unlock
+                    this.renderAccounts();
                 }, 800);
                 
                 this.showToast("Identity Verified", "success");
