@@ -119,7 +119,7 @@ export class UIManager {
         // Apply general settings to local variables & DOM
         if (settingsToApply.theme) this.setTheme(settingsToApply.theme, true);
         if (settingsToApply.accentColor) this.setAccentColor(settingsToApply.accentColor, true);
-        
+
         this.privacyMode = !!settingsToApply.privacyMode;
         this.screenGuardian = !!settingsToApply.screenGuardian;
 
@@ -127,18 +127,18 @@ export class UIManager {
         if (saveLocal || settingsToApply.vaultPin !== undefined || settingsToApply.privacyMode !== undefined) {
             if (settingsToApply.theme) localStorage.setItem(this.getStorageKey('theme'), settingsToApply.theme);
             if (settingsToApply.accentColor) localStorage.setItem(this.getStorageKey('accent_color'), settingsToApply.accentColor);
-            
+
             localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacyMode));
             localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
-            
+
             if (settingsToApply.autolock !== undefined) localStorage.setItem(this.getStorageKey('autolock'), String(settingsToApply.autolock));
-            
+
             // Critical, Ensure the PIN is persisted to local storage
             if (settingsToApply.vaultPin) {
                 localStorage.setItem(this.getStorageKey('vault_pin'), settingsToApply.vaultPin);
             }
         }
-        
+
         this.updateLockVaultVisibility();
         this.renderAccounts();
         console.log('Settings applied successfully');
@@ -148,7 +148,7 @@ export class UIManager {
         // Theme
         const theme = localStorage.getItem(this.getStorageKey('theme')) || 'light';
         this.updateSegmentedUI('theme-segmented', theme);
-        
+
         // Autolock
         const autolock = localStorage.getItem(this.getStorageKey('autolock')) || '0';
         this.updateSegmentedUI('autolock-segmented', autolock);
@@ -160,7 +160,7 @@ export class UIManager {
 
         const segments = container.querySelectorAll('.segment');
         const indicator = container.querySelector('.segment-indicator') as HTMLElement;
-        
+
         let activeIdx = 0;
         segments.forEach((seg, idx) => {
             const isActive = seg.getAttribute('data-val') === value;
@@ -198,9 +198,9 @@ export class UIManager {
         const lockBtn = document.getElementById('lock-vault-btn');
         const setupBtn = document.getElementById('setup-pin-btn');
         const removeBtn = document.getElementById('remove-pin-btn');
-        
+
         const hasPin = !!localStorage.getItem(`${this.userId}_vault_pin`);
-        
+
         if (lockBtn) lockBtn.classList.toggle('hidden', !hasPin);
         if (setupBtn) setupBtn.style.display = hasPin ? 'none' : 'flex';
         if (removeBtn) removeBtn.style.display = hasPin ? 'flex' : 'none';
@@ -213,22 +213,22 @@ export class UIManager {
 
     public setTheme(theme: 'light' | 'dark', silent: boolean = false) {
         this.currentTheme = theme;
-        
+
         // Update body classes for new theme system
         const body = document.body;
         body.classList.remove('light-theme', 'dark-theme');
         body.classList.add(`${theme}-theme`);
-        
+
         // Update legacy attribute for compatibility
         document.documentElement.setAttribute('data-theme', theme);
-        
+
         // Save to storage
         localStorage.setItem(this.getStorageKey('theme'), theme);
-        
+
         // Update segmented control
         const segments = document.querySelectorAll('#theme-segmented .segment');
         const indicator = document.querySelector('#theme-segmented .segment-indicator');
-        
+
         segments.forEach(segment => {
             if (segment.getAttribute('data-val') === theme) {
                 segment.classList.add('active');
@@ -236,7 +236,7 @@ export class UIManager {
                 segment.classList.remove('active');
             }
         });
-        
+
         // Move indicator
         if (indicator) {
             const activeSegment = document.querySelector(`#theme-segmented .segment[data-val="${theme}"]`) as HTMLElement;
@@ -245,18 +245,18 @@ export class UIManager {
                 (indicator as HTMLElement).style.width = `${activeSegment.offsetWidth}px`;
             }
         }
-        
+
         // Update legacy theme icons
         const themeIcon = document.getElementById('theme-icon-lucide');
         const themeText = document.getElementById('theme-text');
-        
+
         if (themeIcon) {
             themeIcon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
         }
         if (themeText) {
             themeText.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
         }
-        
+
         this.refreshLucide();
         if (!silent) this.pushWebSettings();
     }
@@ -369,12 +369,12 @@ export class UIManager {
             this.screenGuardian = target.checked;
             localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
             this.pushWebSettings();
-            
+
             // Immediate feedback: if we just disabled it and it's blurred, hide it
             if (!this.screenGuardian) {
                 document.getElementById('privacy-blur-overlay')?.classList.add('hidden');
             }
-            
+
             this.showToast(this.screenGuardian ? "Privacy Shield Active" : "Privacy Shield Disabled", "info");
         });
 
@@ -415,17 +415,17 @@ export class UIManager {
             this.showToast("Initiating Cloud Sync...", "info");
             const icon = document.getElementById('sync-btn-icon');
             if (icon) icon.classList.add('sync-spin');
-            
+
             try {
                 // First push current settings and webSettings to cloud
                 await this.pushSettings();
                 await this.pushWebSettings();
-                
+
                 // Then trigger a full vault sync
                 // Note: window.api.syncVault() or similar if available, 
                 // but since we usually sync on change, let's just refresh data
                 await this.loadInitialData();
-                
+
                 this.showToast("Cloud Synchronization Complete", "success");
                 this.updateLastActivity('Manual Cloud Sync');
             } catch (err) {
@@ -460,14 +460,14 @@ export class UIManager {
         const pinInput = document.getElementById('unlock-pin') as HTMLInputElement;
         pinInput?.addEventListener('input', (e) => {
             const value = (e.target as HTMLInputElement).value;
-            
+
             // Only allow numeric digits
             const numericValue = value.replace(/[^0-9]/g, '');
             if (value !== numericValue) {
                 (e.target as HTMLInputElement).value = numericValue;
                 // Don't return here, we want to update dots even if cleaned
             }
-            
+
             // Call validation/update logic for EVERY change (it has its own 4-char guard for success/error)
             this.validateAndAutoUnlock(numericValue);
         });
@@ -482,13 +482,13 @@ export class UIManager {
                 // Track export/import actions
                 const exportBtn = document.getElementById('btn-export-vault');
                 const importBtn = document.getElementById('btn-import-vault');
-                
+
                 if (exportBtn) {
                     exportBtn.addEventListener('click', () => {
                         this.updateLastActivity('Exported vault');
                     });
                 }
-                
+
                 if (importBtn) {
                     importBtn.addEventListener('click', () => {
                         this.updateLastActivity('Imported vault');
@@ -500,7 +500,7 @@ export class UIManager {
                 e.preventDefault();
             }
         });
-        
+
         // Handle window resize for icon refreshing if layout shifts majorly
         window.addEventListener('resize', this.debounce(() => this.refreshLucide(), 250));
 
@@ -522,7 +522,7 @@ export class UIManager {
             tab.addEventListener('click', () => {
                 const tabName = tab.getAttribute('data-tab');
                 this.updateLastActivity(`Switched to ${tabName}`);
-                
+
                 // Update activity display when switching to settings
                 if (tabName === 'settings') {
                     setTimeout(() => {
@@ -570,12 +570,12 @@ export class UIManager {
         const dropdown = document.getElementById('accent-dropdown');
         const currentAccent = document.getElementById('current-accent');
         const accentLabel = document.querySelector('.accent-label');
-        
+
         if (!toggle || !dropdown) {
             console.error('Accent color selector elements not found!');
             return;
         }
-        
+
         // Remove existing listeners to avoid duplicates
         if (this.handleToggleClick) {
             toggle.removeEventListener('click', this.handleToggleClick);
@@ -583,14 +583,14 @@ export class UIManager {
         if (this.handleDocumentClick) {
             document.removeEventListener('click', this.handleDocumentClick);
         }
-        
+
         // Bind methods to maintain context
         this.handleToggleClick = (e: Event) => {
             e.preventDefault();
             e.stopPropagation();
-            
+
             const isOpen = dropdown.classList.contains('show');
-            
+
             if (isOpen) {
                 dropdown.classList.remove('show');
                 toggle.classList.remove('active');
@@ -601,7 +601,7 @@ export class UIManager {
                 toggle.parentElement?.classList.add('open');
             }
         };
-        
+
         this.handleDocumentClick = (e: Event) => {
             if (!toggle.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
                 dropdown.classList.remove('show');
@@ -609,25 +609,25 @@ export class UIManager {
                 toggle.parentElement?.classList.remove('open');
             }
         };
-        
+
         // Add event listeners
         toggle.addEventListener('click', this.handleToggleClick);
         document.addEventListener('click', this.handleDocumentClick);
-        
+
         // Handle color selection
         document.querySelectorAll('.accent-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const accent = item.getAttribute('data-accent');
                 if (accent) {
                     this.setAccentColor(accent);
-                    
+
                     // Update UI
                     document.querySelectorAll('.accent-item').forEach(i => i.classList.remove('active'));
                     item.classList.add('active');
-                    
+
                     // Update current accent display
                     const color = item.style.background;
                     if (currentAccent) {
@@ -636,7 +636,7 @@ export class UIManager {
                     if (accentLabel) {
                         accentLabel.textContent = this.getAccentDisplayName(accent);
                     }
-                    
+
                     // Close dropdown
                     dropdown.classList.remove('show');
                     toggle.classList.remove('active');
@@ -644,18 +644,18 @@ export class UIManager {
                 }
             });
         });
-        
+
         // Initialize current accent display
         this.updateCurrentAccentDisplay();
-        
+
         // Ensure Lucide icons are created for the chevron
         this.refreshLucide();
     }
-    
+
     // Store methods as properties to maintain context
     private handleToggleClick: ((e: Event) => void) | null = null;
     private handleDocumentClick: ((e: Event) => void) | null = null;
-    
+
     private getAccentDisplayName(accent: string): string {
         const names: Record<string, string> = {
             'royal-purple': 'Royal Purple',
@@ -679,12 +679,12 @@ export class UIManager {
         };
         return names[accent] || accent;
     }
-    
+
     private updateCurrentAccentDisplay() {
         const currentAccent = document.getElementById('current-accent');
         const accentLabel = document.querySelector('.accent-label');
         const savedAccent = localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple';
-        
+
         // Find the active accent item
         const activeItem = document.querySelector(`.accent-item[data-accent="${savedAccent}"]`);
         if (activeItem) {
@@ -729,11 +729,11 @@ export class UIManager {
             root.style.setProperty('--accent-primary', `hsl(${hue}, var(--s), 65%)`);
             root.style.setProperty('--accent-hover', `hsl(${hue}, var(--s), 75%)`);
             root.style.setProperty('--accent-soft', `hsla(${hue}, var(--s), 65%, 0.15)`);
-            
+
             // Save to localStorage
             localStorage.setItem(this.getStorageKey('accent_color'), accentColor);
-            
-            
+
+
             if (!silent) this.pushWebSettings();
         }
     }
@@ -741,7 +741,7 @@ export class UIManager {
     private initializeTheme() {
         // Check for saved theme preference
         const savedTheme = localStorage.getItem(this.getStorageKey('theme')) as 'light' | 'dark' | null;
-        
+
         if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
             // Use saved theme
             this.setTheme(savedTheme);
@@ -769,7 +769,7 @@ export class UIManager {
 
     private setupThemeSwitcher() {
         const segments = document.querySelectorAll('#theme-segmented .segment');
-        
+
         // Setup theme segments
         segments.forEach(segment => {
             segment.addEventListener('click', () => {
@@ -787,10 +787,10 @@ export class UIManager {
 
     private loadAccentColor() {
         const savedAccent = localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple';
-        
+
         // Set the accent color
         this.setAccentColor(savedAccent, true); // Silent init to avoid push-default overwrite
-        
+
         // Update active state in UI
         const accentItems = document.querySelectorAll('.accent-item');
         accentItems.forEach(item => {
@@ -800,7 +800,7 @@ export class UIManager {
                 item.classList.remove('active');
             }
         });
-        
+
         // Update current accent display
         this.updateCurrentAccentDisplay();
     }
@@ -816,7 +816,7 @@ export class UIManager {
     private async loadInitialData() {
         try {
             const user = await (window as any).api.getCurrentUser();
-            
+
             // Apply cloud settings first if they exist
             if (user && user.settings) {
                 this.applySettings(user.settings, true);
@@ -824,7 +824,7 @@ export class UIManager {
 
             const userNameDisplay = document.getElementById('user-name-display');
             const userAvatar = document.getElementById('user-avatar');
-            
+
             if (userNameDisplay && user) {
                 userNameDisplay.textContent = user.username;
             }
@@ -852,7 +852,7 @@ export class UIManager {
         const settingsView = document.getElementById('settings-view');
         vaultView?.classList.toggle('hidden', tab !== 'vault');
         settingsView?.classList.toggle('hidden', tab !== 'settings');
-        
+
         if (tab === 'vault') this.refreshLucide(vaultView || undefined);
         else if (tab === 'settings') this.refreshLucide(settingsView || undefined);
     }
@@ -863,8 +863,8 @@ export class UIManager {
         if (!grid || !emptyState) return;
 
         // Filter accounts based on search query
-        const filtered = this.accounts.filter(acc => 
-            acc.issuer.toLowerCase().includes(this.searchQuery) || 
+        const filtered = this.accounts.filter(acc =>
+            acc.issuer.toLowerCase().includes(this.searchQuery) ||
             acc.account.toLowerCase().includes(this.searchQuery)
         );
 
@@ -892,7 +892,7 @@ export class UIManager {
         const card = document.createElement('div');
         card.className = 'account-card animate-fade-in';
         card.style.animationDelay = `${index * 0.05}s`;
-        
+
         card.innerHTML = `
             <div class="account-header">
                 <div class="account-icon">
@@ -939,8 +939,8 @@ export class UIManager {
                 this.showToast("Vault Locked - Enter PIN to Access", "error");
                 return;
             }
-             const otp = await (window as any).api.generateTOTP(account.secret);
-             this.copyOTPToClipboard(otp, codeElement);
+            const otp = await (window as any).api.generateTOTP(account.secret);
+            this.copyOTPToClipboard(otp, codeElement);
         });
 
         const copyBtn = card.querySelector('.copy-btn') as HTMLElement;
@@ -964,7 +964,7 @@ export class UIManager {
             }
             this.showEditModal(account);
         });
-        
+
         card.querySelector('.delete-btn')?.addEventListener('click', (e) => {
             e.stopPropagation();
             // Security: Prevent deletion if vault is locked
@@ -1014,10 +1014,10 @@ export class UIManager {
         navigator.clipboard.writeText(otp).then(() => {
             // Show visual feedback
             this.showCopyFeedback(element);
-            
+
             // Update activity
             this.updateLastActivity('OTP copied');
-            
+
             // Show toast
             this.showToast('OTP code copied to clipboard', 'success');
         }).catch(() => {
@@ -1028,12 +1028,12 @@ export class UIManager {
     private showCopyFeedback(element: HTMLElement) {
         const originalText = element.textContent;
         const originalColor = element.style.color;
-        
+
         // Change to "Copied!" with green color
         element.textContent = 'Copied!';
         element.style.color = '#28a745';
         element.style.transform = 'scale(1.1)';
-        
+
         setTimeout(() => {
             element.textContent = originalText;
             element.style.color = originalColor;
@@ -1045,7 +1045,7 @@ export class UIManager {
         const now = new Date().toISOString();
         localStorage.setItem(this.getStorageKey('last_activity'), now);
         localStorage.setItem(this.getStorageKey('last_action'), action);
-        
+
         // Update the display if settings are open
         this.updateLastActivityDisplay();
     }
@@ -1053,17 +1053,17 @@ export class UIManager {
     private updateLastActivityDisplay() {
         const lastActivityElement = document.getElementById('last-activity-display');
         const lastActionElement = document.getElementById('last-action-display');
-        
+
         if (lastActivityElement) {
             const lastActivity = localStorage.getItem(this.getStorageKey('last_activity'));
             const lastAction = localStorage.getItem(this.getStorageKey('last_action')) || 'No activity';
-            
+
             if (lastActivity) {
                 const date = new Date(lastActivity);
                 const now = new Date();
                 const diffMs = now.getTime() - date.getTime();
                 const diffMins = Math.floor(diffMs / 60000);
-                
+
                 let timeAgo;
                 if (diffMins < 1) {
                     timeAgo = 'Just now';
@@ -1076,10 +1076,10 @@ export class UIManager {
                     const days = Math.floor(diffMins / 1440);
                     timeAgo = `${days} day${days > 1 ? 's' : ''} ago`;
                 }
-                
+
                 lastActivityElement.textContent = timeAgo;
             }
-            
+
             if (lastActionElement) {
                 lastActionElement.textContent = lastAction;
             }
@@ -1205,7 +1205,7 @@ export class UIManager {
             const issuer = (document.getElementById('edit-issuer') as HTMLInputElement).value;
             const accountName = (document.getElementById('edit-account') as HTMLInputElement).value;
             if (!issuer) return this.showToast("Identification required", "error");
-            
+
             await (window as any).api.saveAccount({ ...account, issuer, account: accountName });
             await this.refreshAccounts();
             this.hideModal();
@@ -1217,16 +1217,16 @@ export class UIManager {
     public showToast(message: string, type: 'info' | 'success' | 'error' = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
-        
+
         const toast = document.createElement('div');
         toast.className = `neumorphic-toast toast-${type} animate-fade-in`;
-        
+
         const iconName = type === 'error' ? 'alert-circle' : type === 'success' ? 'check-circle' : 'info';
         toast.innerHTML = `
             <i data-lucide="${iconName}" class="toast-icon"></i>
             <span class="toast-message">${message}</span>
         `;
-        
+
         container.appendChild(toast);
         this.refreshLucide(toast);
 
@@ -1249,10 +1249,10 @@ export class UIManager {
         if (!vessel) return;
         vessel.classList.add('show');
         document.body.classList.add('vault-is-locked'); // Optimize performance
-        
+
         // Security: Clear all OTP codes immediately when vault is locked
         this.clearAllOTPCodes();
-        
+
         this.refreshLucide(vessel);
         const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
         if (pinIn) { pinIn.value = ''; pinIn.focus(); }
@@ -1261,7 +1261,7 @@ export class UIManager {
     private handleUnlock() {
         const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
         if (!pinIn) return;
-        
+
         this.validateAndAutoUnlock(pinIn.value);
     }
 
@@ -1269,7 +1269,7 @@ export class UIManager {
         const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
         const saved = localStorage.getItem(this.getStorageKey('vault_pin'));
         const progressDots = document.querySelectorAll('.pin-vessel .pin-dot');
-        
+
         // Update progress dots based on input length
         progressDots.forEach((dot, index) => {
             dot.classList.remove('filled', 'error', 'success');
@@ -1277,7 +1277,7 @@ export class UIManager {
                 dot.classList.add('filled');
             }
         });
-        
+
         if (pinValue.length === 4) {
             if (pinValue === saved) {
                 // Success feedback
@@ -1287,17 +1287,17 @@ export class UIManager {
                         dot.classList.add('success');
                     }, index * 80);
                 });
-                
+
                 setTimeout(() => {
                     document.getElementById('lock-vessel')?.classList.remove('show');
                     document.body.classList.remove('vault-is-locked'); // Restore performance
                     pinIn.value = '';
                     progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
-                    
+
                     // Security: Restore OTP codes after successful unlock
                     this.renderAccounts();
                 }, 800);
-                
+
                 this.showToast("Identity Verified", "success");
             } else {
                 // Error feedback
@@ -1307,14 +1307,14 @@ export class UIManager {
                     dot.classList.remove('filled');
                     dot.classList.add('error');
                 });
-                
+
                 setTimeout(() => {
                     vessel?.classList.remove('animate-shake');
                     pinIn.value = '';
                     pinIn.focus();
                     progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
                 }, 1000);
-                
+
                 this.showToast("Verification Failed", "error");
             }
         }
@@ -1323,14 +1323,14 @@ export class UIManager {
     private clearPinInput() {
         const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
         const progressDots = document.querySelectorAll('.pin-dot');
-        
+
         if (pinIn) {
             pinIn.value = '';
             pinIn.style.borderColor = '';
             pinIn.style.boxShadow = '';
             pinIn.focus();
         }
-        
+
         // Reset progress dots
         progressDots.forEach(dot => {
             dot.classList.remove('filled', 'error', 'success');
@@ -1461,16 +1461,16 @@ export class UIManager {
         const pinField = document.getElementById('pin-step1') as HTMLInputElement;
         const continueBtn = document.getElementById('pin-step1-continue');
         const setupDots = document.querySelectorAll('.pin-dot-setup');
-        
+
         pinField?.addEventListener('input', (e) => {
             const val = (e.target as HTMLInputElement).value;
             const numeric = val.replace(/[^0-9]/g, '');
             if (val !== numeric) (e.target as HTMLInputElement).value = numeric;
-            
+
             setupDots.forEach((dot, idx) => {
                 dot.classList.toggle('filled', idx < numeric.length);
             });
-            
+
             if (continueBtn) {
                 (continueBtn as HTMLButtonElement).disabled = numeric.length !== 4;
             }
@@ -1490,16 +1490,16 @@ export class UIManager {
         const pinField = document.getElementById('pin-step2') as HTMLInputElement;
         const continueBtn = document.getElementById('pin-step2-continue');
         const setupDots = document.querySelectorAll('.pin-dot-setup');
-        
+
         pinField?.addEventListener('input', (e) => {
             const val = (e.target as HTMLInputElement).value;
             const numeric = val.replace(/[^0-9]/g, '');
             if (val !== numeric) (e.target as HTMLInputElement).value = numeric;
-            
+
             setupDots.forEach((dot, idx) => {
                 dot.classList.toggle('filled', idx < numeric.length);
             });
-            
+
             if (continueBtn) {
                 (continueBtn as HTMLButtonElement).disabled = numeric.length !== 4;
             }
@@ -1627,7 +1627,7 @@ export class UIManager {
             </div>
         `;
         this.showModal(content);
-        
+
         document.getElementById('cancel-import')?.addEventListener('click', () => this.hideModal());
         document.getElementById('confirm-import')?.addEventListener('click', async () => {
             const pass = (document.getElementById('import-pass') as HTMLInputElement).value;
