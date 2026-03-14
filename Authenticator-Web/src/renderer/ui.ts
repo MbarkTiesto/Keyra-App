@@ -226,25 +226,7 @@ export class UIManager {
         localStorage.setItem(this.getStorageKey('theme'), theme);
 
         // Update segmented control
-        const segments = document.querySelectorAll('#theme-segmented .segment');
-        const indicator = document.querySelector('#theme-segmented .segment-indicator');
-
-        segments.forEach(segment => {
-            if (segment.getAttribute('data-val') === theme) {
-                segment.classList.add('active');
-            } else {
-                segment.classList.remove('active');
-            }
-        });
-
-        // Move indicator
-        if (indicator) {
-            const activeSegment = document.querySelector(`#theme-segmented .segment[data-val="${theme}"]`) as HTMLElement;
-            if (activeSegment) {
-                (indicator as HTMLElement).style.left = `${activeSegment.offsetLeft}px`;
-                (indicator as HTMLElement).style.width = `${activeSegment.offsetWidth}px`;
-            }
-        }
+        this.updateSegmentedUI('theme-segmented', theme);
 
         // Update legacy theme icons
         const themeIcon = document.getElementById('theme-icon-lucide');
