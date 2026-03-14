@@ -143,7 +143,7 @@ i[data-lucide] { stroke-width: 2.2px; }
     padding: 18px;
     transition: all var(--transition-medium);
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to allow dropdowns */
     display: flex; flex-direction: column;
     gap: 12px;
     border: none;
@@ -795,7 +795,7 @@ input:checked + .slider:before {
 
 /* Click outside to close */
 .accent-color-compact.open .accent-dropdown {
-    z-index: 1001;
+    z-index: 2100;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -868,18 +868,38 @@ input:checked + .slider:before {
 }
 
 .bento-card:hover {
-    transform: translateY(-2px);
-    box-shadow: -10px -10px 20px hsla(0, 0%, 100%, 0.6), 10px 10px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+    box-shadow: -5px -5px 12px hsla(0, 0%, 100%, 0.4), 5px 5px 12px rgba(0, 0, 0, 0.07);
+    filter: none;
 }
 
 .setting-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: var(--space-lg) var(--space-md); /* Increased vertical padding */
+    padding: var(--space-lg) var(--space-md);
     background: var(--bg-primary);
     box-shadow: var(--nm-pressed);
     border-radius: var(--radius-md);
-    margin-bottom: var(--space-md); /* Increased margin between rows */
+    margin-bottom: var(--space-md);
     border: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative; /* Added for z-index containment */
+    z-index: 1;
+}
+
+/* Ensure the row containing the open dropdown is on top of other rows */
+.setting-row:has(.accent-color-compact.open) {
+    z-index: 2000;
+}
+
+.setting-row:hover {
+    box-shadow: var(--nm-raised);
+    transform: translateY(-2px) scale(1.005);
+}
+
+.setting-row:active {
+    box-shadow: var(--nm-pressed);
+    transform: translateY(0) scale(0.995);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
