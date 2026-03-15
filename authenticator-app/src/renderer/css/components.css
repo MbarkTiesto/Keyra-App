@@ -194,6 +194,7 @@ i[data-lucide] {
 }
 
 .nav-tab {
+    font-family: var(--font-main);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -223,6 +224,7 @@ i[data-lucide] {
 
 /* User Identity Button - Neuomorphic */
 .user-button {
+    font-family: var(--font-main);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -288,13 +290,13 @@ i[data-lucide] {
 }
 
 .dropdown-header {
-    padding: 10px 12px 8px;
-    border-bottom: 1px solid var(--nm-shadow-dark);
-
-    margin-bottom: 6px;
+    font-family: var(--font-main);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .dropdown-user-name {
+    font-family: var(--font-main);
     font-size: 14px;
     font-weight: 800;
     color: var(--text-primary);
@@ -1270,7 +1272,15 @@ input:checked+.slider:before {
     color: var(--accent-primary);
 }
 
+.setting-name {
+    font-family: var(--font-main);
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
 .setting-desc {
+    font-family: var(--font-main);
     font-size: 13.5px;
     font-weight: 600;
     opacity: 0.7;
@@ -1471,6 +1481,7 @@ input:checked+.slider:before {
 }
 
 .pin-subtitle {
+    font-family: var(--font-main);
     font-size: 14px;
     color: var(--text-secondary);
     font-weight: 700;
@@ -1810,6 +1821,7 @@ body.light-theme .setting-row:hover {
 }
 
 .bento-title {
+    font-family: var(--font-heading);
     font-weight: 850;
     font-size: clamp(18px, 4vw, 22px);
     color: var(--text-primary);
@@ -2038,6 +2050,7 @@ body.light-theme .setting-row:hover {
 }
 
 .privacy-overlay h2 {
+    font-family: var(--font-heading);
     font-size: var(--font-size-2xl);
     font-weight: var(--weight-black);
     color: var(--text-primary);
@@ -2045,8 +2058,22 @@ body.light-theme .setting-row:hover {
     letter-spacing: -0.01em;
     text-transform: uppercase;
     line-height: 1.25;
-    white-space: nowrap;
-    text-align: center;
+}
+
+/* Profile & Activity Tab Typography Sync */
+.profile-avatar {
+    font-family: var(--font-heading);
+}
+
+.profile-details h3 {
+    font-family: var(--font-heading);
+}
+
+.profile-details p,
+.badge,
+.sync-info strong,
+.sync-info p {
+    font-family: var(--font-main);
 }
 
 .privacy-overlay p {
@@ -2081,13 +2108,13 @@ body.light-theme .setting-row:hover {
     50% { opacity: 1; transform: translateY(-4px); }
 }
 
-
 .bento-subtitle {
+    font-family: var(--font-main);
     font-size: 11px;
-    font-weight: 800;
-    color: var(--text-tertiary);
+    font-weight: 850;
+    color: var(--accent-primary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1.5px;
     opacity: 0.8;
 }
 
