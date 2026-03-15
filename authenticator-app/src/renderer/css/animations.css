@@ -1,11 +1,13 @@
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(12px) scale(0.985);
+        filter: blur(4px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+        filter: blur(0);
     }
 }
 
@@ -125,14 +127,13 @@
     border-radius: var(--radius-lg);
 }
 
-/* Hover elevation */
-.hover-elevate {
-    transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+/* Elastic Motion utility */
+.animate-elastic {
+    transition: all var(--transition-elastic);
 }
 
-.hover-elevate:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+.animate-blur-in {
+    animation: fadeIn 0.5s var(--transition-medium) forwards;
 }
 
 /* Privacy Blur Overlay Styles */

@@ -1,21 +1,25 @@
 :root {
-    /* Scientific Design Tokens - HSL System */
-    --h: 258; /* Core Purple Hue */
+    /* Scientific Design Tokens - Crystalline Elite HSL System */
+    --h: 258; /* Core Identity Hue */
     --s: 100%;
     
-    --bg-primary: hsl(var(--h), 20%, 100%);
-    --bg-secondary: hsl(var(--h), 25%, 98%);
-    --bg-tertiary: hsl(var(--h), 30%, 96%);
+    --bg-primary: hsl(var(--h), 20%, 98%);
+    --bg-secondary: hsl(var(--h), 25%, 96%);
+    --bg-tertiary: hsl(var(--h), 30%, 94%);
     
-    --text-primary: hsl(var(--h), 40%, 8%);
-    --text-secondary: hsl(var(--h), 15%, 38%);
-    --text-tertiary: hsl(var(--h), 12%, 60%);
+    --text-primary: hsl(var(--h), 45%, 10%);
+    --text-secondary: hsl(var(--h), 20%, 35%);
+    --text-tertiary: hsl(var(--h), 15%, 55%);
     
-    --accent-primary: hsl(var(--h), var(--s), 68%);
-    --accent-secondary: hsl(280, 100%, 75%);
-    --accent-hover: hsl(var(--h), var(--s), 62%);
-    --accent-soft: hsla(var(--h), var(--s), 68%, 0.12);
+    --accent-primary: hsl(var(--h), var(--s), 64%);
+    --accent-secondary: hsl(280, 100%, 72%);
+    --accent-hover: hsl(var(--h), var(--s), 58%);
+    --accent-soft: hsla(var(--h), var(--s), 64%, 0.12);
     
+    /* Composite Glass Borders */
+    --glass-border: 1px solid hsla(var(--h), 100%, 100%, 0.45);
+    --glass-outline: 1px solid hsla(var(--h), 100%, 0%, 0.04);
+
     /* Accent Color Themes */
     --accent-royal-purple: 258; /* Default Royal Purple */
     --accent-electric-blue: 200; /* Electric Blue */
@@ -76,35 +80,44 @@
     --space-xl: 48px;
     --space-2xl: 64px;
     
-    --shadow-soft: 0 4px 20px hsla(var(--h), var(--s), 20%, 0.04);
-    --shadow-medium: 0 12px 36px hsla(var(--h), var(--s), 20%, 0.08);
-    --shadow-hard: 0 24px 64px hsla(var(--h), var(--s), 20%, 0.12);
+    --shadow-soft: 
+        0 4px 12px hsla(var(--h), 20%, 10%, 0.04),
+        0 1px 4px hsla(var(--h), 20%, 10%, 0.02);
+    --shadow-medium: 
+        0 12px 36px hsla(var(--h), 20%, 10%, 0.08),
+        0 2px 10px hsla(var(--h), 20%, 10%, 0.04);
+    --shadow-hard: 
+        0 24px 72px hsla(var(--h), 20%, 10%, 0.12),
+        0 4px 20px hsla(var(--h), 20%, 10%, 0.06);
 
-    /* Neuomorphic Design System - Light (Soft Clay) */
+    /* Crystalline Neumorphism - Surface Depth */
     --nm-surface: hsl(var(--h), 20%, 94%);
-    --nm-shadow-light: hsla(0, 0%, 100%, 0.95);
-    --nm-shadow-dark: hsla(var(--h), 25%, 82%, 0.6);
+    --nm-shadow-light: hsl(0, 0%, 100%);
+    --nm-shadow-dark: hsl(var(--h), 25%, 86%);
+    
     --nm-shadow-out: 
-        10px 10px 20px var(--nm-shadow-dark), 
-        -10px -10px 20px var(--nm-shadow-light);
+        12px 12px 24px var(--nm-shadow-dark), 
+        -12px -12px 24px var(--nm-shadow-light);
     --nm-shadow-in: 
-        inset 8px 8px 16px var(--nm-shadow-dark), 
-        inset -8px -8px 16px var(--nm-shadow-light);
+        inset 10px 10px 20px var(--nm-shadow-dark), 
+        inset -10px -10px 20px var(--nm-shadow-light);
     --nm-shadow-out-sm: 
-        4px 4px 10px var(--nm-shadow-dark), 
-        -4px -4px 10px var(--nm-shadow-light);
+        6px 6px 14px var(--nm-shadow-dark), 
+        -6px -6px 14px var(--nm-shadow-light);
     --nm-shadow-in-sm: 
-        inset 4px 4px 8px var(--nm-shadow-dark), 
-        inset -4px -4px 8px var(--nm-shadow-light);
+        inset 6px 6px 12px var(--nm-shadow-dark), 
+        inset -6px -6px 12px var(--nm-shadow-light);
     
-    --radius-sm: 12px;   /* Inner Icons / Menus */
-    --radius-md: 20px;  /* Buttons / Standard Inputs */
-    --radius-lg: 32px;  /* Cards / Standard Modals */
-    --radius-xl: 48px;  /* Large Containers */
-    --radius-full: 999px; /* Capsule Shapes */
+    /* Radius System */
+    --radius-sm: 14px;
+    --radius-md: 22px;
+    --radius-lg: 36px;
+    --radius-xl: 52px;
+    --radius-full: 1000px;
     
-    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    --transition-medium: 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    --transition-elastic: 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 
     /* Scientific Dimensional Scaling */
     --btn-h-lg: 60px;   /* Hero / Main Actions */
@@ -112,28 +125,28 @@
     --btn-h-sm: 36px;   /* Compact / Tertiary */
     --btn-px: clamp(16px, 4vw, 32px);
 
-    /* Typography System - Premium Modular Scale */
+    /* Typography System - Fluid Elite Scale */
     --font-main: 'Nunito', 'Inter', -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    --font-size-2xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
-    --font-size-xs:  clamp(0.8rem, 0.75rem + 0.25vw, 0.85rem);
-    --font-size-sm:  clamp(0.9rem, 0.85rem + 0.25vw, 0.95rem);
-    --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.05rem);
-    --font-size-md:   clamp(1.125rem, 1.05rem + 0.35vw, 1.25rem);
-    --font-size-lg:   clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-    --font-size-xl:   clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
-    --font-size-2xl:  clamp(2rem, 1.75rem + 1.25vw, 2.75rem);
-    --font-size-3xl:  clamp(2.75rem, 2.25rem + 2.5vw, 4rem);
+    --font-size-2xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.72rem);
+    --font-size-xs:  clamp(0.75rem, 0.7rem + 0.2vw, 0.82rem);
+    --font-size-sm:  clamp(0.88rem, 0.85rem + 0.2vw, 0.95rem);
+    --font-size-base: clamp(1rem, 0.98rem + 0.2vw, 1.05rem);
+    --font-size-md:   clamp(1.15rem, 1.1rem + 0.4vw, 1.35rem);
+    --font-size-lg:   clamp(1.4rem, 1.3rem + 0.6vw, 1.75rem);
+    --font-size-xl:   clamp(1.8rem, 1.6rem + 1vw, 2.5rem);
+    --font-size-2xl:  clamp(2.5rem, 2.2rem + 1.5vw, 3.5rem);
+    --font-size-3xl:  clamp(3.5rem, 3rem + 3vw, 5.5rem);
 
     --weight-medium: 500;
     --weight-semibold: 600;
     --weight-bold: 700;
     --weight-black: 900;
 
-    --ls-tight: -0.015em;
-    --ls-normal: 0.01em;
-    --ls-wide: 0.03em;
+    --ls-tight: -0.02em;
+    --ls-normal: 0.015em;
+    --ls-wide: 0.05em;
 }
 
 [data-theme="dark"] {

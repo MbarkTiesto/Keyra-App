@@ -50,11 +50,11 @@
     width: 34px;
     height: 34px;
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-out-sm);
-    border: none;
+    box-shadow: var(--nm-shadow-out-sm), var(--glass-outline);
+    border: var(--glass-border);
     border-radius: var(--radius-full);
     color: var(--text-secondary);
-    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: all var(--transition-medium);
     margin-right: 12px;
     cursor: pointer;
     overflow: hidden;
@@ -114,11 +114,11 @@
 }
 
 .connectivity-indicator #status-text {
-    font-size: 11px;
-    font-weight: 850;
+    font-size: var(--font-size-2xs);
+    font-weight: var(--weight-black);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    letter-spacing: var(--ls-wide);
+    transition: all var(--transition-medium);
     opacity: 0;
     width: 0;
     white-space: nowrap;
@@ -129,8 +129,8 @@
 
 .connectivity-indicator.expanded #status-text {
     opacity: 1;
-    width: 65px;
-    margin-left: 2px;
+    width: 72px;
+    margin-left: 4px;
 }
 
 /* Responsive: Always compact on very narrow screens if needed, otherwise leave it interactive */
@@ -234,8 +234,8 @@ i[data-lucide] {
     right: 0;
     min-width: 240px;
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-out);
-    border: none;
+    box-shadow: var(--nm-shadow-out), var(--glass-outline);
+    border: var(--glass-border);
     border-radius: var(--radius-lg);
     padding: 10px;
     z-index: 1000;
@@ -243,7 +243,7 @@ i[data-lucide] {
     visibility: hidden;
     transform: translateY(12px) scale(0.95);
     transform-origin: top right;
-    transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.2s ease;
+    transition: opacity var(--transition-medium), transform var(--transition-medium), visibility var(--transition-medium);
 }
 
 .dropdown-menu.show {
@@ -330,17 +330,17 @@ body.light-theme .dropdown-menu {
 
 .account-card {
     background: var(--nm-surface);
-    border: none;
+    border: var(--glass-border);
     border-radius: var(--radius-lg);
     padding: 24px;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    box-shadow: var(--nm-shadow-out);
-    animation: cardEntrance 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+    box-shadow: var(--nm-shadow-out), var(--glass-outline);
+    animation: cardEntrance 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
     opacity: 0;
 }
 
@@ -515,11 +515,12 @@ body.light-theme .otp-hero {
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.02);
     color: var(--accent-hover);
     box-shadow: 
-        6px 6px 12px var(--nm-shadow-dark), 
-        -6px -6px 12px var(--nm-shadow-light);
+        8px 8px 20px var(--nm-shadow-dark), 
+        -8px -8px 20px var(--nm-shadow-light),
+        0 0 15px var(--accent-soft);
 }
 
 .btn-primary:active {

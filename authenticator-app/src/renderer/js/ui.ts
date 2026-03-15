@@ -602,8 +602,8 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
             (window as any).api.setContentProtection(this.screenGuardian);
             this.pushSettings();
-            this.showToast(this.screenGuardian ? "Screen Guardian Active" : "Screen Guardian Disabled", "info");
-            this.updateLastActivity(`Screen Guardian ${this.screenGuardian ? 'Enabled' : 'Disabled'}`);
+            this.showToast(this.screenGuardian ? "Screen Guardian Active" : "Screen Guardian Standby", "info");
+            this.updateLastActivity(`Screen Guardian ${this.screenGuardian ? 'Engaged' : 'Released'}`);
         });
 
         // Interactive Privacy Toggle
@@ -612,8 +612,8 @@ export class UIManager {
             this.privacyBlur = target.checked;
             localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacyBlur));
             this.pushSettings();
-            this.showToast(this.privacyBlur ? "Interactive Privacy Enabled" : "Interactive Privacy Disabled", "info");
-            this.updateLastActivity(`Interactive Privacy ${this.privacyBlur ? 'Enabled' : 'Disabled'}`);
+            this.showToast(this.privacyBlur ? "Interactive Privacy Engaged" : "Interactive Privacy Disengaged", "info");
+            this.updateLastActivity(`Privacy Shield ${this.privacyBlur ? 'Activated' : 'Neutralized'}`);
         });
 
         // Accent Color
