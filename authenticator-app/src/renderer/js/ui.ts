@@ -499,19 +499,13 @@ export class UIManager {
             this.updateLastActivity('Vault locked');
         });
 
-        // Close App Logic
-        document.getElementById('btn-close-app')?.addEventListener('click', () => {
-            (window as any).api.close();
-        });
+        // Redundant close listeners removed (now handled in app.ts for immediate activation)
 
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
             const nextTheme = this.currentTheme === 'light' ? 'dark' : 'light';
             this.setTheme(nextTheme);
         });
 
-        document.getElementById('menu-close-app-btn')?.addEventListener('click', () => {
-            (window as any).api.close();
-        });
         document.getElementById('btn-logout-trigger')?.addEventListener('click', () => {
             document.getElementById('modal-logout')?.classList.add('show');
             this.refreshLucide();

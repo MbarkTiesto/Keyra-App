@@ -25,6 +25,14 @@ function initAutoLock() {
 }
 
 async function init() {
+    // ─── Global Window Controls (Available immediately) ────────────────
+    const closeButtons = ['btn-close-app', 'btn-auth-close', 'btn-lock-close', 'menu-close-app-btn'];
+    closeButtons.forEach(id => {
+        document.getElementById(id)?.addEventListener('click', () => {
+            (window as any).api.close();
+        });
+    });
+
     setupAuthUI();
 
     setAppInitCallback(async () => {

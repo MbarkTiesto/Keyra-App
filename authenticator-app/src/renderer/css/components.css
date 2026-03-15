@@ -2742,6 +2742,42 @@ body.light-theme .cloud-sync-pill {
     gap: var(--space-lg);
     border: none;
     margin: auto;
+    position: relative;
+}
+
+.auth-close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    z-index: 10;
+}
+
+.auth-close-btn:hover {
+    transform: scale(1.1);
+    color: #ff3b30;
+    box-shadow: var(--nm-shadow-out);
+}
+
+.auth-close-btn:active {
+    transform: scale(0.95);
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.auth-close-btn i {
+    width: 18px;
+    height: 18px;
 }
 
 .auth-header {
