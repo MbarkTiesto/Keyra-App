@@ -20,6 +20,7 @@ function createWindow() {
         minWidth: 380,
         minHeight: 500,
         resizable: false,
+        icon: path.join(__dirname, '../../assets/icon.png'),
         titleBarStyle: 'hidden', // Apple style clean top
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
