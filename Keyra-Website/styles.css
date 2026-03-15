@@ -1215,6 +1215,18 @@ button {
     color: var(--accent-primary);
     background: var(--bg-primary);
     box-shadow: var(--nm-raised);
+    overflow: hidden;
+}
+
+.dev-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-medium);
+}
+
+.dev-card:hover .dev-img {
+    transform: scale(1.05);
 }
 
 .dev-badge {
