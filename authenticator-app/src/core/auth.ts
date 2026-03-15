@@ -165,25 +165,44 @@ export async function checkSession(): Promise<{ success: boolean, message: strin
 }
 
 export async function login(username: string, password: string): Promise<{ success: boolean, message: string }> {
-    const users = await getUsers();
-    let user = users.find(u => u.username === username);
-    
-    // Cloud Fallback
-    if (!user) {
+    let user: UserRecord | null = null;
+    let cloudFetchSuccess = false;
+
+    // 1. Cloud First Approach
+    try {
         const cloudData = await getUserData(username);
         if (cloudData) {
             user = cloudData;
-            users.push(user!);
-            await saveUsers(users);
+            cloudFetchSuccess = true;
+            
+            // Proactively update local cache with fresh cloud data
+            const localUsers = await getUsers();
+            const localIdx = localUsers.findIndex(u => u.username === username);
+            if (localIdx !== -1) {
+                localUsers[localIdx] = cloudData;
+            } else {
+                localUsers.push(cloudData);
+            }
+            await saveUsers(localUsers);
         }
+    } catch (err: any) {
+        console.warn("Cloud login fetch failed, will attempt local fallback:", err.message);
     }
 
-    if (!user) return { success: false, message: "Invalid credentials." };
+    // 2. Local Fallback (if cloud failed or user not found in cloud)
+    if (!user) {
+        const localUsers = await getUsers();
+        user = localUsers.find(u => u.username === username) || null;
+    }
+
+    if (!user) {
+        return { success: false, message: "Account not found. Please ensure you have an active internet connection for first-time login." };
+    }
 
     if (!user.isActivated) return { success: false, message: "Please verify your email first." };
 
     if (!verifyPassword(password, user.hash, user.salt)) {
-        return { success: false, message: "Invalid credentials." };
+        return { success: false, message: "Incorrect password. Please try again." };
     }
 
     try {

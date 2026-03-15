@@ -4,7 +4,13 @@ import { app } from 'electron';
 import { AuthenticatorAccount } from './crypto';
 
 // Load from .env
-require('dotenv').config();
+const dotenv = require('dotenv');
+const envPath = app.isPackaged 
+    ? path.join(process.resourcesPath, '.env') 
+    : path.join(process.cwd(), '.env');
+
+dotenv.config({ path: envPath });
+
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = process.env.GITHUB_OWNER;
 const GITHUB_REPO = process.env.GITHUB_REPO;

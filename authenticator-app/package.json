@@ -38,6 +38,9 @@
         "owner": "MbarkT3STO",
         "repo": "Keyra-App"
       }
+    ],
+    "extraResources": [
+      ".env"
     ]
   },
   "keywords": [],
