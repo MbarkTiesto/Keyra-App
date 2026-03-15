@@ -1096,6 +1096,21 @@ button {
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3xl);
+    background: radial-gradient(circle at top right, rgba(var(--h), var(--s), 55%, 0.05), transparent), var(--bg-primary);
+    position: relative;
+    overflow: hidden;
+}
+
+.download-container::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+    opacity: 0.1;
+    pointer-events: none;
 }
 
 .download-info flex {
@@ -1114,10 +1129,44 @@ button {
 }
 
 .download-options {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    flex: 1.2;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: var(--space-md);
+}
+
+.recommended-badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: var(--accent-primary);
+    color: white;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(var(--h), var(--s), 55%, 0.3);
+    z-index: 10;
+    pointer-events: none;
+    animation: badge-pulse 2s infinite;
+}
+
+@keyframes badge-pulse {
+    0% { transform: translateY(0); box-shadow: 0 4px 10px rgba(var(--h), var(--s), 55%, 0.3); }
+    50% { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(var(--h), var(--s), 55%, 0.5); }
+    100% { transform: translateY(0); box-shadow: 0 4px 10px rgba(var(--h), var(--s), 55%, 0.3); }
+}
+
+.download-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), var(--nm-raised), 0 0 0 1px rgba(var(--h), var(--s), 55%, 0.1);
+}
+
+.download-dropdown-vessel {
+    position: relative;
+    width: 100%;
 }
 
 .download-card {
@@ -1127,15 +1176,21 @@ button {
     border-radius: var(--radius-lg);
     gap: var(--space-md);
     transition: all var(--transition-medium);
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    color: inherit;
 }
 
 .download-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), var(--nm-raised);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1), var(--nm-raised);
 }
 
-.download-card:active {
-    transform: translateY(1px);
+.download-card:active,
+.dropdown-trigger.active {
+    transform: translateY(2px);
     box-shadow: var(--nm-pressed);
     background: var(--bg-primary);
 }
@@ -1145,6 +1200,108 @@ button {
     color: var(--accent-primary);
     width: 40px;
     text-align: center;
+}
+
+.dropdown-chevron {
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    transition: all var(--transition-medium);
+    border-radius: 50%;
+}
+
+.dropdown-trigger.active .dropdown-chevron {
+    transform: rotate(180deg);
+    color: var(--accent-primary);
+    background: var(--bg-primary);
+    box-shadow: var(--nm-pressed);
+}
+
+/* Submenu Styles */
+.download-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: var(--space-md);
+    border-radius: var(--radius-lg);
+    opacity: 0;
+    transform: translateY(-10px);
+    background: var(--bg-secondary);
+}
+
+.download-submenu.show {
+    max-height: 400px;
+    padding: var(--space-sm);
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: var(--nm-pressed);
+}
+
+.submenu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+}
+
+.submenu-item:hover {
+    background: var(--bg-primary);
+    box-shadow: var(--nm-raised);
+    color: var(--accent-primary);
+    transform: translateX(8px);
+}
+
+.submenu-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-secondary);
+    font-size: 1.2rem;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-raised);
+}
+
+.submenu-item:hover .submenu-icon {
+    box-shadow: var(--nm-pressed);
+}
+
+.submenu-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.arch-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.arch-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.submenu-item i.fa-download {
+    font-size: 0.9rem;
+    opacity: 0.5;
+    transition: opacity var(--transition-fast);
+}
+
+.submenu-item:hover i.fa-download {
+    opacity: 1;
 }
 
 .os-info {

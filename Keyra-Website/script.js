@@ -234,6 +234,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setInterval(updateMockTimers, 150);
 
+    // --- Download Dropdowns Logic ---
+    const dropdownTriggers = document.querySelectorAll('.dropdown-trigger');
+    const submenus = document.querySelectorAll('.download-submenu');
+
+    const closeAllDropdowns = () => {
+        dropdownTriggers.forEach(trigger => trigger.classList.remove('active'));
+        submenus.forEach(menu => menu.classList.remove('show'));
+    };
+
+    dropdownTriggers.forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdownId = trigger.getAttribute('data-dropdown');
+            const targetMenu = document.getElementById(`${dropdownId}-dropdown`);
+            
+            const isClosing = trigger.classList.contains('active');
+            
+            closeAllDropdowns();
+            
+            if (!isClosing) {
+                trigger.classList.add('active');
+                if (targetMenu) targetMenu.classList.add('show');
+            }
+        });
+    });
+
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.download-dropdown-vessel')) {
+            closeAllDropdowns();
+        }
+    });
+
     // --- Dynamic GitHub Stats ---
     const fetchGitHubStats = async () => {
         const starsEl = document.getElementById('github-stars');
@@ -265,5 +298,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    fetchGitHubStats();
+    // --- OS Detection & Recommended Badge ---
+    const detectOSAndHighlight = () => {
+        const platform = window.navigator.platform.toLowerCase();
+        let recommendedCardId = '';
+        
+        if (platform.includes('win')) {
+            recommendedCardId = 'windows-download';
+        } else if (platform.includes('mac')) {
+            recommendedCardId = 'macos-download';
+        } else if (platform.includes('linux')) {
+            recommendedCardId = 'linux-download';
+        }
+        
+        if (recommendedCardId) {
+            const vessel = document.getElementById(recommendedCardId);
+            const card = vessel.querySelector('.download-card');
+            
+            if (vessel && card) {
+                // Add badge
+                const badge = document.createElement('div');
+                badge.className = 'recommended-badge';
+                badge.textContent = 'Recommended';
+                vessel.appendChild(badge);
+                
+                // Add a special class for extra prominence
+                card.style.borderColor = 'rgba(var(--h), var(--s), 55%, 0.3)';
+                card.style.borderWidth = '1px';
+                card.style.borderStyle = 'solid';
+            }
+        }
+    };
+
+    detectOSAndHighlight();
 });
