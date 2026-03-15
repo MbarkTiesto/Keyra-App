@@ -128,7 +128,6 @@ body {
 .navbar-section {
     display: flex;
     align-items: center;
-    -webkit-app-region: no-drag;
 }
 
 .navbar-left {
@@ -145,6 +144,19 @@ body {
 .navbar-right {
     flex: 0 0 auto;
     justify-content: flex-end;
+}
+
+/* Surgery: Disable drag only on interactive elements to allow window movement */
+.nav-tabs,
+.user-menu,
+.connectivity-indicator,
+.navbar-brand {
+    -webkit-app-region: no-drag;
+}
+
+/* Support dragging on the rest of the navbar */
+.navbar {
+    -webkit-app-region: drag;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

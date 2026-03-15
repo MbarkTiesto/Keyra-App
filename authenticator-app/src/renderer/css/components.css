@@ -2786,6 +2786,17 @@ body.light-theme .cloud-sync-pill {
 .auth-header {
     text-align: center;
     margin-bottom: var(--space-md);
+    -webkit-app-region: drag;
+}
+
+/* Ensure controls are still interactive */
+.auth-close-btn,
+.auth-submit-btn,
+.auth-link,
+.form-input,
+.pin-field,
+.pin-indicators {
+    -webkit-app-region: no-drag;
 }
 
 .auth-header .brand-icon {
