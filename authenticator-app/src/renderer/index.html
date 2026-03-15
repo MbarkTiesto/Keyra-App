@@ -59,75 +59,77 @@
             <button id="btn-auth-close" class="auth-close-btn" title="Exit Application">
                 <i data-lucide="x"></i>
             </button>
-            <div class="auth-header">
-                <div class="brand-icon">
-                    <img src="assets/logo.png" class="app-logo-medium nm-logo">
+            <div class="auth-container-scrollable">
+                <div class="auth-header">
+                    <div class="brand-icon">
+                        <img src="assets/logo.png" class="app-logo-medium nm-logo">
+                    </div>
+                    <h1 class="auth-title">Keyra</h1>
+                    <p class="auth-subtitle">YOUR VAULT IS SECURE</p>
                 </div>
-                <h1 class="auth-title">Keyra</h1>
-                <p class="auth-subtitle">YOUR VAULT IS SECURE</p>
-            </div>
 
-            <!-- Login Box -->
-            <div id="auth-login-box">
-                <form id="form-login">
-                    <div class="form-group">
-                        <label class="form-label">Vault Name</label>
-                        <input type="text" id="login-username" class="form-input" placeholder="Your username" required>
+                <!-- Login Box -->
+                <div id="auth-login-box">
+                    <form id="form-login">
+                        <div class="form-group">
+                            <label class="form-label">Vault Name</label>
+                            <input type="text" id="login-username" class="form-input" placeholder="Your username" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Master Password</label>
+                            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-primary auth-submit-btn">Unlock Vault</button>
+                        <div id="login-error" class="auth-error"></div>
+                    </form>
+                    <div class="auth-footer">
+                        <p>First time? <button id="btn-show-signup" class="auth-link">Create your Vault</button></p>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Master Password</label>
-                        <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="btn-primary auth-submit-btn">Unlock Vault</button>
-                    <div id="login-error" class="auth-error"></div>
-                </form>
-                <div class="auth-footer">
-                    <p>First time? <button id="btn-show-signup" class="auth-link">Create your Vault</button></p>
                 </div>
-            </div>
 
-            <!-- Signup Box -->
-            <div id="auth-signup-box" class="hidden">
-                <form id="form-signup">
-                    <div class="form-group">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" id="signup-username" class="form-input" placeholder="John Doe" required>
+                <!-- Signup Box -->
+                <div id="auth-signup-box" class="hidden">
+                    <form id="form-signup">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="signup-username" class="form-input" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" id="signup-email" class="form-input" placeholder="name@domain.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Master Password</label>
+                            <input type="password" id="signup-password" class="form-input" placeholder="Min 8 characters" required>
+                        </div>
+                        <button type="submit" class="btn-primary auth-submit-btn">Create Vault</button>
+                        <div id="signup-error" class="auth-error"></div>
+                    </form>
+                    <div class="auth-footer">
+                        <p>Already have a vault? <button id="btn-show-login" class="auth-link">Sign In</button></p>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" id="signup-email" class="form-input" placeholder="name@domain.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Master Password</label>
-                        <input type="password" id="signup-password" class="form-input" placeholder="Min 8 characters" required>
-                    </div>
-                    <button type="submit" class="btn-primary auth-submit-btn">Create Vault</button>
-                    <div id="signup-error" class="auth-error"></div>
-                </form>
-                <div class="auth-footer">
-                    <p>Already have a vault? <button id="btn-show-login" class="auth-link">Sign In</button></p>
                 </div>
-            </div>
 
-            <!-- Verify Box -->
-            <div id="auth-verify-box" class="hidden">
-                <h2 class="auth-verify-title">Verify it's You</h2>
-                <p class="auth-verify-subtitle">Enter the 6-digit code we sent to your email.</p>
-                <form id="form-verify">
-                    <input type="hidden" id="verify-email-field">
-                    <div class="verify-inputs">
-                        <input type="text" maxlength="1" class="verify-digit form-input">
-                        <input type="text" maxlength="1" class="verify-digit form-input">
-                        <input type="text" maxlength="1" class="verify-digit form-input">
-                        <input type="text" maxlength="1" class="verify-digit form-input">
-                        <input type="text" maxlength="1" class="verify-digit form-input">
-                        <input type="text" maxlength="1" class="verify-digit form-input">
+                <!-- Verify Box -->
+                <div id="auth-verify-box" class="hidden">
+                    <h2 class="auth-verify-title">Verify it's You</h2>
+                    <p class="auth-verify-subtitle">Enter the 6-digit code we sent to your email.</p>
+                    <form id="form-verify">
+                        <input type="hidden" id="verify-email-field">
+                        <div class="verify-inputs">
+                            <input type="text" maxlength="1" class="verify-digit form-input">
+                            <input type="text" maxlength="1" class="verify-digit form-input">
+                            <input type="text" maxlength="1" class="verify-digit form-input">
+                            <input type="text" maxlength="1" class="verify-digit form-input">
+                            <input type="text" maxlength="1" class="verify-digit form-input">
+                            <input type="text" maxlength="1" class="verify-digit form-input">
+                        </div>
+                        <button type="submit" class="btn-primary auth-submit-btn">Unlock</button>
+                        <div id="verify-error" class="auth-error"></div>
+                    </form>
+                    <div class="auth-footer">
+                        <button id="btn-resend-code" class="auth-resend-btn">Resend Code <span id="resend-timer"></span></button>
                     </div>
-                    <button type="submit" class="btn-primary auth-submit-btn">Unlock</button>
-                    <div id="verify-error" class="auth-error"></div>
-                </form>
-                <div class="auth-footer">
-                    <button id="btn-resend-code" class="auth-resend-btn">Resend Code <span id="resend-timer"></span></button>
                 </div>
             </div>
         </div>

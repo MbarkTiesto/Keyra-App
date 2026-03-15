@@ -110,6 +110,7 @@
     --radius-md: 16px;
     --radius-lg: 24px;
     --radius-xl: 32px;
+    --radius-2xl: 48px;
     --radius-full: 1000px;
     
     --transition-fast: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
