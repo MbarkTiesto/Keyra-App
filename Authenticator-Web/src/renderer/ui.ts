@@ -225,6 +225,7 @@ export class UIManager {
         if (lockBtn) lockBtn.classList.toggle('hidden', !hasPin);
         if (setupBtn) setupBtn.style.display = hasPin ? 'none' : 'flex';
         if (removeBtn) removeBtn.style.display = hasPin ? 'flex' : 'none';
+        if (removeBtn) removeBtn.title = "Remove Security Policy";
     }
 
     private initTheme() {
@@ -348,7 +349,7 @@ export class UIManager {
                 localStorage.setItem(this.getStorageKey('autolock'), val);
                 this.updateSegmentedUI('autolock-segmented', val);
                 this.pushWebSettings();
-                this.showToast(`Vault Auto-lock: ${val === '0' ? 'Off' : val + 'm'}`, "info");
+                this.showToast(val === '0' ? "Auto-lock is off" : `Auto-lock set to ${val}m`, "info");
             });
         });
 
@@ -363,7 +364,7 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacyMode));
             this.pushWebSettings();
             this.renderAccounts(); // Re-render to apply/remove masking
-            this.showToast(this.privacyMode ? "Privacy Mode Enabled" : "Privacy Mode Disabled", "info");
+            this.showToast(this.privacyMode ? "Codes are now hidden" : "Codes are now visible", "info");
         });
 
         // Screen Guardian Toggle
@@ -378,7 +379,7 @@ export class UIManager {
                 document.getElementById('privacy-blur-overlay')?.classList.add('hidden');
             }
 
-            this.showToast(this.screenGuardian ? "Privacy Shield Active" : "Privacy Shield Disabled", "info");
+            this.showToast(this.screenGuardian ? "Screenshot protection is on" : "Screenshot protection is off", "info");
         });
 
 
@@ -391,7 +392,7 @@ export class UIManager {
             }
             const res = await (window as any).api.exportVault();
             if (res.success) {
-                this.showToast("Vault backup exported successfully", "success");
+                this.showToast("Vault backup created", "success");
             } else if (res.message) {
                 this.showToast(res.message, "error");
             }
@@ -429,7 +430,7 @@ export class UIManager {
                 // but since we usually sync on change, let's just refresh data
                 await this.loadInitialData();
 
-                this.showToast("Cloud Synchronization Complete", "success");
+                this.showToast("Vault backed up!", "success");
                 this.updateLastActivity('Manual Cloud Sync');
             } catch (err) {
                 console.error("Manual sync failed", err);
@@ -629,6 +630,7 @@ export class UIManager {
                 const accent = item.getAttribute('data-accent');
                 if (accent) {
                     this.setAccentColor(accent);
+                    this.showToast("Color updated!", "success");
 
                     // Update UI
                     document.querySelectorAll('.accent-item').forEach(i => i.classList.remove('active'));
@@ -784,7 +786,7 @@ export class UIManager {
                     this.setTheme(theme);
                     localStorage.setItem(this.getStorageKey('theme'), theme);
                     localStorage.setItem(this.getStorageKey('theme_manual_override'), 'true');
-                    this.updateLastActivity(`Changed to ${theme} mode`);
+                    this.updateLastActivity(`Changed theme`);
                     this.showToast(`Switched to ${theme} mode`, 'success');
                 }
             });
@@ -985,7 +987,7 @@ export class UIManager {
             }
             const otpCode = await (window as any).api.generateTOTP(account.secret);
             await navigator.clipboard.writeText(otpCode);
-            this.showToast("OTP Copied to Clipboard", "success");
+            this.showToast("Code copied!", "success");
         };
 
         card.querySelector('.edit-btn')?.addEventListener('click', (e) => {
@@ -1052,9 +1054,9 @@ export class UIManager {
             this.updateLastActivity('OTP copied');
 
             // Show toast
-            this.showToast('OTP code copied to clipboard', 'success');
+            this.showToast('Code copied!', 'success');
         }).catch(() => {
-            this.showToast('Failed to copy code', 'error');
+            this.showToast('Failed to copy', 'error');
         });
     }
 
@@ -1110,7 +1112,9 @@ export class UIManager {
                     timeAgo = `${days} day${days > 1 ? 's' : ''} ago`;
                 }
 
-                lastActivityElement.textContent = timeAgo;
+                if (lastActivityElement) {
+                    lastActivityElement.textContent = timeAgo;
+                }
             }
 
             if (lastActionElement) {
@@ -1220,28 +1224,31 @@ export class UIManager {
                         <i data-lucide="plus-circle"></i>
                     </div>
                     <div>
-                        <h2 style="font-weight: 900; font-size: clamp(24px, 4vw, 28px); color: var(--text-primary); letter-spacing: -1px;">Initialize Identity</h2>
-                        <div class="modal-help-text" style="font-weight: 600; opacity: 0.8; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">Register new secure service token</div>
+                        <h2 style="font-weight: 900; font-size: clamp(24px, 4vw, 28px); color: var(--text-primary); letter-spacing: -1px;">Add Token</h2>
+                        <div class="modal-help-text" style="font-weight: 600; opacity: 0.8; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">SAVE DIGITAL IDENTITY</div>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Service Provider</label>
-                    <input type="text" id="new-issuer" class="form-input" placeholder="e.g. Identity Node">
+                    <label class="form-label">Service</label>
+                    <input type="text" id="new-issuer" class="form-input" placeholder="e.g. GitHub, Google">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Vault Label</label>
-                    <input type="text" id="new-account" class="form-input" placeholder="User Reference">
+                    <label class="form-label">Account</label>
+                    <input type="text" id="new-account" class="form-input" placeholder="name@domain.com">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Base32 Secret</label>
-                    <input type="text" id="new-secret" class="form-input" placeholder="Secure Token Payload">
+                    <label class="form-label">TOTP Secret</label>
+                    <input type="text" id="new-secret" class="form-input" placeholder="Enter secret key">
                     <div class="modal-help-text">Input derived from manual entry or registry backup</div>
                 </div>
                 
                 <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
-                    <button class="btn-primary" id="save-new-account" style="flex: 2; height: var(--btn-h-lg); font-size: 17px;">Verify & Secure</button>
-                    <button class="user-button" id="cancel-add-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Discard</button>
+                    <button class="btn-primary" id="save-new-account" style="flex: 2; height: var(--btn-h-lg); font-size: 17px;">
+                        <i data-lucide="shield-plus"></i>
+                        Save Token
+                    </button>
+                    <button class="user-button" id="cancel-add-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Cancel</button>
                 </div>
             </div>
         `;
@@ -1267,26 +1274,39 @@ export class UIManager {
             <div style="padding: clamp(var(--space-md), 8vw, var(--space-xl));">
                 <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg);">
                     <div class="account-icon nm-icon-large" style="width: 64px; height: 64px;">
-                        <i data-lucide="edit-3"></i>
+                        <i data-lucide="settings-2"></i>
                     </div>
                     <div>
-                        <h2 style="font-weight: 900; font-size: clamp(24px, 4vw, 28px); color: var(--text-primary); letter-spacing: -1px;">Refine Metadata</h2>
-                        <div class="modal-help-text" style="font-weight: 600; opacity: 0.8; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">Adjust identity for ${account.issuer}</div>
+                        <h2 style="font-weight: 900; font-size: clamp(24px, 4vw, 28px); color: var(--text-primary); letter-spacing: -1px;">Edit Identity</h2>
+                        <div class="modal-help-text" style="font-weight: 600; opacity: 0.8; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;">UPDATE SERVICE DETAILS</div>
                     </div>
                 </div>
                 
+                <div class="modal-entity-badge" style="margin-bottom: 20px;">
+                    <div class="entity-icon">
+                        <i data-lucide="shield"></i>
+                    </div>
+                    <div class="entity-info">
+                        <span class="entity-name">${account.issuer}</span>
+                        <span class="entity-label">${account.account || 'Vault Token'}</span>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label class="form-label">Provider Label</label>
+                    <label class="form-label">Service</label>
                     <input type="text" id="edit-issuer" class="form-input" value="${account.issuer}">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Identity Reference</label>
+                    <label class="form-label">Account</label>
                     <input type="text" id="edit-account" class="form-input" value="${account.account}">
                 </div>
                 
                 <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
-                    <button class="btn-primary" id="update-account" style="flex: 2; height: var(--btn-h-lg); font-size: 17px;">Commit Changes</button>
-                    <button class="user-button" id="cancel-edit-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Discard</button>
+                    <button class="btn-primary" id="update-account" style="flex: 2; height: var(--btn-h-lg); font-size: 17px;">
+                        <i data-lucide="check"></i>
+                        Save Changes
+                    </button>
+                    <button class="user-button" id="cancel-edit-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Cancel</button>
                 </div>
             </div>
         `;
@@ -1538,9 +1558,9 @@ export class UIManager {
                     <i data-lucide="mail-check" style="width: 48px; height: 48px; color: var(--accent-primary);"></i>
                 </div>
                 
-                <h2 style="font-weight: 900; font-size: 32px; color: var(--text-primary); margin-bottom: 12px; letter-spacing: -1.2px;">Verify Identity</h2>
+                <h2 style="font-weight: 900; font-size: 32px; color: var(--text-primary); margin-bottom: 12px; letter-spacing: -1.2px;">Check your Email</h2>
                 <p style="color: var(--text-secondary); margin-bottom: 40px; font-weight: 500; font-size: 16px; line-height: 1.5;">
-                    Security protocol initiated. Enter the 6-digit synchronization code sent to <br>
+                    Enter the 6-digit code we just sent to <br>
                     <strong style="color: var(--accent-primary); font-weight: 700;">${email}</strong>
                 </p>
                 
@@ -1554,21 +1574,23 @@ export class UIManager {
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 20px; margin-top: 48px;">
-                    <button class="btn-primary" id="btn-submit-email-verify" style="flex: 2; height: 64px; font-size: 18px; font-weight: 850; border-radius: var(--radius-xl); box-shadow: var(--nm-raised);">
-                        Authorize Change
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 48px;">
+                    <button class="btn-primary" id="btn-submit-email-verify" style="height: 64px; font-size: 18px; font-weight: 850; border-radius: var(--radius-xl); box-shadow: var(--nm-raised);">
+                        Verify & Update
                     </button>
-                    <button class="user-button" id="btn-cancel-email-verify" style="flex: 1; height: 64px; font-size: 15px; font-weight: 750; border-radius: var(--radius-xl); box-shadow: var(--nm-raised);">
-                        Discard
+                    <button class="user-button" id="btn-cancel-email-verify" style="height: 64px; font-size: 15px; font-weight: 750; border-radius: var(--radius-xl); box-shadow: var(--nm-raised); justify-content: center;">
+                        Cancel
                     </button>
                 </div>
 
                 <div style="margin-top: 32px; padding-top: 24px; border-top: 1px dashed var(--border-color);">
-                    <button id="btn-resend-verify-email" style="background: none; border: none; font-weight: 800; color: var(--accent-primary); cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;" disabled>
-                        <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
-                        <span>Resend Dispatch</span> 
-                        <span id="verify-email-resend-timer" style="opacity: 0.7; font-variant-numeric: tabular-nums;">(30s)</span>
-                    </button>
+                    <div style="text-align: center; font-size: 14px;">
+                        <span>Didn't get the code?</span>
+                        <button id="btn-resend-verify-email" style="background: none; border: none; font-weight: 800; color: var(--accent-primary); cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-left: 8px;" disabled>
+                            <span>Send again</span> 
+                            <span id="verify-email-resend-timer" style="opacity: 0.7; font-variant-numeric: tabular-nums;">(30s)</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -1651,7 +1673,6 @@ export class UIManager {
     private showPinSetupStep1() {
         const content = `
             <div class="pin-steps-modal">
-                <!-- Progress Steps -->
                 <div class="pin-progress-container">
                     <div class="pin-step active" data-step="1">
                         <div class="pin-step-number">1</div>
@@ -1664,14 +1685,13 @@ export class UIManager {
                     </div>
                 </div>
 
-                <!-- Step 1 Content -->
                 <div class="pin-step-content">
                     <div class="pin-header">
                         <div class="pin-brand-icon">
-                            <i data-lucide="shield-ellipsis"></i>
+                            <i data-lucide="shield-check"></i>
                         </div>
-                        <h2 class="pin-title">Create Security PIN</h2>
-                        <p class="pin-subtitle">Choose a 4-digit master code for vault access</p>
+                        <h2 class="pin-title">Set Master PIN</h2>
+                        <p class="pin-subtitle">ESTABLISH 4-DIGIT VAULT KEY</p>
                     </div>
 
                     <div class="pin-input-container">
@@ -1684,18 +1704,21 @@ export class UIManager {
                                 <div class="pin-dot-setup" data-digit="4"></div>
                             </div>
                         </div>
-                        <div class="pin-helper">Enter 4-digit security code</div>
+                        <div class="pin-helper">Choose New PIN</div>
                     </div>
 
                     <div class="pin-actions">
                         <button class="btn-primary pin-continue-btn" id="pin-step1-continue" disabled>
                             <i data-lucide="arrow-right"></i>
-                            Continue
+                            Next Phase
                         </button>
                         <button class="user-button pin-cancel-btn" id="pin-step1-cancel">
                             Cancel
                         </button>
                     </div>
+                    <p class="modal-help-text" style="text-align: center; margin-top: 20px;">
+                        Keep this code safe. It is required to unlock your identities.
+                    </p>
                 </div>
             </div>
         `;
@@ -1706,7 +1729,6 @@ export class UIManager {
     private showPinSetupStep2() {
         const content = `
             <div class="pin-steps-modal">
-                <!-- Progress Steps -->
                 <div class="pin-progress-container">
                     <div class="pin-step completed" data-step="1">
                         <div class="pin-step-number"><i data-lucide="check"></i></div>
@@ -1719,14 +1741,13 @@ export class UIManager {
                     </div>
                 </div>
 
-                <!-- Step 2 Content -->
                 <div class="pin-step-content">
                     <div class="pin-header">
                         <div class="pin-brand-icon">
-                            <i data-lucide="shield-check"></i>
+                            <i data-lucide="check-circle"></i>
                         </div>
-                        <h2 class="pin-title">Confirm Security PIN</h2>
-                        <p class="pin-subtitle">Re-enter your 4-digit master code to verify</p>
+                        <h2 class="pin-title">Verify PIN</h2>
+                        <p class="pin-subtitle">RE-ENTER KEY TO CONFIRM</p>
                     </div>
 
                     <div class="pin-input-container">
@@ -1739,19 +1760,22 @@ export class UIManager {
                                 <div class="pin-dot-setup" data-digit="4"></div>
                             </div>
                         </div>
-                        <div class="pin-helper">Confirm your 4-digit security code</div>
+                        <div class="pin-helper">Confirm New PIN</div>
                     </div>
 
                     <div class="pin-actions">
                         <button class="btn-primary pin-continue-btn" id="pin-step2-continue" disabled>
-                            <i data-lucide="check"></i>
-                            Activate PIN
+                            <i data-lucide="shield-check"></i>
+                            Activate Vault
                         </button>
                         <button class="user-button pin-back-btn" id="pin-step2-back">
                             <i data-lucide="arrow-left"></i>
                             Back
                         </button>
                     </div>
+                    <p class="modal-help-text" style="text-align: center; margin-top: 20px;">
+                        Passwords must match exactly to synchronize security.
+                    </p>
                 </div>
             </div>
         `;
@@ -1836,8 +1860,18 @@ export class UIManager {
                     <div class="pin-brand-icon danger">
                         <i data-lucide="shield-off"></i>
                     </div>
-                    <h2 class="pin-title">Remove Security PIN</h2>
-                    <p class="pin-subtitle">This will disable PIN protection for your vault</p>
+                    <h2 class="pin-title danger">Deactivate Security?</h2>
+                    <p class="pin-subtitle">VAULT WILL BE UNPROTECTED</p>
+                </div>
+
+                <div class="modal-entity-badge" style="margin: 20px 0;">
+                    <div class="entity-icon">
+                        <i data-lucide="lock"></i>
+                    </div>
+                    <div class="entity-info">
+                        <span class="entity-name">Master PIN Policy</span>
+                        <span class="entity-label">Active Protection</span>
+                    </div>
                 </div>
 
                 <div class="pin-warning-container">
@@ -1845,17 +1879,17 @@ export class UIManager {
                         <i data-lucide="alert-triangle"></i>
                     </div>
                     <div class="pin-warning-text">
-                        <strong>Warning:</strong> Removing the PIN will make your vault less secure. Anyone with access to this device can open your vault.
+                        Removing the PIN means anyone with access to this device can view your identities. This action is immediate.
                     </div>
                 </div>
 
                 <div class="pin-actions">
                     <button class="btn-primary danger" id="confirm-remove-pin">
                         <i data-lucide="trash-2"></i>
-                        Remove PIN
+                        Remove Security
                     </button>
                     <button class="user-button" id="cancel-remove-pin">
-                        Cancel
+                        Keep PIN Active
                     </button>
                 </div>
             </div>
@@ -1880,16 +1914,31 @@ export class UIManager {
         const content = `
             <div style="padding: clamp(32px, 8vw, 48px); text-align: center;">
                 <div style="color: #ff3b30; margin-bottom: 24px;">
-                    <i data-lucide="alert-triangle" style="width: 64px; height: 64px;"></i>
+                    <i data-lucide="trash-2" style="width: 64px; height: 64px;"></i>
                 </div>
-                <h2 style="font-weight: 850; font-size: 24px; margin-bottom: 12px; color: var(--text-primary);">Destroy Token?</h2>
-                <div class="modal-help-text" style="font-size: 16px; margin-bottom: 40px;">
-                    Permanently remove identity for <strong>${account.issuer}</strong>? This action is irreversible.
+                <h2 style="font-weight: 850; font-size: 24px; margin-bottom: 4px; color: var(--text-primary);" class="danger">Delete Token?</h2>
+                <div class="modal-help-text" style="font-weight: 800; opacity: 0.8; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; margin-bottom: 24px;">PERMANENT ACTION</div>
+                
+                <div class="modal-entity-badge" style="margin-bottom: 32px;">
+                    <div class="entity-icon">
+                        <i data-lucide="shield"></i>
+                    </div>
+                    <div class="entity-info">
+                        <span class="entity-name">${account.issuer}</span>
+                        <span class="entity-label">${account.account || 'Vault Token'}</span>
+                    </div>
                 </div>
+
+                <p class="modal-help-text" style="font-size: 14px; margin-bottom: 40px; line-height: 1.6;">
+                    Removing this token is permanent. You will lose access to its OTP codes.
+                </p>
                 
                 <div style="display: flex; gap: 16px;">
-                    <button class="btn-primary" id="confirm-delete" style="flex: 1; height: var(--btn-h-lg); background: var(--bg-primary); color: #ff3b30; box-shadow: var(--nm-raised);">Confirm Erase</button>
-                    <button class="user-button" id="cancel-delete-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg);">Discard</button>
+                    <button class="btn-primary danger" id="confirm-delete" style="flex: 1; height: var(--btn-h-lg);">
+                        <i data-lucide="trash-2"></i>
+                        Delete Token
+                    </button>
+                    <button class="user-button" id="cancel-delete-btn" style="flex: 1; justify-content: center; height: var(--btn-h-lg);">Keep Token</button>
                 </div>
             </div>
         `;
@@ -1909,22 +1958,35 @@ export class UIManager {
             <div style="padding: clamp(var(--space-md), 8vw, var(--space-xl));">
                 <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg);">
                     <div class="account-icon nm-icon-large" style="width: 64px; height: 64px;">
-                        <i data-lucide="unlock"></i>
+                        <i data-lucide="upload"></i>
                     </div>
                     <div>
                         <h2 style="font-weight: 900; font-size: 24px; color: var(--text-primary);">Restore Vault</h2>
-                        <div class="modal-help-text" style="text-transform: uppercase; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">Verification required for decryption</div>
+                        <div class="modal-help-text" style="text-transform: uppercase; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">VERIFY MASTER KEY TO IMPORT</div>
                     </div>
                 </div>
                 
+                <div class="modal-entity-badge" style="margin-bottom: 20px;">
+                    <div class="entity-icon">
+                        <i data-lucide="hard-drive"></i>
+                    </div>
+                    <div class="entity-info">
+                        <span class="entity-name">Encrypted Backup</span>
+                        <span class="entity-label">Awaiting decryption key</span>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label class="form-label">Backup Password</label>
-                    <input type="password" id="import-pass" class="form-input" placeholder="Enter the password for this backup">
-                    <div class="modal-help-text">This is usually the master password used when the backup was created.</div>
+                    <label class="form-label">Backup Master Password</label>
+                    <input type="password" id="import-pass" class="form-input" placeholder="••••••••">
+                    <p class="modal-help-text" style="margin-top: 8px;">Enter the master password that was used when this backup was created.</p>
                 </div>
                 
                 <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
-                    <button class="btn-primary" id="confirm-import" style="flex: 2; height: var(--btn-h-lg);">Verify & Restore</button>
+                    <button class="btn-primary" id="confirm-import" style="flex: 2; height: var(--btn-h-lg);">
+                        <i data-lucide="shield-check"></i>
+                        Restore Vault
+                    </button>
                     <button class="user-button" id="cancel-import" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Cancel</button>
                 </div>
             </div>
