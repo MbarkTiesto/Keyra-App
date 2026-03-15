@@ -43,7 +43,7 @@
             <div class="splash-text">
                 <h1 class="splash-title">Keyra</h1>
                 <div class="splash-status">
-                    <span id="splash-status-text">Orchestrating Cryptographic Nexus</span>
+                <span id="splash-status-text">Getting things ready...</span>
                     <div class="splash-progress-bar">
                         <div class="splash-progress-inner"></div>
                     </div>
@@ -67,25 +67,25 @@
                     <i data-lucide="shield-check"></i>
                 </div>
                 <h1 class="auth-title">Keyra</h1>
-                <p class="auth-subtitle">IDENTITY PROTECTED</p>
+                <p class="auth-subtitle">YOUR VAULT IS SECURE</p>
             </div>
 
             <!-- Login Box -->
             <div id="auth-login-box">
                 <form id="form-login">
                     <div class="form-group">
-                        <label class="form-label">Vault Identity</label>
-                        <input type="text" id="login-username" class="form-input" placeholder="Username" required>
+                        <label class="form-label">Vault Name</label>
+                        <input type="text" id="login-username" class="form-input" placeholder="Your username" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Master Key</label>
+                        <label class="form-label">Master Password</label>
                         <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
                     </div>
                     <button type="submit" class="btn-primary auth-submit-btn">Unlock Vault</button>
                     <div id="login-error" class="auth-error"></div>
                 </form>
                 <div class="auth-footer">
-                    <p>First time? <button id="btn-show-signup" class="auth-link">Create Vault</button></p>
+                    <p>First time? <button id="btn-show-signup" class="auth-link">Create your Vault</button></p>
                 </div>
             </div>
 
@@ -114,8 +114,8 @@
 
             <!-- Verify Box -->
             <div id="auth-verify-box" class="hidden">
-                <h2 class="auth-verify-title">Verify Identity</h2>
-                <p class="auth-verify-subtitle">Enter 6-digit code from your email.</p>
+                <h2 class="auth-verify-title">Verify it's You</h2>
+                <p class="auth-verify-subtitle">Enter the 6-digit code we sent to your email.</p>
                 <form id="form-verify">
                     <input type="hidden" id="verify-email-field">
                     <div class="verify-inputs">
@@ -151,9 +151,9 @@
                     </div>
                     <div class="privacy-scan-line"></div>
                 </div>
-                <h2>Secured State</h2>
-                <p>Application UI is hidden for your privacy.</p>
-                <div class="privacy-hint">Focus window to resume session</div>
+                <h2>Vault Hidden</h2>
+                <p>We've hidden your data to keep it private.</p>
+                <div class="privacy-hint">Click or focus here to continue</div>
             </div>
         </div>
 
@@ -166,39 +166,39 @@
                         <div class="logo-glow"></div>
                     </div>
                     <h2 class="about-bento-title">Keyra Authenticator</h2>
-                    <p class="about-bento-mission">Unbreakable Security & Elite Aesthetics</p>
+                    <p class="about-bento-mission">Professional Security Made Simple</p>
                 </div>
 
                 <div class="about-bento-grid">
                     <!-- Version Block -->
                     <div class="bento-item bento-version">
-                        <div class="bento-item-label">IDENTITY</div>
+                        <div class="bento-item-label">APP VERSION</div>
                         <div class="bento-item-value">v1.2.0 <span class="pro-tag">PRO</span></div>
-                        <div class="bento-item-hint">LATEST STABLE</div>
+                        <div class="bento-item-hint">UP TO DATE</div>
                     </div>
 
                     <!-- Sync Status Block -->
                     <div class="bento-item bento-status">
-                        <div class="bento-item-label">SYSTEM HEALTH</div>
+                        <div class="bento-item-label">SYSTEM STATUS</div>
                         <div class="bento-item-value success-text">
                             <i data-lucide="check-circle-2"></i>
-                            OPERATIONAL
+                            RUNNING WELL
                         </div>
-                        <div class="bento-item-hint">PROTECTION ACTIVE</div>
+                        <div class="bento-item-hint">PROTECTION IS ON</div>
                     </div>
 
                     <!-- Activity Block (Full Width on small, 2-col on large) -->
                     <div class="bento-item bento-activity">
                         <div class="bento-item-label">LAST ACTION</div>
-                        <div class="bento-item-value" id="about-last-action">No activity</div>
-                        <div class="bento-item-hint" id="about-last-activity">Never recorded</div>
+                        <div class="bento-item-value" id="about-last-action">Nothing yet</div>
+                        <div class="bento-item-hint" id="about-last-activity">No history recorded</div>
                     </div>
 
                     <!-- Sync Block (Replaces Tech) -->
                     <div class="bento-item bento-sync">
-                        <div class="bento-item-label">VAULT SYNCHRONIZATION</div>
-                        <div class="bento-item-value" id="about-last-sync">Calculating...</div>
-                        <div class="bento-item-hint">CLOUD BACKUP SECURED</div>
+                        <div class="bento-item-label">CLOUD SYNC</div>
+                        <div class="bento-item-value" id="about-last-sync">Checking...</div>
+                        <div class="bento-item-hint">SAFELY BACKED UP</div>
                     </div>
                 </div>
 
@@ -223,11 +223,11 @@
                     <nav class="nav-tabs">
                         <button class="nav-tab active" data-tab="vault">
                             <i data-lucide="archive" style="width: 20px; height: 20px;"></i>
-                            <span>Security Enclave</span>
+                            <span>My Vault</span>
                         </button>
                         <button class="nav-tab" data-tab="settings">
                             <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
-                            <span>Core Configuration</span>
+                            <span>Settings</span>
                         </button>
                     </nav>
                 </div>
@@ -278,7 +278,7 @@
 
                     <!-- Scientific & Cute Window Controls -->
                     <div class="window-controls">
-                        <button id="btn-close-app" class="btn-control btn-close" title="Close Keyra">
+                        <button id="btn-close-app" class="btn-control btn-close" title="Close App">
                             <i data-lucide="x"></i>
                         </button>
                     </div>
@@ -292,17 +292,17 @@
             <section id="vault-view" class="view-section">
                 <div class="section-header">
                     <div class="header-main">
-                        <h1 class="section-title">Security Enclave</h1>
-                        <p class="section-subtitle">ACTIVE CRYPTOGRAPHIC TOKENS</p>
+                        <h1 class="section-title">My Vault</h1>
+                        <p class="section-subtitle">YOUR SAVED ACCOUNTS</p>
                     </div>
                     <div class="search-add-group">
                         <div class="search-vessel">
                             <i data-lucide="search" class="search-icon"></i>
-                            <input type="text" id="vault-search" class="search-input" placeholder="Search identities...">
+                            <input type="text" id="vault-search" class="search-input" placeholder="Search your accounts...">
                         </div>
                         <button class="btn-primary" id="add-account-btn" style="height: 42px; border-radius: var(--radius-full); padding: 0 20px; font-size: 14px;">
                             <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-                            <span>Provision Identity</span>
+                            <span>Add Account</span>
                         </button>
                     </div>
                 </div>
@@ -313,13 +313,13 @@
                 
                 <!-- Empty State (No Accounts) -->
                 <div id="empty-state" class="hidden">
-                    <div class="empty-state-vessel">
+                        <div class="empty-state-vessel">
                         <i data-lucide="fingerprint" style="width: 100px; height: 100px; opacity: 0.8;"></i>
-                        <h2>Vault Synced</h2>
-                        <p>No active tokens detected. Secure your first identity to activate protection.</p>
+                        <h2>Your Vault is Empty</h2>
+                        <p>Add your first account to get started.</p>
                         <button class="btn-primary" id="empty-add-btn" style="padding: 0 48px; min-width: 240px; height: var(--btn-h-lg);">
                             <i data-lucide="plus" style="width: 24px; height: 24px;"></i>
-                            <span>Add Token</span>
+                            <span>Add Account</span>
                         </button>
                     </div>
                 </div>
@@ -330,8 +330,8 @@
                         <div class="nm-search-icon-vessel">
                             <i data-lucide="search-x"></i>
                         </div>
-                        <h2>Identity Not Found</h2>
-                        <p>We couldn't find a match for your search. Try refining your keywords.</p>
+                        <h2>No Results Found</h2>
+                        <p>We couldn't find what you're looking for. Try a different search.</p>
                     </div>
                 </div>
             </section>
@@ -340,8 +340,8 @@
             <section id="settings-view" class="view-section hidden">
                 <div class="section-header" style="margin-bottom: var(--space-xl);">
                     <div class="header-main">
-                        <h1 class="section-title">Core Configuration</h1>
-                        <p class="section-subtitle">VAULT QUANTUM GOVERNANCE</p>
+                        <h1 class="section-title">Settings</h1>
+                        <p class="section-subtitle">CUSTOMIZE YOUR EXPERIENCE</p>
                     </div>
                 </div>
 
@@ -355,14 +355,14 @@
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Security</h3>
-                            <div class="bento-subtitle">Vault Privacy & Access</div>
+                            <div class="bento-subtitle">How you access your Vault</div>
                         </div>
                     </div>
                     <div class="bento-content">
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Access PIN</div>
-                                <div class="setting-desc">Multi-factor verification core</div>
+                                <div class="setting-name">App PIN</div>
+                                <div class="setting-desc">A 4-digit code to unlock the app</div>
                             </div>
                             <div id="pin-status-badge"></div>
                             <button class="btn-icon danger hidden" id="remove-pin-btn" title="Remove Security Policy" style="margin-right: 8px;">
@@ -372,8 +372,8 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Auto-Lock Vault</div>
-                                <div class="setting-desc">Timeout after inactivity</div>
+                                <div class="setting-name">Auto-Lock App</div>
+                                <div class="setting-desc">Lock automatically when inactive</div>
                             </div>
                             <div class="segmented-control" id="autolock-segmented">
                                 <button class="segment" data-val="0">Off</button>
@@ -385,8 +385,8 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Privacy Mode</div>
-                                <div class="setting-desc">Mask OTP codes until requested</div>
+                                <div class="setting-name">Hide Codes</div>
+                                <div class="setting-desc">Tap to reveal your security codes</div>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="privacy-mode-toggle">
@@ -395,8 +395,8 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Screen Guardian</div>
-                                <div class="setting-desc">Prevent screenshots &amp; recordings</div>
+                                <div class="setting-name">Anti-Peek Protection</div>
+                                <div class="setting-desc">Block screenshots and recordings</div>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="screen-guardian-toggle">
@@ -405,8 +405,8 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Menu Exit Item</div>
-                                <div class="setting-desc">Add Close App to user menu</div>
+                                <div class="setting-name">Close App Shortcut</div>
+                                <div class="setting-desc">Add a close button to your menu</div>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="menu-exit-toggle">
@@ -415,8 +415,8 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Interactive Privacy</div>
-                                <div class="setting-desc">Blur UI when mouse leaves window</div>
+                                <div class="setting-name">Auto-Blur</div>
+                                <div class="setting-desc">Blur the app when you click away</div>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="privacy-blur-toggle">
@@ -433,15 +433,15 @@
                             <i data-lucide="palette" style="color: hsl(280, 100%, 75%);"></i>
                         </div>
                         <div class="bento-title-vessel">
-                            <h3 class="bento-title">Appearance</h3>
-                            <div class="bento-subtitle">Theme & Interface Aura</div>
+                            <h3 class="bento-title">Look & Feel</h3>
+                            <div class="bento-subtitle">Theme and colors</div>
                         </div>
                     </div>
                     <div class="bento-content">
                         <div class="setting-row">
                             <div class="setting-info">
                                 <div class="setting-name">Theme</div>
-                                <div class="setting-desc">Adjust interface luminosity</div>
+                                <div class="setting-desc">Light or dark mode</div>
                             </div>
                             <div class="segmented-control" id="theme-segmented">
                                 <button class="segment" data-val="light">Light</button>
@@ -453,7 +453,7 @@
                         <div class="setting-row">
                             <div class="setting-info">
                                 <div class="setting-name">Accent Color</div>
-                                <div class="setting-desc">Choose your interface hue</div>
+                                <div class="setting-desc">Choose your favorite color</div>
                             </div>
                             <div class="accent-color-selector">
                                 <button class="accent-color-option active" data-accent="royal-purple" style="background: hsl(258, 100%, 68%);" title="Royal Purple">
@@ -515,8 +515,8 @@
 
                         <div class="setting-row" id="oled-mode-row">
                             <div class="setting-info">
-                                <div class="setting-name">OLED Optimization</div>
-                                <div class="setting-desc">Pure black for power savings</div>
+                                <div class="setting-name">Darkest Black</div>
+                                <div class="setting-desc">Saves battery on OLED screens</div>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="oled-mode-toggle">
@@ -526,8 +526,8 @@
 
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Ultra Performance</div>
-                                <div class="setting-desc">Zero latency, no animations</div>
+                                <div class="setting-name">Performance Mode</div>
+                                <div class="setting-desc">Makes the app faster on older PCs</div>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="performance-mode-toggle">
@@ -545,14 +545,14 @@
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Cloud Sync</h3>
-                            <div class="bento-subtitle">GitHub Real-Time Vault Sync</div>
+                            <div class="bento-subtitle">Keep your Vault safe on GitHub</div>
                         </div>
                     </div>
                     <div class="bento-content">
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Auto-Synchronize</div>
-                                <div class="setting-desc">Push changes instantly to GitHub</div>
+                                <div class="setting-name">Auto-Sync</div>
+                                <div class="setting-desc">Save changes to GitHub instantly</div>
                             </div>
                             <label class="switch">
                                 <input type="checkbox" id="cloud-sync-toggle" checked>
@@ -561,8 +561,8 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name">Sync Status</div>
-                                <div class="setting-desc" id="sync-status-desc">Synchronized</div>
+                                <div class="setting-name">Status</div>
+                                <div class="setting-desc" id="sync-status-desc">All set!</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px; color: #28a745; font-size: 13px; font-weight: 800;">
                                 <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
@@ -583,14 +583,14 @@
                             <i data-lucide="shield" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
-                            <h3 class="bento-title">System Tools</h3>
-                            <div class="bento-subtitle">Backup & Recovery Hub</div>
+                            <h3 class="bento-title">Maintenance</h3>
+                            <div class="bento-subtitle">Backup and Restore</div>
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
                         <button class="btn-primary btn-maintenance" id="btn-export-vault">
                             <i data-lucide="download"></i>
-                            <span>Export Vault</span>
+                            <span>Backup Vault</span>
                         </button>
                         <button class="btn-primary btn-maintenance" id="btn-import-vault">
                             <i data-lucide="upload"></i>
@@ -599,7 +599,7 @@
                     </div>
                     <div style="margin-top: 12px; font-size: 11.5px; opacity: 0.6; font-weight: 600; line-height: 1.5;">
                         <i data-lucide="alert-circle" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 4px;"></i>
-                        Backups are encrypted using your master password.
+                        Backups are protected by your master password.
                     </div>
                 </div>
 
@@ -611,8 +611,8 @@
             <section id="account-view" class="view-section hidden">
                 <div class="section-header" style="margin-bottom: var(--space-xl);">
                     <div class="header-main">
-                        <h1 class="section-title">Identity Parameters</h1>
-                        <p class="section-subtitle">CRYPTOGRAPHIC PROFILE & ACCESS</p>
+                        <h1 class="section-title">My Account</h1>
+                        <p class="section-subtitle">YOUR PROFILE AND SECURITY</p>
                     </div>
                 </div>
 
@@ -625,8 +625,8 @@
                             </div>
                             <div class="profile-details">
                                 <h3 id="acc-display-username" style="font-size: 24px; font-weight: 850; margin-bottom: 4px;">Loading...</h3>
-                                <p id="acc-primary-email" style="opacity: 0.7; font-weight: 600;">Primary Email</p>
-                                <div id="pending-email-badge" class="badge hidden" style="background: var(--accent-primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; margin-top: 8px; display: inline-block;">Email Change Pending</div>
+                                <p id="acc-primary-email" style="opacity: 0.7; font-weight: 600;">Your Email</p>
+                                <div id="pending-email-badge" class="badge hidden" style="background: var(--accent-primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; margin-top: 8px; display: inline-block;">Email Change in Progress</div>
                             </div>
                         </div>
 
@@ -635,8 +635,8 @@
                             <div class="sync-info" style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
                                 <i data-lucide="mail-warning" style="color: var(--accent-primary);"></i>
                                 <div>
-                                    <strong style="display: block; font-size: 14px;">Verification Needed</strong>
-                                    <p id="pending-email-text" style="font-size: 13px; opacity: 0.8;">Confirming change to: example@mail.com</p>
+                                    <strong style="display: block; font-size: 14px;">Verify your Email</strong>
+                                    <p id="pending-email-text" style="font-size: 13px; opacity: 0.8;">Confirming your new email address.</p>
                                 </div>
                             </div>
                             <div class="sync-actions" style="display: flex; gap: 8px;">
@@ -654,7 +654,7 @@
                             </div>
                             <div class="bento-title-vessel">
                                 <h3 class="bento-title">Display Name</h3>
-                                <div class="bento-subtitle">IDENTITY APPEARANCE</div>
+                                <div class="bento-subtitle">WHAT WE CALL YOU</div>
                             </div>
                         </div>
                         <form id="form-change-username" class="settings-form" style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
@@ -670,8 +670,8 @@
                                 <i data-lucide="mail" style="color: var(--accent-primary);"></i>
                             </div>
                             <div class="bento-title-vessel">
-                                <h3 class="bento-title">Security Email</h3>
-                                <div class="bento-subtitle">VAULT ACCESS NOTIFICATIONS</div>
+                                <h3 class="bento-title">Email Address</h3>
+                                <div class="bento-subtitle">FOR NOTIFICATIONS & RECOVERY</div>
                             </div>
                         </div>
                         <form id="form-request-email-change" class="settings-form" style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
@@ -687,11 +687,11 @@
                                 <i data-lucide="shield-alert" style="color: #ff4444;"></i>
                             </div>
                             <div class="bento-title-vessel">
-                                <h3 class="bento-title danger" style="color: #ff4444;">Master Key Security</h3>
-                                <div class="bento-subtitle">RE-ENCRYPTION ZONE</div>
+                                <h3 class="bento-title danger" style="color: #ff4444;">Master Password</h3>
+                                <div class="bento-subtitle">SECURITY ZONE</div>
                             </div>
                         </div>
-                        <p class="caution-text" style="font-size: 12px; opacity: 0.7; margin: 12px 0; line-height: 1.5;">Changing your master password will re-encrypt your entire vault. Ensure you save it somewhere safe.</p>
+                        <p class="caution-text" style="font-size: 12px; opacity: 0.7; margin: 12px 0; line-height: 1.5;">Changing your master password will update your vault's security. Please make sure you don't forget your new password.</p>
                         <form id="form-change-password" class="settings-form" style="display: flex; flex-direction: column; gap: 12px;">
                             <input type="password" id="new-master-password" class="form-input" placeholder="New Master Password" required minlength="8">
                             <input type="password" id="confirm-master-password" class="form-input" placeholder="Confirm New Password" required minlength="8">
@@ -717,8 +717,8 @@
                             <i data-lucide="log-out"></i>
                         </div>
                         <div class="modal-title-vessel">
-                            <h2 class="danger">End Session?</h2>
-                            <p>VAULT WILL BE LOCKED ON SIGN OUT</p>
+                            <h2 class="danger">Sign Out?</h2>
+                            <p>YOUR VAULT WILL BE LOCKED</p>
                         </div>
                     </div>
                     <div class="modal-divider"></div>
@@ -732,14 +732,14 @@
                                 <span class="entity-label">Active Session</span>
                             </div>
                         </div>
-                        <p class="modal-help-text">Signing out will lock your vault and return you to the authentication screen. All unsaved changes will remain encrypted.</p>
+                        <p class="modal-help-text">Signing out will lock your vault. You'll need your password to get back in.</p>
                     </div>
                     <div class="modal-footer">
                         <button class="btn-danger" id="btn-confirm-logout">
                             <i data-lucide="log-out"></i>
                             Sign Out
                         </button>
-                        <button class="user-button" id="btn-cancel-logout" style="justify-content: center;">Keep Session</button>
+                        <button class="user-button" id="btn-cancel-logout" style="justify-content: center;">Stay Signed In</button>
                     </div>
                 </div>
             </div>
@@ -754,8 +754,8 @@
                             <i data-lucide="mail-check"></i>
                         </div>
                         <div class="modal-title-vessel">
-                            <h2>Verify Email</h2>
-                            <p>Enter 6-digit code sent to new email</p>
+                            <h2>Check your Email</h2>
+                            <p>Enter the 6-digit code we just sent you</p>
                         </div>
                     </div>
                     <div class="modal-body">
@@ -769,8 +769,8 @@
                         </div>
                         <div id="email-verify-error" class="auth-error opacity-0"></div>
                         <div style="text-align: center; font-size: 13px; margin-top: 16px;">
-                            <span>Didn't receive it?</span>
-                            <button id="btn-resend-email-code" class="auth-resend-btn">Resend Code <span id="email-resend-timer"></span></button>
+                            <span>Didn't get the code?</span>
+                            <button id="btn-resend-email-code" class="auth-resend-btn">Send again <span id="email-resend-timer"></span></button>
                         </div>
                     </div>
                     <div class="modal-footer" style="padding-top: 0;">
@@ -790,7 +790,7 @@
         <div id="cloud-sync-indicator" class="cloud-sync-pill hidden">
             <div class="sync-glow"></div>
             <i data-lucide="refresh-cw" class="sync-icon"></i>
-            <span>Vault Syncing</span>
+            <span>Backing up...</span>
         </div>
     </div>
 

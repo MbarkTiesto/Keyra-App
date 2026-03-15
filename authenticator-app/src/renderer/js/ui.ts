@@ -77,7 +77,7 @@ export class UIManager {
         }
         
         if (!isOnline) {
-            this.showToast("Working Offline", "info");
+            this.showToast("You're offline", "info");
         }
     }
 
@@ -95,7 +95,7 @@ export class UIManager {
         }
     }
 
-    public setLoading(show: boolean, title: string = "Processing", subtitle: string = "VAULT SECURITY SYNCHRONIZATION") {
+    public setLoading(show: boolean, title: string = "One moment...", subtitle: string = "GETTING THINGS READY") {
         const overlay = document.getElementById('loading-overlay');
         const titleEl = document.getElementById('loading-title');
         const subtitleEl = document.getElementById('loading-subtitle');
@@ -452,7 +452,7 @@ export class UIManager {
                 const target = e.currentTarget as HTMLElement;
                 const tabName = target.getAttribute('data-tab') as 'vault' | 'settings' | 'account';
                 this.switchTab(tabName);
-                this.updateLastActivity(`Switched to ${tabName}`);
+                this.updateLastActivity(`Viewed ${tabName}`);
             });
         });
 
@@ -532,7 +532,7 @@ export class UIManager {
                 localStorage.setItem(this.getStorageKey('autolock'), val);
                 this.updateSegmentedUI('autolock-segmented', val);
                 this.pushSettings();
-                this.showToast(`Vault Auto-lock: ${val === '0' ? 'Off' : val + 'm'}`, "info");
+                this.showToast(val === '0' ? 'Auto-lock turned off' : `Locked after ${val}m of inactivity`, "info");
                 this.updateLastActivity(`Changed autolock to ${val}m`);
             });
         });
@@ -544,8 +544,8 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('oled_mode'), String(this.oledMode));
             document.body.classList.toggle('oled-optimized', this.oledMode);
             this.pushSettings();
-            this.showToast(this.oledMode ? "OLED Mode Enabled" : "OLED Mode Disabled", "info");
-            this.updateLastActivity(`OLED Mode ${this.oledMode ? 'Enabled' : 'Disabled'}`);
+            this.showToast(this.oledMode ? "Darkest Black turned on" : "Darkest Black turned off", "info");
+            this.updateLastActivity(`OLED Mode ${this.oledMode ? 'on' : 'off'}`);
         });
 
         // Performance Mode Toggle
@@ -566,8 +566,8 @@ export class UIManager {
             }
 
             this.pushSettings();
-            this.showToast(this.performanceMode ? "Ultra Performance Active" : "Visual Effects Restored", "info");
-            this.updateLastActivity(`Performance Mode ${this.performanceMode ? 'Enabled' : 'Disabled'}`);
+            this.showToast(this.performanceMode ? "Performance Mode is on" : "Performance Mode is off", "info");
+            this.updateLastActivity(`Performance Mode ${this.performanceMode ? 'on' : 'off'}`);
         });
 
         // Menu Exit Toggle
@@ -577,8 +577,8 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('menu_exit_integration'), String(this.menuExitIntegration));
             this.updateCloseButtonVisibility();
             this.pushSettings();
-            this.showToast(this.menuExitIntegration ? "Close Button moved to Menu" : "Close Button moved to Navbar", "info");
-            this.updateLastActivity(`Menu Exit ${this.menuExitIntegration ? 'Enabled' : 'Disabled'}`);
+            this.showToast(this.menuExitIntegration ? "Close button moved to menu" : "Close button moved to navbar", "info");
+            this.updateLastActivity(`Menu Exit ${this.menuExitIntegration ? 'on' : 'off'}`);
         });
 
         // Settings PIN
@@ -591,8 +591,8 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacyMode));
             this.pushSettings();
             this.renderAccounts();
-            this.showToast(this.privacyMode ? "Privacy Mode Enabled" : "Privacy Mode Disabled", "info");
-            this.updateLastActivity(`Privacy Mode ${this.privacyMode ? 'Enabled' : 'Disabled'}`);
+            this.showToast(this.privacyMode ? "Codes are now hidden" : "Codes are now visible", "info");
+            this.updateLastActivity(`Hide Codes ${this.privacyMode ? 'on' : 'off'}`);
         });
 
         // Screen Guardian Toggle
@@ -602,8 +602,8 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
             (window as any).api.setContentProtection(this.screenGuardian);
             this.pushSettings();
-            this.showToast(this.screenGuardian ? "Screen Guardian Active" : "Screen Guardian Standby", "info");
-            this.updateLastActivity(`Screen Guardian ${this.screenGuardian ? 'Engaged' : 'Released'}`);
+            this.showToast(this.screenGuardian ? "Screenshot protection is on" : "Screenshot protection is off", "info");
+            this.updateLastActivity(`Anti-Peek ${this.screenGuardian ? 'on' : 'off'}`);
         });
 
         // Interactive Privacy Toggle
@@ -612,8 +612,8 @@ export class UIManager {
             this.privacyBlur = target.checked;
             localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacyBlur));
             this.pushSettings();
-            this.showToast(this.privacyBlur ? "Interactive Privacy Engaged" : "Interactive Privacy Disengaged", "info");
-            this.updateLastActivity(`Privacy Shield ${this.privacyBlur ? 'Activated' : 'Neutralized'}`);
+            this.showToast(this.privacyBlur ? "Auto-blur is on" : "Auto-blur is off", "info");
+            this.updateLastActivity(`Auto-blur ${this.privacyBlur ? 'on' : 'off'}`);
         });
 
         // Accent Color
@@ -624,8 +624,8 @@ export class UIManager {
         document.getElementById('btn-export-vault')?.addEventListener('click', async () => {
             const res = await (window as any).api.exportVault();
             if (res.success) {
-                this.showToast("Vault backup exported", "success");
-                this.updateLastActivity('Exported vault');
+                this.showToast("Vault backup created", "success");
+                this.updateLastActivity('Backed up vault');
             }
         });
         document.getElementById('btn-import-vault')?.addEventListener('click', async () => {
@@ -705,7 +705,7 @@ export class UIManager {
             try {
                 const res = await (window as any).api.changeUsername(newName);
                 if (res.success) {
-                    this.showToast("Display name updated", "success");
+                    this.showToast("Name updated!", "success");
                     await this.loadAccountInfo();
                     // Update main name display
                     const userNameDisp = document.getElementById('user-name-display');
@@ -730,7 +730,7 @@ export class UIManager {
             try {
                 const res = await (window as any).api.requestEmailChange(newEmail);
                 if (res.success) {
-                    this.showToast("Verification code sent", "success");
+                    this.showToast("Confirmation code sent!", "success");
                     
                     const modal = document.getElementById('modal-email-verify');
                     if (modal) {
@@ -839,7 +839,7 @@ export class UIManager {
             try {
                 const res = await (window as any).api.changePassword(newPass);
                 if (res.success) {
-                    this.showToast("Master key updated", "success");
+                    this.showToast("Password updated!", "success");
                     (document.getElementById('new-master-password') as HTMLInputElement).value = '';
                     (document.getElementById('confirm-master-password') as HTMLInputElement).value = '';
                 } else {
@@ -868,7 +868,7 @@ export class UIManager {
                     setTimeout(() => modal.classList.add('hidden'), 300);
                 }
                 await this.loadAccountInfo();
-                this.showToast("Email updated successfully", "success");
+                this.showToast("Email updated!", "success");
                 digits.forEach(i => i.value = '');
             } else {
                 if (err) {
@@ -986,8 +986,8 @@ export class UIManager {
                 const accent = option.getAttribute('data-accent');
                 if (accent) {
                     this.setAccentColor(accent);
-                    this.showToast("Accent color updated", "success");
-                    this.updateLastActivity(`Changed accent to ${accent}`);
+                    this.showToast("Color updated!", "success");
+                    this.updateLastActivity(`Changed color to ${accent}`);
                 }
             });
         });
@@ -1009,12 +1009,12 @@ export class UIManager {
         try {
             await this.pushSettings();
             await this.refreshAccounts();
-            this.showToast("Cloud Vault Synchronized", "success");
+            this.showToast("Vault backed up!", "success");
             localStorage.setItem(this.getStorageKey('last_sync'), new Date().toISOString());
             this.updateLastActivity('Manual Cloud Sync');
             if (statusDesc) statusDesc.textContent = 'Synchronized';
         } catch (err) {
-            this.showToast("Sync Failed", "error");
+            this.showToast("Sync failed", "error");
             if (statusDesc) statusDesc.textContent = 'Sync Failed';
         } finally {
             if (icon) icon.classList.remove('sync-spin');
@@ -1170,7 +1170,7 @@ export class UIManager {
                     <button class="btn-icon edit-btn" title="Refine Metadata">
                         <i data-lucide="settings-2"></i>
                     </button>
-                    <button class="btn-icon danger delete-btn" title="Remove Token">
+                    <button class="btn-icon danger delete-btn" title="Remove Account">
                         <i data-lucide="trash-2"></i>
                     </button>
                 </div>
@@ -1188,7 +1188,7 @@ export class UIManager {
             <div class="card-footer" style="padding: 0;">
                 <button class="btn-primary copy-btn" style="width: 100%;">
                     <i data-lucide="copy"></i>
-                    <span>Secure Copy</span>
+                    <span>Copy Code</span>
                 </button>
             </div>
         `;
@@ -1197,7 +1197,7 @@ export class UIManager {
         copyBtn.onclick = async () => {
             const otpCode = await (window as any).api.generateTOTP(account.secret);
             await navigator.clipboard.writeText(otpCode);
-            this.showToast("OTP Copied", "success");
+            this.showToast("Code copied!", "success");
             this.updateLastActivity('OTP copied');
         };
 
@@ -1227,7 +1227,7 @@ export class UIManager {
     private async handleScannedData(data: string) {
         try {
             if (!data.startsWith('otpauth://totp/')) {
-                this.showToast("Invalid QR Format", "error");
+                this.showToast("QR code not recognized", "error");
                 return;
             }
 
@@ -1241,7 +1241,7 @@ export class UIManager {
                 secret: parsed.secret
             });
             this.renderAccounts();
-            this.showToast(`Added ${parsed.issuer} account!`, "success");
+            this.showToast(`Account added!`, "success");
             this.updateLastActivity('Added token via Scan');
         } catch (err) {
             console.error("Invalid QR Format", err);
@@ -1367,7 +1367,7 @@ export class UIManager {
                     (document.getElementById('unlock-pin') as HTMLInputElement).value = '';
                     dots.forEach(dot => dot.classList.remove('filled', 'success'));
                 }, 500);
-                this.showToast("Vault Unlocked", "success");
+                this.showToast("Vault unlocked!", "success");
                 this.updateLastActivity('Vault unlocked');
             } else {
                 dots.forEach(dot => dot.classList.add('error'));
@@ -1375,7 +1375,7 @@ export class UIManager {
                     (document.getElementById('unlock-pin') as HTMLInputElement).value = '';
                     dots.forEach(dot => dot.classList.remove('filled', 'error'));
                 }, 800);
-                this.showToast("Verification Failed", "error");
+                this.showToast("Incorrect PIN", "error");
             }
         }
     }
@@ -1468,7 +1468,7 @@ export class UIManager {
             this.pushSettings();
             this.updateLockVaultVisibility();
             this.updatePinStatus();
-            this.showToast("Security Policy Removed", "info");
+            this.showToast("Security code removed", "info");
             this.hideModal();
         });
         document.getElementById('cancel-remove-pin')?.addEventListener('click', () => this.hideModal());
@@ -1558,7 +1558,7 @@ export class UIManager {
                         this.pushSettings();
                         this.updateLockVaultVisibility();
                         this.updatePinStatus();
-                        this.showToast("PIN Activated", "success");
+                        this.showToast("PIN set up!", "success");
                         this.hideModal();
                     } else {
                         this.showToast("PIN Matching Failed", "error");
@@ -1633,7 +1633,7 @@ export class UIManager {
                 this.accounts = await (window as any).api.saveAccount({ id: Date.now().toString(), issuer, account, secret });
                 this.renderAccounts();
                 this.hideModal();
-                this.showToast("Token Saved", "success");
+                this.showToast("Account saved!", "success");
                 this.updateLastActivity('Added token');
             }
         });
@@ -1689,7 +1689,7 @@ export class UIManager {
                 this.accounts = await (window as any).api.saveAccount({ ...account, issuer, account: accName });
                 this.renderAccounts();
                 this.hideModal();
-                this.showToast("Updated", "success");
+                this.showToast("Account updated!", "success");
                 this.updateLastActivity('Edited token');
             }
         });
@@ -1735,7 +1735,7 @@ export class UIManager {
             this.accounts = await (window as any).api.deleteAccount(account.id);
             this.renderAccounts();
             this.hideModal();
-            this.showToast("Token removed", "info");
+            this.showToast("Account removed", "info");
             this.updateLastActivity('Deleted token');
         });
         document.getElementById('cancel-delete-btn')?.addEventListener('click', () => this.hideModal());
@@ -1786,7 +1786,7 @@ export class UIManager {
             const res = await (window as any).api.performVaultImport(salt, encryptedVaultData, pass, autolock, desktopSettings, webSettings);
             if (res.success) {
                 this.hideModal();
-                this.showToast("Vault restored", "success");
+                this.showToast("Vault restored!", "success");
                 await this.refreshAccounts();
             } else this.showToast(res.message, "error");
         });
