@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, globalShortcut, screen, desktopCapturer } from 'electron';
 import * as path from 'path';
 import { signup, resendCode, verifyEmail, login, logout, getCurrentUser, getActiveAccounts, saveActiveAccounts, updateUserSettings, checkSession, getBackupData, importVaultData, pollForUpdates, changeUsername, changePassword, requestEmailChange, confirmEmailChange, resendEmailChangeCode, cancelEmailChange } from '../core/auth';
-import { generateTOTP, getRemainingSeconds } from '../core/totp';
+import { generateTOTP, getRemainingSeconds, getBatchOTPs } from '../core/totp';
 import * as fs from 'fs';
 import { dialog } from 'electron';
 
@@ -136,6 +136,10 @@ ipcMain.handle('generate-totp', (event, secret) => {
 
 ipcMain.handle('get-remaining-seconds', () => {
     return getRemainingSeconds();
+});
+
+ipcMain.handle('get-batch-otps', (event, secrets) => {
+    return getBatchOTPs(secrets);
 });
 
 ipcMain.handle('parse-uri', (event, uri) => {

@@ -25,6 +25,7 @@ contextBridge.exposeInMainWorld('api', {
     deleteAccount: (id: string) => ipcRenderer.invoke('delete-account', id),
     generateTOTP: (secret: string) => ipcRenderer.invoke('generate-totp', secret),
     getRemainingSeconds: () => ipcRenderer.invoke('get-remaining-seconds'),
+    getBatchOTPs: (secrets: string[]) => ipcRenderer.invoke('get-batch-otps', secrets),
     parseURI: (uri: string) => ipcRenderer.invoke('parse-uri', uri),
     exportVault: () => ipcRenderer.invoke('export-vault'),
     importVault: () => ipcRenderer.invoke('import-vault'),

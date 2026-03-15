@@ -18,6 +18,7 @@ export class UIManager {
     private liveSyncInterval: any = null;
     private emailResendTimer: number = 0;
     private emailResendInterval: any = null;
+    private cardCache: HTMLElement[] = [];
 
     constructor(public userId: string = 'default') {
         this.initTheme();
@@ -1193,7 +1194,20 @@ export class UIManager {
             emptyState.classList.add('hidden');
             searchEmptyState.classList.add('hidden');
             grid.innerHTML = '';
-            filtered.forEach((acc, index) => grid.appendChild(this.createAccountCard(acc, index)));
+            this.cardCache = []; 
+            filtered.forEach((acc, index) => {
+                const card = this.createAccountCard(acc, index);
+                grid.appendChild(card);
+                this.cardCache.push(card);
+            });
+
+            // Immediate batch update for all rendered cards so they don't stay empty for 1s
+            const secrets = filtered.map(acc => acc.secret);
+            (window as any).api.getBatchOTPs(secrets).then((res: { otps: string[], remaining: number }) => {
+                this.cardCache.forEach((card, i) => {
+                    if (res.otps[i]) this.updateCardOTP(card, res.otps[i], res.remaining);
+                });
+            });
         }
         this.refreshLucide();
     }
@@ -1266,7 +1280,8 @@ export class UIManager {
             this.showDeleteConfirm(account);
         });
 
-        this.updateCardOTP(card, account.secret);
+        // Initial update will be handled by the batch call in renderAccounts or the timer
+        // No need to call this.updateCardOTP here with incomplete data
         return card;
     }
 
@@ -1295,14 +1310,10 @@ export class UIManager {
         }
     }
 
-    private async updateCardOTP(card: HTMLElement, secret: string) {
-        const codeElement = card.querySelector('.otp-code');
+    private async updateCardOTP(card: HTMLElement, otp: string, remaining: number) {
+        const codeElement = card.querySelector('.otp-code') as HTMLElement;
         if (!codeElement) return;
 
-        // Skip heavy generateTOTP calls frequently in performance mode if possible
-        // But for TOTP, correctness is more important than 1 FPS gain.
-        // Instead, we optimize the CSS/DOM side of it.
-        const otp = await (window as any).api.generateTOTP(secret);
         const formattedOtp = otp.substring(0, 3) + ' ' + otp.substring(3);
         
         if (!this.privacyMode) {
@@ -1311,21 +1322,25 @@ export class UIManager {
             }
         }
 
-        const remaining = await (window as any).api.getRemainingSeconds();
         const progressBar = card.querySelector('.timer-linear-progress') as HTMLElement;
         if (progressBar) {
-            const percentage = (remaining / 30) * 100;
-            progressBar.style.width = `${percentage}%`;
+            const scale = remaining / 30;
+            progressBar.style.transform = `scaleX(${scale})`;
             progressBar.style.backgroundColor = remaining <= 5 ? '#ff3b30' : 'var(--accent-primary)';
         }
     }
 
     private startTimer() {
         if (this.timerInterval) clearInterval(this.timerInterval);
-        this.timerInterval = setInterval(() => {
-            const cards = document.querySelectorAll('.account-card');
-            cards.forEach((card, i) => {
-                if (this.accounts[i]) this.updateCardOTP(card as HTMLElement, this.accounts[i].secret);
+        this.timerInterval = setInterval(async () => {
+            if (this.accounts.length === 0 || this.cardCache.length === 0) return;
+            
+            // Batch process all secrets in one IPC called
+            const secrets = this.accounts.map(acc => acc.secret);
+            const { otps, remaining } = await (window as any).api.getBatchOTPs(secrets);
+
+            this.cardCache.forEach((card, i) => {
+                if (otps[i]) this.updateCardOTP(card, otps[i], remaining);
             });
         }, 1000);
     }

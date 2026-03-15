@@ -92,3 +92,12 @@ export function getRemainingSeconds(timeStep: number = 30): number {
     const epoch = Math.round(new Date().getTime() / 1000.0);
     return timeStep - (epoch % timeStep);
 }
+
+/**
+ * Generates OTPs for a batch of secrets in a single call
+ */
+export function getBatchOTPs(secrets: string[]): { otps: string[], remaining: number } {
+    const remaining = getRemainingSeconds();
+    const otps = secrets.map(secret => generateTOTP(secret));
+    return { otps, remaining };
+}

@@ -21,6 +21,20 @@ body {
    HYPER-MODERN AURA BACKGROUND
    ───────────────────────────────────────────────────────────────────────────── */
 
+/* Lightweight CSS Grain - Replaces heavy SVG filters */
+.grain-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.02;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: overlay;
+}
+
 .aura-background {
     position: fixed;
     top: 0;
@@ -34,28 +48,14 @@ body {
     transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Tactile Noise Overlay - Enhanced for subtle texture */
-.aura-background::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    filter: url(#noiseFilter);
-    opacity: 0.03; /* Very subtle for premium feel */
-    pointer-events: none;
-    mix-blend-mode: overlay;
-    z-index: 1;
-}
-
 .aura-blob {
     position: absolute;
     border-radius: 50%;
-    filter: blur(120px); /* Increased blur for smoother highlights */
-    opacity: 0.25; /* Softer integration */
-    animation: blobFloat 40s infinite alternate ease-in-out;
-    will-change: transform, opacity;
+    filter: blur(120px); 
+    opacity: 0.25; 
+    animation: blobFloat 60s infinite alternate ease-in-out; /* Slower = Lower CPU */
+    will-change: transform;
+    pointer-events: none;
 }
 
 .aura-1 {

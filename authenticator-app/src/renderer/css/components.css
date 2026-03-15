@@ -461,7 +461,10 @@ body.light-theme .dropdown-menu {
     width: 100%;
     background: var(--accent-primary);
     border-radius: var(--radius-full);
-    transition: width 1s linear, background-color 0.3s ease;
+    transform-origin: left;
+    transform: scaleX(1);
+    transition: transform 1s linear, background-color 0.3s ease;
+    will-change: transform;
 }
 
 /* Light mode: solid white cards */
