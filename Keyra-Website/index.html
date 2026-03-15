@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Keyra App - Secure, Modern, and Fast Authenticator">
+    <title>Keyra App | The Modern Authenticator</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+    <!-- Navigation -->
+    <nav class="navbar nm-flat">
+        <div class="nav-brand">
+            <div class="logo-icon nm-convex">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <span class="brand-text">Keyra</span>
+        </div>
+        
+        <div class="nav-actions">
+            <button id="themeToggle" class="nm-button icon-btn" aria-label="Toggle Theme">
+                <i class="fa-solid fa-moon dark-icon"></i>
+                <i class="fa-solid fa-sun light-icon hidden"></i>
+            </button>
+            <a href="https://keyraapp.netlify.app/" target="_blank" class="nm-button primary-btn">
+                <span>Use Online</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="badge nm-inset">
+                    <span class="pulse-dot"></span>
+                    <span>Version 2.0 is out!</span>
+                </div>
+                
+                <h1 class="hero-title">
+                    Your Security, <br>
+                    <span class="text-gradient">Beautifully Simple.</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Experience the next generation authenticator with premium Neumorphic design, cross-platform syncing, and bank-grade security.
+                </p>
+                
+                <div class="hero-actions">
+                    <a href="#download" class="nm-button primary-btn large-btn">
+                        <span>Download App</span>
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+                    <a href="https://keyraapp.netlify.app/" target="_blank" class="nm-button secondary-btn large-btn">
+                        <span>Open Web Vault</span>
+                        <i class="fa-solid fa-globe"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <!-- Abstract UI Representation -->
+                <div class="mockup-container nm-convex">
+                    <div class="mockup-header">
+                        <div class="window-controls">
+                            <span class="nm-inset"></span>
+                            <span class="nm-inset"></span>
+                            <span class="nm-inset"></span>
+                        </div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-card nm-flat">
+                            <div class="mockup-icon nm-inset"><i class="fa-brands fa-github text-gradient"></i></div>
+                            <div class="mockup-text">
+                                <div class="mockup-title">GitHub</div>
+                                <div class="mockup-code">123 456</div>
+                            </div>
+                            <div class="mockup-pie nm-convex"></div>
+                        </div>
+                        <div class="mockup-card nm-flat">
+                            <div class="mockup-icon nm-inset"><i class="fa-brands fa-google text-gradient"></i></div>
+                            <div class="mockup-text">
+                                <div class="mockup-title">Google</div>
+                                <div class="mockup-code">987 654</div>
+                            </div>
+                            <div class="mockup-pie nm-convex"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Showcase -->
+        <section class="features" id="features">
+            <div class="section-header">
+                <h2>Designed for the Modern Web</h2>
+                <p>Everything you need to secure your digital life, wrapped in a stunning interface.</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card nm-flat">
+                    <div class="feature-icon nm-convex">
+                        <i class="fa-solid fa-palette text-gradient"></i>
+                    </div>
+                    <h3>Neumorphic UI</h3>
+                    <p>A tactile, soft, and satisfying user interface that supports pure dark and light modes with dynamic accents.</p>
+                </div>
+                
+                <div class="feature-card nm-flat">
+                    <div class="feature-icon nm-convex">
+                        <i class="fa-solid fa-bolt text-gradient"></i>
+                    </div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized for 60fps performance, ensuring smooth animations and immediate responsiveness.</p>
+                </div>
+                
+                <div class="feature-card nm-flat">
+                    <div class="feature-icon nm-convex">
+                        <i class="fa-solid fa-lock text-gradient"></i>
+                    </div>
+                    <h3>Bank-Grade Security</h3>
+                    <p>Local encryption and secure key storage keep your 2FA codes safe from any unauthorized access.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Section -->
+        <section class="download" id="download">
+            <div class="download-container nm-flat">
+                <div class="download-info">
+                    <h2>Available on your <br> favorite platform</h2>
+                    <p>Download Keyra Desktop App for a seamless, native experience on your operating system.</p>
+                </div>
+                
+                <div class="download-options">
+                    <a href="#" class="download-card nm-convex">
+                        <i class="fa-brands fa-windows"></i>
+                        <div class="os-info">
+                            <span class="os-name">Windows</span>
+                            <span class="os-arch">x64 / ARM</span>
+                        </div>
+                        <div class="download-icon nm-inset"><i class="fa-solid fa-download"></i></div>
+                    </a>
+                    
+                    <a href="#" class="download-card nm-convex">
+                        <i class="fa-brands fa-apple"></i>
+                        <div class="os-info">
+                            <span class="os-name">macOS</span>
+                            <span class="os-arch">Intel / Apple Silicon</span>
+                        </div>
+                        <div class="download-icon nm-inset"><i class="fa-solid fa-download"></i></div>
+                    </a>
+                    
+                    <a href="#" class="download-card nm-convex">
+                        <i class="fa-brands fa-linux"></i>
+                        <div class="os-info">
+                            <span class="os-name">Linux</span>
+                            <span class="os-arch">AppImage / .deb</span>
+                        </div>
+                        <div class="download-icon nm-inset"><i class="fa-solid fa-download"></i></div>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo-icon nm-convex small">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <span>Keyra App</span>
+            </div>
+            <p class="copyright">&copy; 2026 Keyra App. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
