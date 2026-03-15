@@ -1571,7 +1571,7 @@ export class UIManager {
         }
 
         if (setupBtn) {
-            setupBtn.textContent = hasPin ? 'Change PIN' : 'Setup PIN';
+            setupBtn.textContent = hasPin ? 'Change' : 'Setup';
         }
 
         if (removeBtn) {
