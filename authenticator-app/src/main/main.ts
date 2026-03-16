@@ -195,6 +195,16 @@ ipcMain.handle('parse-uri', (event, uri) => {
     return parseOTPAuthURI(uri);
 });
 
+ipcMain.handle('encrypt-pin', (event, pin) => {
+    const { encryptPIN } = require('../core/auth');
+    return encryptPIN(pin);
+});
+
+ipcMain.handle('decrypt-pin', (event, encryptedPin) => {
+    const { decryptPIN } = require('../core/auth');
+    return decryptPIN(encryptedPin);
+});
+
 // -- Backup & Maintenance --
 ipcMain.handle('export-vault', async () => {
     const { filePath } = await dialog.showSaveDialog(mainWindow!, {

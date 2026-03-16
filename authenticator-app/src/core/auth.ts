@@ -324,6 +324,16 @@ export function getBackupData(): {
     };
 }
 
+export function encryptPIN(pin: string): string {
+    if (!currentKey) throw new Error("No active user session.");
+    return encryptVault(pin, currentKey);
+}
+
+export function decryptPIN(encryptedPin: string): string {
+    if (!currentKey) throw new Error("No active user session.");
+    return decryptVault(encryptedPin, currentKey);
+}
+
 export async function importVaultData(
     salt: string, 
     encryptedVaultData: string, 

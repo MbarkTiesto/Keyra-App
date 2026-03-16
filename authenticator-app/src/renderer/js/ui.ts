@@ -43,6 +43,7 @@ export class UIManager {
         this.initUpdateSystem();
         this.initSystemIntegration();
         this.initPhoneSecurity();
+        this.migratePin();
     }
 
     private initUpdateSystem() {
@@ -541,7 +542,6 @@ export class UIManager {
 
         // Mouse Sensors for Privacy (Document level is often more stable for viewport exit)
         document.documentElement.addEventListener('mouseleave', (e) => {
-            // Check if it's actually leaving the window (not just a child element)
             if (!e.relatedTarget) {
                 if (this.privacyBlur) this.showPrivacyOverlay();
             }
@@ -557,8 +557,23 @@ export class UIManager {
         });
 
         window.addEventListener('focus', () => {
-            this.hidePrivacyOverlay();
+            if (this.privacyBlur || this.screenGuardian) this.hidePrivacyOverlay();
         });
+    }
+
+    private async migratePin() {
+        const pin = localStorage.getItem(this.getStorageKey('vault_pin'));
+        if (pin && pin.length === 4 && /^\d+$/.test(pin)) {
+            console.log("Migrating legacy plaintext PIN to encrypted storage...");
+            try {
+                const encrypted = await (window as any).api.encryptPIN(pin);
+                localStorage.setItem(this.getStorageKey('vault_pin'), encrypted);
+                await this.pushSettings();
+                console.log("PIN migration successful");
+            } catch (e) {
+                console.error("PIN migration failed", e);
+            }
+        }
     }
 
     private showPrivacyOverlay() {
@@ -1767,14 +1782,32 @@ export class UIManager {
         if (pinIn) this.validateAndAutoUnlock(pinIn.value);
     }
 
-    private validateAndAutoUnlock(pinValue: string) {
+    private async validateAndAutoUnlock(pinValue: string) {
         const saved = localStorage.getItem(this.getStorageKey('vault_pin'));
         const dots = document.querySelectorAll('.pin-dot');
 
         dots.forEach((dot, i) => dot.classList.toggle('filled', i < pinValue.length));
 
         if (pinValue.length === 4) {
-            if (pinValue === saved) {
+            let isCorrect = false;
+            try {
+                if (saved) {
+                    // Try decrypting. If it fails, it's either an invalid key or plaintext.
+                    // We'll handle plaintext migration in init, so here we expect encrypted if it's there.
+                    // But for robustness, we handle both if needed or assume migration worked.
+                    if (saved.length === 4 && /^\d+$/.test(saved)) {
+                        isCorrect = (pinValue === saved);
+                    } else {
+                        const decrypted = await (window as any).api.decryptPIN(saved);
+                        isCorrect = (pinValue === decrypted);
+                    }
+                }
+            } catch (e) {
+                console.error("PIN Decryption failed during unlock", e);
+                isCorrect = false;
+            }
+
+            if (isCorrect) {
                 dots.forEach(dot => dot.classList.add('success'));
                 setTimeout(() => {
                     document.getElementById('lock-vessel')?.classList.remove('show');
@@ -1957,19 +1990,25 @@ export class UIManager {
                 if (nextBtn) nextBtn.disabled = val.length !== 4;
             });
 
-            nextBtn?.addEventListener('click', () => {
+            nextBtn?.addEventListener('click', async () => {
                 if (phase === 'entry') {
                     firstEntry = input.value;
                     phase = 'confirm';
                     renderModal();
                 } else {
                     if (input.value === firstEntry) {
-                        localStorage.setItem(this.getStorageKey('vault_pin'), input.value);
-                        this.pushSettings();
-                        this.updateLockVaultVisibility();
-                        this.updatePinStatus();
-                        this.showToast("PIN set up!", "success");
-                        this.hideModal();
+                        try {
+                            const encrypted = await (window as any).api.encryptPIN(input.value);
+                            localStorage.setItem(this.getStorageKey('vault_pin'), encrypted);
+                            await this.pushSettings();
+                            this.updateLockVaultVisibility();
+                            this.updatePinStatus();
+                            this.showToast("PIN set up and encrypted!", "success");
+                            this.hideModal();
+                        } catch (e) {
+                            console.error("PIN Setup encryption failed", e);
+                            this.showToast("Security setup failed", "error");
+                        }
                     } else {
                         this.showToast("PIN Matching Failed", "error");
                         phase = 'entry';
