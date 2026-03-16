@@ -116,6 +116,10 @@ ipcMain.handle('poll-for-updates', () => pollForUpdates());
 // -- Account Management --
 ipcMain.handle('change-username', (event, newUsername) => changeUsername(newUsername));
 ipcMain.handle('change-password', (event, newPassword) => changePassword(newPassword));
+ipcMain.handle('update-profile-picture', (event, base64Image) => {
+    const { updateProfilePicture } = require('../core/auth');
+    return updateProfilePicture(base64Image);
+});
 ipcMain.handle('request-email-change', (event, newEmail) => requestEmailChange(newEmail));
 ipcMain.handle('confirm-email-change', (event, code) => confirmEmailChange(code));
 ipcMain.handle('resend-email-change-code', () => resendEmailChangeCode());

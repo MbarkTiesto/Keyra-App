@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('api', {
     updateUserSettings: (settings: any) => ipcRenderer.invoke('update-user-settings', settings),
     changeUsername: (newUsername: string) => ipcRenderer.invoke('change-username', newUsername),
     changePassword: (newPassword: string) => ipcRenderer.invoke('change-password', newPassword),
+    updateProfilePicture: (base64Image: string) => ipcRenderer.invoke('update-profile-picture', base64Image),
     requestEmailChange: (newEmail: string) => ipcRenderer.invoke('request-email-change', newEmail),
     confirmEmailChange: (code: string) => ipcRenderer.invoke('confirm-email-change', code),
     resendEmailChangeCode: () => ipcRenderer.invoke('resend-email-change-code'),

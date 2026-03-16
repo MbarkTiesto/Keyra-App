@@ -53,6 +53,7 @@ export interface UserRecord {
     "Desktop Settings"?: UserSettings;
     "Web Settings"?: any;
     autolock: string;
+    profilePicture?: string;
 }
 
 /*

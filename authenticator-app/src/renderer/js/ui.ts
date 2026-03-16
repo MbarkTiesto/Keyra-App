@@ -918,6 +918,49 @@ export class UIManager {
             }
         });
 
+        // Change Avatar Logic
+        document.getElementById('btn-change-avatar')?.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/png, image/jpeg, image/webp';
+            input.onchange = async (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (!file) return;
+
+                if (file.size > 2 * 1024 * 1024) {
+                    this.showToast('Image must be less than 2MB', 'error');
+                    return;
+                }
+
+                // Show loading before processing
+                this.setLoading(true, "Updating Profile", "UPLOADING AVATAR");
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const base64 = e.target?.result as string;
+                    try {
+                        const res = await (window as any).api.updateProfilePicture(base64);
+                        if (res.success) {
+                            this.showToast(res.message, 'success');
+                            await this.loadAccountInfo();
+                        } else {
+                            this.showToast(res.message, 'error');
+                        }
+                    } catch (err: any) {
+                        this.showToast(err.message || "Failed to update profile picture", 'error');
+                    } finally {
+                        this.setLoading(false);
+                    }
+                };
+                reader.onerror = () => {
+                    this.showToast("Failed to read image file", 'error');
+                    this.setLoading(false);
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        });
+
         // Request Email Change
         document.getElementById('form-request-email-change')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1158,17 +1201,40 @@ export class UIManager {
         const dispName = document.getElementById('acc-display-username');
         const dispEmail = document.getElementById('acc-primary-email');
         const initialsEl = document.getElementById('acc-initials');
-        const avatarEl = document.getElementById('acc-avatar');
+        const avatarImgEl = document.getElementById('acc-avatar-img') as HTMLImageElement;
 
         if (dispName) dispName.textContent = user.username;
         if (dispEmail) dispEmail.textContent = user.email;
 
-        // Initials Logic
-        if (initialsEl) {
-            const names = user.username.split(' ');
-            initialsEl.textContent = names.length > 1 
-                ? (names[0][0] + names[1][0]).toUpperCase()
-                : user.username.slice(0, 2).toUpperCase();
+        // Avatar Logic
+        if (avatarImgEl && initialsEl) {
+            if (user.profilePicture) {
+                avatarImgEl.src = user.profilePicture;
+                avatarImgEl.classList.remove('hidden');
+                initialsEl.classList.add('hidden');
+            } else {
+                avatarImgEl.classList.add('hidden');
+                initialsEl.classList.remove('hidden');
+                const names = user.username.split(' ');
+                initialsEl.textContent = names.length > 1 
+                    ? (names[0][0] + names[1][0]).toUpperCase()
+                    : user.username.slice(0, 2).toUpperCase();
+            }
+        }
+
+        // Also sync the navbar avatar
+        const navbarAvatarImg = document.getElementById('navbar-avatar-img') as HTMLImageElement;
+        const navbarAvatarInitials = document.getElementById('navbar-avatar-initials');
+        if (navbarAvatarImg && navbarAvatarInitials) {
+            if (user.profilePicture) {
+                navbarAvatarImg.src = user.profilePicture;
+                navbarAvatarImg.classList.remove('hidden');
+                navbarAvatarInitials.classList.add('hidden');
+            } else {
+                navbarAvatarImg.classList.add('hidden');
+                navbarAvatarInitials.classList.remove('hidden');
+                navbarAvatarInitials.textContent = user.username.charAt(0).toUpperCase();
+            }
         }
 
         // Pending UI
@@ -2177,8 +2243,22 @@ export class UIManager {
             if (user) {
                 const nameDisplay = document.getElementById('user-name-display');
                 if (nameDisplay) nameDisplay.textContent = user.username;
-                const avatar = document.getElementById('user-avatar');
-                if (avatar) avatar.textContent = user.username.charAt(0).toUpperCase();
+
+                // Navbar avatar: show profile picture or initials
+                const navbarAvatarImg = document.getElementById('navbar-avatar-img') as HTMLImageElement;
+                const navbarAvatarInitials = document.getElementById('navbar-avatar-initials');
+                if (navbarAvatarImg && navbarAvatarInitials) {
+                    if (user.profilePicture) {
+                        navbarAvatarImg.src = user.profilePicture;
+                        navbarAvatarImg.classList.remove('hidden');
+                        navbarAvatarInitials.classList.add('hidden');
+                    } else {
+                        navbarAvatarImg.classList.add('hidden');
+                        navbarAvatarInitials.classList.remove('hidden');
+                        navbarAvatarInitials.textContent = user.username.charAt(0).toUpperCase();
+                    }
+                }
+
                 // Populate dropdown header
                 const dropdownName = document.getElementById('dropdown-user-name');
                 const dropdownEmail = document.getElementById('dropdown-user-email');

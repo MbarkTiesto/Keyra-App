@@ -39,7 +39,8 @@ export function getCurrentUser() {
         isPhoneVerified: !!currentUser.isPhoneVerified,
         pendingPhone: currentUser.pendingPhone,
         settings: currentUser["Desktop Settings"],
-        autolock: currentUser.autolock
+        autolock: currentUser.autolock,
+        profilePicture: currentUser.profilePicture
     };
 }
 
@@ -60,6 +61,23 @@ export async function cancelEmailChange(): Promise<{ success: boolean, message: 
     await syncUserData(currentUser.username, users[userIndex]);
 
     return { success: true, message: "Pending email change cancelled." };
+}
+
+export async function updateProfilePicture(base64Image: string): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    user.profilePicture = base64Image;
+    currentUser.profilePicture = base64Image; // Sync local session
+
+    await saveUsers(users);
+    await syncUserData(currentUser.username, user);
+
+    return { success: true, message: "Profile picture updated successfully." };
 }
 
 
