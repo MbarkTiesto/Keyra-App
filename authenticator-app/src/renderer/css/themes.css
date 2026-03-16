@@ -336,22 +336,22 @@ body.dark-theme {
 
 /* Enhanced Light Mode */
 body.light-theme {
-    /* Soft Gray-Blue Light Backgrounds — Sync with Keyra-Website */
-    --bg-primary: #e0e5ec;
-    --bg-secondary: #d1d9e6;
-    --bg-tertiary: #c2cbd8;
+    /* Premium Arctic Light Backgrounds — Sync with Modern Neumorphic Aesthetic */
+    --bg-primary: #f0f4f8;
+    --bg-secondary: #e6edf4;
+    --bg-tertiary: #dbe4ee;
 
-    --text-primary: #2d3436;
-    --text-secondary: #636e72;
-    --text-tertiary: #b2bec3;
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-tertiary: #94a3b8;
 
     /* Muted accent for light surfaces */
     --accent-primary: hsl(var(--dynamic-accent-hue, 258), 85%, 58%);
     --accent-secondary: hsl(calc(var(--dynamic-accent-hue, 258) + 20), 85%, 65%);
     --accent-hover: hsl(var(--dynamic-accent-hue, 258), 85%, 52%);
-    --accent-soft: hsla(var(--dynamic-accent-hue, 258), 85%, 58%, 0.08);
+    --accent-soft: hsla(var(--dynamic-accent-hue, 258), 85%, 58%, 0.1);
 
-    --border-color: rgba(0, 0, 0, 0.05); /* Softer borders for pure neumorphism */
+    --border-color: rgba(203, 213, 225, 0.4); /* Softer borders for pure neumorphism */
 
     --aura-1: hsla(var(--dynamic-accent-hue, 258), 80%, 55%, 0.22);
     --aura-2: hsla(calc(var(--dynamic-accent-hue, 258) + 30), 80%, 62%, 0.16);
@@ -361,23 +361,23 @@ body.light-theme {
     --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.10);
     --shadow-hard:   0 20px 60px rgba(0, 0, 0, 0.16);
 
-    /* Dedicated Light Mode Neumorphic Shadows */
-    --nm-surface: #e0e5ec;
+    /* Dedicated Light Mode Neumorphic Shadows - Refined for Arctic Surface */
+    --nm-surface: #f0f4f8;
     --nm-shadow-light: #ffffff;
-    --nm-shadow-dark: rgba(163, 177, 198, 0.65); /* Deeper shadow for clear extrusion */
+    --nm-shadow-dark: rgba(203, 213, 225, 0.7); /* Precise depth for cleaner look */
     
     --nm-shadow-out: 
-        14px 14px 28px var(--nm-shadow-dark), 
-        -14px -14px 28px var(--nm-shadow-light);
+        12px 12px 24px var(--nm-shadow-dark), 
+        -12px -12px 24px var(--nm-shadow-light);
     --nm-shadow-in: 
-        inset 12px 12px 24px var(--nm-shadow-dark), 
-        inset -12px -12px 24px var(--nm-shadow-light);
+        inset 10px 10px 20px var(--nm-shadow-dark), 
+        inset -10px -10px 20px var(--nm-shadow-light);
     --nm-shadow-out-sm: 
-        7px 7px 16px var(--nm-shadow-dark), 
-        -7px -7px 16px var(--nm-shadow-light);
+        6px 6px 14px var(--nm-shadow-dark), 
+        -6px -6px 14px var(--nm-shadow-light);
     --nm-shadow-in-sm: 
-        inset 7px 7px 14px var(--nm-shadow-dark), 
-        inset -7px -7px 14px var(--nm-shadow-light);
+        inset 6px 6px 12px var(--nm-shadow-dark), 
+        inset -6px -6px 12px var(--nm-shadow-light);
 }
 
 /* OLED Optimization Classes - Force True Black #000000 */

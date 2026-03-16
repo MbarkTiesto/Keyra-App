@@ -25,7 +25,6 @@ export class UIManager {
 
     constructor(public userId: string = 'default') {
         this.initTheme();
-        this.initOSThemeDetection();
         this.initPrivacyMode();
         this.initScreenGuardian();
         this.initPerformanceMode();
@@ -39,18 +38,11 @@ export class UIManager {
         this.loadInitialData();
         this.initFromCloud();
         this.startLiveSync();
-        this.initCaptureResults();
         this.initConnectivityStatus();
         this.updatePinStatus();
         this.initUpdateSystem();
         this.initSystemIntegration();
         this.initPhoneSecurity();
-    }
-
-    private initCaptureResults() {
-        (window as any).api.onCaptureResult(async (data: string) => {
-            await this.handleScannedData(data);
-        });
     }
 
     private initUpdateSystem() {
@@ -388,20 +380,7 @@ export class UIManager {
         }
     }
 
-    private initOSThemeDetection() {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        mediaQuery.addEventListener('change', (e) => {
-            // Only auto-switch if user hasn't manually set a theme in this session or if it's the auth screen
-            const hasManualTheme = !!localStorage.getItem(this.getStorageKey('theme'));
-            const authVessel = document.getElementById('auth-vessel');
-            const isAuthActive = authVessel && authVessel.classList.contains('show');
 
-            if (!hasManualTheme || isAuthActive) {
-                const newTheme = e.matches ? 'dark' : 'light';
-                this.setTheme(newTheme, false);
-            }
-        });
-    }
 
     public setTheme(theme: 'light' | 'dark', silent: boolean = false) {
         this.currentTheme = theme;
@@ -412,6 +391,7 @@ export class UIManager {
 
         localStorage.setItem(this.getStorageKey('theme'), theme);
         localStorage.setItem('keyra_theme', theme);
+        localStorage.setItem('default_theme', theme);
 
         this.updateSegmentedUI('theme-segmented', theme);
 

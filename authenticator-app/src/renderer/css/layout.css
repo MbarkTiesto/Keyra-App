@@ -18,7 +18,7 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   HYPER-MODERN AURA BACKGROUND
+   CLEAN NEUMORPHIC BACKGROUND
    ───────────────────────────────────────────────────────────────────────────── */
 
 /* Lightweight CSS Grain - Replaces heavy SVG filters */
@@ -35,56 +35,8 @@ body {
     mix-blend-mode: overlay;
 }
 
-.aura-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+body {
     background-color: var(--nm-surface);
-    z-index: -1;
-    overflow: hidden;
-    /* Soft blending for a molded look */
-    transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.aura-blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(120px); 
-    opacity: 0.25; 
-    animation: blobFloat 60s infinite alternate ease-in-out; /* Slower = Lower CPU */
-    will-change: transform;
-    pointer-events: none;
-}
-
-.aura-1 {
-    width: 70vw;
-    height: 70vw;
-    background: radial-gradient(circle at center, var(--aura-1), transparent 70%);
-    top: -20%;
-    left: -10%;
-    opacity: 0.3;
-}
-
-.aura-2 {
-    width: 60vw;
-    height: 60vw;
-    background: radial-gradient(circle at center, var(--aura-2), transparent 70%);
-    bottom: -15%;
-    right: -10%;
-    animation-delay: -10s;
-    opacity: 0.25;
-}
-
-.aura-3 {
-    width: 50vw;
-    height: 50vw;
-    background: radial-gradient(circle at center, var(--aura-3), transparent 70%);
-    top: 30%;
-    right: 10%;
-    animation-delay: -20s;
-    opacity: 0.15;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
