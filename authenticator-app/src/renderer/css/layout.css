@@ -261,10 +261,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: hsla(var(--h), 20%, 5%, 0.6);
-    /* Reduced blur for better performance and focus on surface */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: var(--modal-overlay);
     display: flex;
     align-items: center;
     justify-content: center;

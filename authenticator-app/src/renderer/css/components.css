@@ -163,13 +163,13 @@ i[data-lucide] {
 .app-logo-medium {
     width: clamp(64px, 10vw, 84px);
     height: auto;
-    filter: var(--logo-hue-shift) drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+    filter: var(--logo-hue-shift);
 }
 
 .app-logo-large {
     width: clamp(100px, 15vw, 140px);
     height: auto;
-    filter: var(--logo-hue-shift) drop-shadow(0 12px 24px rgba(0,0,0,0.45));
+    filter: var(--logo-hue-shift);
 }
 
 .nm-logo {
@@ -637,8 +637,7 @@ body.dark-theme .dropdown-menu {
     color: var(--accent-hover);
     box-shadow: 
         8px 8px 20px var(--nm-shadow-dark), 
-        -8px -8px 20px var(--nm-shadow-light),
-        0 0 15px var(--accent-soft);
+        -8px -8px 20px var(--nm-shadow-light);
 }
 
 .btn-primary:active {
@@ -1487,23 +1486,6 @@ input:checked+.slider:before {
     border: 3px solid var(--accent-primary);
 }
 
-.pin-avatar-ring .lock-glow {
-    position: absolute;
-    width: 140%;
-    height: 140%;
-    background: var(--aura-1);
-    filter: blur(30px);
-    opacity: 0.35;
-    z-index: -1;
-    border-radius: 50%;
-    animation: pin-glow-pulse 3s ease-in-out infinite;
-}
-
-@keyframes pin-glow-pulse {
-    0%, 100% { opacity: 0.25; transform: scale(1); }
-    50% { opacity: 0.45; transform: scale(1.05); }
-}
-
 .pin-header {
     margin-bottom: 32px;
 }
@@ -2334,7 +2316,7 @@ body.light-theme .setting-row:hover {
     left: 50%;
     transform: translateX(-50%);
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-out), 0 0 20px var(--accent-soft);
+    box-shadow: var(--nm-shadow-out);
     padding: 12px 28px;
     border-radius: var(--radius-full);
     display: flex;
@@ -2807,7 +2789,6 @@ body.light-theme .cloud-sync-pill {
     height: 14px;
     border-radius: 50%;
     background: var(--accent-primary);
-    box-shadow: 0 0 15px var(--accent-soft);
 }
 
 .nm-spinner-inner {
@@ -2975,9 +2956,6 @@ body.light-theme .cloud-sync-pill {
 .auth-header .brand-icon img {
     width: clamp(100px, 20vw, 140px);
     height: auto;
-    /* Soft neumorphic-style drop shadow for the logo */
-    filter: drop-shadow(10px 10px 20px var(--nm-shadow-dark)) 
-            drop-shadow(-10px -10px 20px var(--nm-shadow-light));
     margin-bottom: var(--space-md);
 }
 
@@ -3055,7 +3033,6 @@ body.light-theme .cloud-sync-pill {
 .auth-link:hover {
     color: var(--accent-hover);
     border-bottom-color: var(--accent-primary);
-    text-shadow: 0 0 10px var(--accent-soft);
 }
 
 /* Verify Page Specifics */
@@ -3222,7 +3199,6 @@ body.light-theme .cloud-sync-pill {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-2xl);
-    backdrop-filter: blur(10px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 1;
     visibility: visible;
@@ -3288,7 +3264,6 @@ body.light-theme .cloud-sync-pill {
 
 #btn-install-update:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.6) !important;
 }
 
 .update-loading-check {

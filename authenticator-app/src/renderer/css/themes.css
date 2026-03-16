@@ -105,6 +105,8 @@
         inset 7px 7px 14px var(--nm-shadow-dark), 
         inset -7px -7px 14px var(--nm-shadow-light);
     
+    --modal-overlay: rgba(224, 229, 236, 0.65);
+    
     /* Radius System */
     --radius-sm: 12px;
     --radius-md: 16px;
@@ -184,6 +186,8 @@
     --nm-shadow-in-sm: 
         inset 5px 5px 10px var(--nm-shadow-dark), 
         inset -5px -5px 10px var(--nm-shadow-light);
+    
+    --modal-overlay: rgba(10, 10, 12, 0.7);
 }
 
 * {
