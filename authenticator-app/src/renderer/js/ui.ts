@@ -55,6 +55,7 @@ export class UIManager {
         const progressBar = document.getElementById('download-progress-bar');
         const percentText = document.getElementById('download-percent-text');
         const versionText = document.getElementById('current-version-text');
+        const nmLoader = document.getElementById('nm-update-loader');
 
         if (versionText) {
             versionText.textContent = `Version 1.0.0`;
@@ -62,6 +63,7 @@ export class UIManager {
 
         checkBtn?.addEventListener('click', () => {
             if (message) message.textContent = 'Checking for updates...';
+            nmLoader?.classList.remove('hidden');
             (window as any).api.checkForUpdates();
         });
 
@@ -81,6 +83,7 @@ export class UIManager {
         });
 
         (window as any).api.onUpdateAvailable((info: any) => {
+            nmLoader?.classList.add('hidden');
             if (message) message.textContent = `Update available: v${info.version}`;
             badge?.classList.remove('hidden');
             checkBtn?.classList.add('hidden');
@@ -92,11 +95,13 @@ export class UIManager {
         });
 
         (window as any).api.onUpdateNotAvailable(() => {
+            nmLoader?.classList.add('hidden');
             if (message) message.textContent = 'Your app is up to date.';
             checkBtn?.classList.remove('hidden');
         });
 
         (window as any).api.onUpdateError((err: string) => {
+            nmLoader?.classList.add('hidden');
             if (message) message.textContent = `Update check failed.`;
             console.error("Update Error:", err);
             checkBtn?.classList.remove('hidden');

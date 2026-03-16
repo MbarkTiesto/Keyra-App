@@ -175,3 +175,83 @@
     font-size: 64px;
     color: white;
 }
+
+/* ── Neumorphic Update Loader ── */
+.nm-update-loader-vessel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    margin: 16px 0;
+    transition: all 0.4s ease;
+}
+
+.nm-update-loader-vessel.hidden {
+    display: none !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.nm-loader-outer {
+    width: 64px;
+    height: 64px;
+    background: var(--nm-surface);
+    border-radius: 50%;
+    box-shadow: var(--nm-shadow-out);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.nm-loader-inner {
+    width: 42px;
+    height: 42px;
+    background: var(--nm-surface);
+    border-radius: 50%;
+    box-shadow: var(--nm-shadow-in);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nm-loader-inner i {
+    font-size: 18px;
+    color: var(--accent-primary);
+    opacity: 0.6;
+}
+
+/* The Spinning Ring */
+.nm-loader-ring {
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: var(--accent-primary);
+    border-right-color: var(--accent-primary);
+    filter: drop-shadow(0 0 8px var(--accent-primary));
+    animation: nm-spin 1.2s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+}
+
+/* Pulsing Background Aura */
+.nm-loader-aura {
+    position: absolute;
+    inset: -12px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    opacity: 0.1;
+    filter: blur(16px);
+    animation: nm-pulse 2s ease-in-out infinite;
+}
+
+@keyframes nm-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes nm-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.1; }
+    50% { transform: scale(1.2); opacity: 0.2; }
+}
