@@ -243,7 +243,7 @@ export class UIManager {
 
     private getSettingsObject(): any {
         return {
-            theme: this.currentTheme,
+            theme: localStorage.getItem(this.getStorageKey('theme')) || 'auto',
             accentColor: localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple',
             wallpaperPreset: this.wallpaperPreset,
             privacyMode: this.privacyMode,
@@ -370,37 +370,44 @@ export class UIManager {
     }
 
     private initTheme() {
-        const savedTheme = localStorage.getItem(this.getStorageKey('theme')) as 'light' | 'dark';
-        if (savedTheme) {
-            this.setTheme(savedTheme, true);
-        } else {
-            // Default to OS theme
-            const osTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            this.setTheme(osTheme, true);
-        }
+        const savedTheme = localStorage.getItem(this.getStorageKey('theme')) || 'auto';
+        this.setTheme(savedTheme, true);
+
+        // Listen for OS theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            const currentSetting = localStorage.getItem(this.getStorageKey('theme')) || 'auto';
+            if (currentSetting === 'auto') {
+                this.setTheme('auto', true);
+            }
+        });
     }
 
+    public setTheme(theme: string, silent: boolean = false) {
+        let themeToApply = theme;
+        if (theme === 'auto') {
+            themeToApply = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
 
-
-    public setTheme(theme: 'light' | 'dark', silent: boolean = false) {
-        this.currentTheme = theme;
-        const body = document.body;
-        body.classList.remove('light-theme', 'dark-theme');
-        body.classList.add(`${theme}-theme`);
-        document.documentElement.setAttribute('data-theme', theme);
-
+        this.currentTheme = themeToApply as 'light' | 'dark';
         localStorage.setItem(this.getStorageKey('theme'), theme);
-        localStorage.setItem('keyra_theme', theme);
-        localStorage.setItem('default_theme', theme);
+        localStorage.setItem('keyra_theme', theme); // For head script
+
+        document.documentElement.setAttribute('data-theme', themeToApply);
+        document.body.classList.remove('light-theme', 'dark-theme');
+        document.body.classList.add(themeToApply + '-theme');
+
+        // OLED Optimization
+        const isDark = themeToApply === 'dark';
+        document.body.classList.toggle('oled-optimized', this.oledMode && isDark);
 
         this.updateSegmentedUI('theme-segmented', theme);
 
         const themeIcon = document.getElementById('theme-icon-fa');
         const themeText = document.getElementById('theme-text');
         if (themeIcon) {
-            themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            themeIcon.className = themeToApply === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         }
-        if (themeText) themeText.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+        if (themeText) themeText.textContent = themeToApply === 'dark' ? 'Light Mode' : 'Dark Mode';
 
         if (!silent) this.pushSettings();
     }
@@ -571,7 +578,7 @@ export class UIManager {
     }
 
     private initSegmentedStates() {
-        const theme = localStorage.getItem(this.getStorageKey('theme')) || 'light';
+        const theme = localStorage.getItem(this.getStorageKey('theme')) || 'auto';
         this.updateSegmentedUI('theme-segmented', theme);
 
         const autolock = localStorage.getItem(this.getStorageKey('autolock')) || '0';
@@ -667,13 +674,19 @@ export class UIManager {
         });
         document.getElementById('empty-add-btn')?.addEventListener('click', () => this.showAddModal());
 
-        // Segmented Theme Toggle
+        // Segmented Theme Toggle (Light/Dark/Auto)
         document.querySelectorAll('#theme-segmented .segment').forEach(seg => {
             seg.addEventListener('click', (e) => {
                 const target = e.currentTarget as HTMLElement;
-                const val = target.getAttribute('data-val') as 'light' | 'dark';
+                const val = target.getAttribute('data-val')!;
                 this.setTheme(val);
-                this.updateLastActivity(`Changed theme to ${val}`);
+                this.updateLastActivity(`Changed appearance to ${val}`);
+                
+                if (val === 'auto') {
+                    this.showToast("App will now follow system theme", "info");
+                } else {
+                    this.showToast(`${val.charAt(0).toUpperCase() + val.slice(1)} mode enabled`, "info");
+                }
             });
         });
 
@@ -1996,7 +2009,7 @@ export class UIManager {
                 </div>
                 <div class="modal-footer">
                     <button class="btn-primary" id="save-new-account">
-                        <i class="fa-solid fa-shield-plus"></i>
+                        <i class="fa-solid fa-shield-halved"></i>
                         Save Token
                     </button>
                     <button class="user-button" id="btn-scan-screen-trigger" style="justify-content: center; white-space: nowrap;">
