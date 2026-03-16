@@ -19,6 +19,5 @@ interface Window {
         maximize: () => void;
         close: () => void;
     };
-    lucide: any;
     currentUserId: string;
 }

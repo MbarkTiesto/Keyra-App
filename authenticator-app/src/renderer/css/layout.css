@@ -454,8 +454,7 @@ body.light-theme .modal {
 
     /* Show only icon on small mobile rows */
     .btn-primary#add-account-btn i {
-        width: 26px;
-        height: 26px;
+        font-size: 26px;
         margin: 0;
     }
 
@@ -512,8 +511,7 @@ body.light-theme .modal {
     }
 
     .brand-icon i {
-        width: 24px !important;
-        height: 24px !important;
+        font-size: 24px !important;
     }
 
     .nav-tab {
@@ -521,8 +519,15 @@ body.light-theme .modal {
     }
 
     .nav-tab i {
-        width: 18px !important;
-        height: 18px !important;
+    font-size: 22px;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-tab.active {
+        font-size: 18px !important;
     }
 
     .user-button {
@@ -534,7 +539,7 @@ body.light-theme .modal {
     }
 
     .user-name,
-    .user-button i[data-lucide="chevron-down"] {
+    .user-button i.fa-chevron-down {
         display: none !important;
     }
 
@@ -560,8 +565,7 @@ body.light-theme .modal {
     }
 
     .brand-icon i {
-        width: 22px !important;
-        height: 22px !important;
+        font-size: 22px !important;
     }
 
     .user-avatar {

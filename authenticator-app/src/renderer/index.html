@@ -17,8 +17,8 @@
         }
     </style>
     
-    <!-- Lucide Icons (Local) -->
-    <script src="js/vendor/lucide.min.js"></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- CSS Architecture -->
     <link rel="stylesheet" href="css/themes.css">
@@ -51,10 +51,10 @@
     <div id="auth-vessel" class="modal-overlay show">
         <div class="auth-container animate-fade-in">
             <button id="btn-auth-close" class="auth-close-btn" title="Exit Application">
-                <i data-lucide="x"></i>
+                <i class="fa-solid fa-xmark"></i>
             </button>
             <button id="btn-auth-back" class="auth-back-btn hidden" title="Back to Login">
-                <i data-lucide="arrow-left"></i>
+                <i class="fa-solid fa-arrow-left"></i>
             </button>
             <div class="auth-container-scrollable">
                 <div class="auth-header">
@@ -188,7 +188,7 @@
                     <div class="bento-item bento-status">
                         <div class="bento-item-label">SYSTEM STATUS</div>
                         <div class="bento-item-value success-text">
-                            <i data-lucide="check-circle-2"></i>
+                            <i class="fa-solid fa-circle-check"></i>
                             RUNNING WELL
                         </div>
                         <div class="bento-item-hint">PROTECTION IS ON</div>
@@ -229,11 +229,11 @@
                 <div class="navbar-section navbar-center">
                     <nav class="nav-tabs">
                         <button class="nav-tab active" data-tab="vault">
-                            <i data-lucide="archive" style="width: 20px; height: 20px;"></i>
+                            <i class="fa-solid fa-box-archive"></i>
                             <span>My Vault</span>
                         </button>
                         <button class="nav-tab" data-tab="settings">
-                            <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+                            <i class="fa-solid fa-gear"></i>
                             <span>Settings</span>
                         </button>
                     </nav>
@@ -253,7 +253,7 @@
                                 <span id="navbar-avatar-initials">?</span>
                             </div>
                             <span class="user-name" id="user-name-display">User</span>
-                            <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
+                            <i class="fa-solid fa-chevron-down"></i>
                         </button>
                         
                         <div class="dropdown-menu" id="user-dropdown">
@@ -262,25 +262,25 @@
                                 <div class="dropdown-user-email" id="dropdown-user-email">Secure Session</div>
                             </div>
                             <div class="dropdown-item" id="account-settings-btn">
-                                <i data-lucide="user" style="width: 18px; height: 18px;"></i>
+                                <i class="fa-solid fa-user"></i>
                                 <span>Account</span>
                             </div>
                             <div class="dropdown-item" id="lock-vault-btn">
 
-                                <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
+                                <i class="fa-solid fa-lock"></i>
                                 <span>Lock Vault</span>
                             </div>
                             <div class="dropdown-item" id="theme-toggle-btn">
-                                <i id="theme-icon-lucide" data-lucide="moon" style="width: 18px; height: 18px;"></i>
+                                <i id="theme-icon-fa" class="fa-solid fa-moon"></i>
                                 <span id="theme-text">Dark Mode</span>
                             </div>
                             <div class="dropdown-item hidden" id="menu-close-app-btn">
-                                <i data-lucide="x-circle" style="width: 18px; height: 18px;"></i>
+                                <i class="fa-solid fa-circle-xmark"></i>
                                 <span>Close App</span>
                             </div>
                             <div class="dropdown-divider"></div>
                             <div class="dropdown-item danger" id="btn-logout-trigger">
-                                <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+                                <i class="fa-solid fa-right-from-bracket"></i>
                                 <span>Sign Out</span>
                             </div>
                         </div>
@@ -289,7 +289,7 @@
                     <!-- Scientific & Cute Window Controls -->
                     <div class="window-controls">
                         <button id="btn-close-app" class="btn-control btn-close" title="Close App">
-                            <i data-lucide="x"></i>
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                 </div>
@@ -307,11 +307,11 @@
                     </div>
                     <div class="search-add-group">
                         <div class="search-vessel">
-                            <i data-lucide="search" class="search-icon"></i>
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
                             <input type="text" id="vault-search" class="search-input" placeholder="Search your accounts...">
                         </div>
                         <button class="btn-primary" id="add-account-btn">
-                            <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                            <i class="fa-solid fa-plus"></i>
                             <span>Add Account</span>
                         </button>
                     </div>
@@ -324,11 +324,11 @@
                 <!-- Empty State (No Accounts) -->
                 <div id="empty-state" class="hidden">
                         <div class="empty-state-vessel">
-                        <i data-lucide="fingerprint" style="width: 100px; height: 100px; opacity: 0.8;"></i>
+                        <i class="fa-solid fa-fingerprint empty-state-icon"></i>
                         <h2>Your Vault is Empty</h2>
                         <p>Add your first account to get started.</p>
                         <button class="btn-primary" id="empty-add-btn">
-                            <i data-lucide="plus" style="width: 24px; height: 24px;"></i>
+                            <i class="fa-solid fa-plus"></i>
                             <span>Add Account</span>
                         </button>
                     </div>
@@ -338,7 +338,7 @@
                 <div id="search-empty-state" class="hidden">
                     <div class="empty-state-vessel nm-search-empty-state">
                         <div class="nm-search-icon-vessel">
-                            <i data-lucide="search-x"></i>
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
                         </div>
                         <h2>No Results Found</h2>
                         <p>We couldn't find what you're looking for. Try a different search.</p>
@@ -361,7 +361,7 @@
                 <div class="account-card bento-card">
                     <div class="bento-header">
                         <div class="bento-icon">
-                            <i data-lucide="shield-check" style="color: var(--accent-primary);"></i>
+                            <i class="fa-solid fa-shield-halved" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Security</h3>
@@ -376,7 +376,7 @@
                             </div>
                             <div id="pin-status-badge"></div>
                             <button class="btn-icon danger hidden" id="remove-pin-btn" title="Remove Security Policy" style="margin-right: 8px;">
-                                <i data-lucide="trash-2" style="width: 18px; height: 18px;"></i>
+                                <i class="fa-solid fa-trash-can"></i>
                             </button>
                             <button class="user-button" id="setup-pin-btn" style="min-width: 100px; justify-content: center;">Setup</button>
                         </div>
@@ -430,7 +430,7 @@
                 <div class="account-card bento-card">
                     <div class="bento-header">
                         <div class="bento-icon">
-                            <i data-lucide="palette" style="color: hsl(280, 100%, 75%);"></i>
+                            <i class="fa-solid fa-palette" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Look & Feel</h3>
@@ -551,7 +551,7 @@
                 <div class="account-card bento-card">
                     <div class="bento-header">
                         <div class="bento-icon">
-                            <i data-lucide="monitor" style="color: var(--accent-primary);"></i>
+                            <i class="fa-solid fa-desktop" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">System Integration</h3>
@@ -596,7 +596,7 @@
                 <div class="account-card bento-card">
                     <div class="bento-header">
                         <div class="bento-icon">
-                            <i data-lucide="refresh-cw" style="color: var(--accent-primary);"></i>
+                            <i class="fa-solid fa-arrows-rotate" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Software Update</h3>
@@ -623,15 +623,15 @@
                             </div>
 
                             <button class="btn-primary" id="btn-check-updates" style="width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+                                <i class="fa-solid fa-magnifying-glass"></i>
                                 <span style="font-weight: 800;">Check for Updates</span>
                             </button>
                             <button class="btn-primary hidden" id="btn-download-update" style="width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                                <i class="fa-solid fa-download"></i>
                                 <span style="font-weight: 800;">Download v1.1.0</span>
                             </button>
                             <button class="btn-primary hidden" id="btn-install-update" style="width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <i data-lucide="zap" style="width: 16px; height: 16px;"></i>
+                                <i class="fa-solid fa-bolt"></i>
                                 <span style="font-weight: 800;">Restart & Install</span>
                             </button>
                         </div>
@@ -642,7 +642,7 @@
                 <div class="account-card bento-card">
                     <div class="bento-header">
                         <div class="bento-icon">
-                            <i data-lucide="cloud" style="color: var(--accent-primary);"></i>
+                            <i class="fa-solid fa-cloud" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Cloud Sync</h3>
@@ -666,12 +666,12 @@
                                 <div class="setting-desc" id="sync-status-desc">All set!</div>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px; color: #28a745; font-size: 13px; font-weight: 800;">
-                                <i data-lucide="check-circle" style="width: 16px; height: 16px;"></i>
+                                <i class="fa-solid fa-circle-check"></i>
                                 ACTIVE
                             </div>
                         </div>
                         <button class="btn-sync-premium" id="btn-sync-now">
-                            <i data-lucide="refresh-cw"></i>
+                            <i class="fa-solid fa-arrows-rotate"></i>
                             <span>Sync Now</span>
                         </button>
                     </div>
@@ -681,7 +681,7 @@
                 <div class="account-card bento-card">
                     <div class="bento-header">
                         <div class="bento-icon">
-                            <i data-lucide="shield" style="color: var(--accent-primary);"></i>
+                            <i class="fa-solid fa-shield" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
                             <h3 class="bento-title">Maintenance</h3>
@@ -690,16 +690,16 @@
                     </div>
                     <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
                         <button class="btn-primary btn-maintenance" id="btn-export-vault">
-                            <i data-lucide="download"></i>
+                            <i class="fa-solid fa-download"></i>
                             <span>Backup Vault</span>
                         </button>
                         <button class="btn-primary btn-maintenance" id="btn-import-vault">
-                            <i data-lucide="upload"></i>
+                            <i class="fa-solid fa-upload"></i>
                             <span>Restore Vault</span>
                         </button>
                     </div>
                     <div style="margin-top: 12px; font-size: 11.5px; opacity: 0.6; font-weight: 600; line-height: 1.5;">
-                        <i data-lucide="alert-circle" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 4px;"></i>
+                        <i class="fa-solid fa-circle-exclamation footer-info-icon"></i>
                         Backups are protected by your master password.
                     </div>
                 </div>
@@ -727,7 +727,7 @@
                                     <span id="acc-initials">--</span>
                                 </div>
                                 <button id="btn-change-avatar" style="position: absolute; bottom: -5px; right: -5px; width: 32px; height: 32px; border-radius: 50%; background: var(--nm-surface); box-shadow: var(--nm-shadow-out); border: none; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition-fast);">
-                                    <i data-lucide="camera" style="width: 14px; height: 14px;"></i>
+                                    <i class="fa-solid fa-camera"></i>
                                 </button>
                             </div>
                             <div class="profile-details">
@@ -740,7 +740,7 @@
                         <!-- Pending Email Action (If exists) -->
                         <div id="pending-email-action-box" class="pending-sync-box hidden" style="background: var(--accent-soft); padding: 16px; border-radius: var(--radius-lg); border-left: 4px solid var(--accent-primary); margin-top: 16px;">
                             <div class="sync-info" style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                                <i data-lucide="mail-warning" style="color: var(--accent-primary);"></i>
+                                <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-primary);"></i>
                                 <div>
                                     <strong style="display: block; font-size: 14px;">Verify your Email</strong>
                                     <p id="pending-email-text" style="font-size: 13px; opacity: 0.8;">Confirming your new email address.</p>
@@ -757,7 +757,7 @@
                     <div class="account-card bento-card">
                         <div class="bento-header">
                             <div class="bento-icon">
-                                <i data-lucide="user-plus" style="color: var(--accent-primary);"></i>
+                                <i class="fa-solid fa-user-plus" style="color: var(--accent-primary);"></i>
                             </div>
                             <div class="bento-title-vessel">
                                 <h3 class="bento-title">Display Name</h3>
@@ -774,7 +774,7 @@
                     <div class="account-card bento-card">
                         <div class="bento-header">
                             <div class="bento-icon">
-                                <i data-lucide="mail" style="color: var(--accent-primary);"></i>
+                                <i class="fa-solid fa-envelope" style="color: var(--accent-primary);"></i>
                             </div>
                             <div class="bento-title-vessel">
                                 <h3 class="bento-title">Email Address</h3>
@@ -791,7 +791,7 @@
                     <div class="account-card bento-card danger-zone" style="border-color: #ff444433;">
                         <div class="bento-header">
                             <div class="bento-icon">
-                                <i data-lucide="shield-alert" style="color: #ff4444;"></i>
+                                <i class="fa-solid fa-shield-virus" style="color: #ff4444;"></i>
                             </div>
                             <div class="bento-title-vessel">
                                 <h3 class="bento-title danger" style="color: #ff4444;">Master Password</h3>
@@ -810,7 +810,7 @@
                     <div class="account-card bento-card">
                         <div class="bento-header">
                             <div class="bento-icon">
-                                <i data-lucide="smartphone" style="color: var(--accent-primary);"></i>
+                                <i class="fa-solid fa-mobile-screen-button" style="color: var(--accent-primary);"></i>
                             </div>
                             <div class="bento-title-vessel">
                                 <h3 class="bento-title">Phone Security</h3>
@@ -833,7 +833,7 @@
                                     <input type="tel" id="new-phone" class="form-input" placeholder="+1 234 567 8900" required style="width: 100%; height: 44px; margin: 0;">
                                 </div>
                                 <button type="submit" id="btn-request-phone" class="btn-primary" style="height: 44px; padding: 0 16px; white-space: nowrap; flex-shrink: 0;">
-                                    <i data-lucide="qr-code" style="width: 16px; height: 16px; margin-right: 6px;"></i>
+                                    <i class="fa-solid fa-qrcode icon-left"></i>
                                     Verify
                                 </button>
                             </form>
@@ -842,7 +842,7 @@
                             <div id="phone-verify-action-box" class="pending-sync-box hidden" style="background: var(--nm-surface); padding: 20px; border-radius: var(--radius-lg); box-shadow: var(--nm-shadow-out-sm); margin-top: 20px; border: 1px solid rgba(128,128,128,0.05);">
                                 <div class="sync-info" style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
                                     <div style="width: 40px; height: 40px; background: rgba(var(--accent-rgb), 0.1); color: var(--accent-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);">
-                                        <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+                                        <i class="fa-solid fa-shield-halved"></i>
                                     </div>
                                     <div>
                                         <strong style="display: block; font-size: 14px; font-weight: 850; color: var(--text-primary); margin-bottom: 2px;">Finish Verification</strong>
@@ -850,14 +850,14 @@
                                     </div>
                                 </div>
                                 <button class="btn-primary" id="btn-verify-now" style="width: 100%; height: 44px; font-size: 13.5px; justify-content: center;">
-                                    <i data-lucide="qr-code" style="width: 16px; margin-right: 8px;"></i>
+                                    <i class="fa-solid fa-qrcode icon-left"></i>
                                     Show QR Code
                                 </button>
                             </div>
                             
                             <!-- Refined Remove Ghost Button -->
                             <button class="user-button hidden" id="btn-remove-phone" style="width: 100%; margin-top: 12px; justify-content: center; height: 42px; font-size: 12.5px; color: #ff3b30; font-weight: 700; background: transparent; border: none; box-shadow: none;">
-                                <i data-lucide="trash-2" style="width: 14px; margin-right: 6px; opacity: 0.8;"></i>
+                                <i class="fa-solid fa-trash-can icon-left" style="opacity: 0.8;"></i>
                                 Remove Number
                             </button>
 
@@ -881,7 +881,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <div class="modal-icon-vessel danger">
-                            <i data-lucide="log-out"></i>
+                            <i class="fa-solid fa-right-from-bracket"></i>
                         </div>
                         <div class="modal-title-vessel">
                             <h2 class="danger">Sign Out?</h2>
@@ -892,7 +892,7 @@
                     <div class="modal-body">
                         <div class="modal-entity-badge">
                             <div class="entity-icon">
-                                <i data-lucide="shield-check"></i>
+                                <i class="fa-solid fa-shield-halved"></i>
                             </div>
                             <div class="entity-info">
                                 <span class="entity-name">Your Keyra Vault</span>
@@ -903,7 +903,7 @@
                     </div>
                     <div class="modal-footer">
                         <button class="btn-danger" id="btn-confirm-logout">
-                            <i data-lucide="log-out"></i>
+                            <i class="fa-solid fa-right-from-bracket"></i>
                             Sign Out
                         </button>
                         <button class="user-button" id="btn-cancel-logout" style="justify-content: center;">Stay Signed In</button>
@@ -918,7 +918,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <div class="modal-icon-vessel">
-                            <i data-lucide="mail-check"></i>
+                            <i class="fa-solid fa-envelope-circle-check"></i>
                         </div>
                         <div class="modal-title-vessel">
                             <h2>Check your Email</h2>
@@ -956,7 +956,7 @@
                 <div class="modal-content" style="padding: 0;">
                     <div class="modal-header" style="text-align: center; display: block; padding: 0 0 16px 0; border-bottom: none;">
                         <div class="modal-icon-vessel" style="background: var(--nm-surface); color: var(--accent-primary); box-shadow: var(--nm-shadow-out-sm); margin: 0 auto 16px;">
-                            <i data-lucide="shield-check"></i>
+                            <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <h2 id="phone-qr-title" style="font-size: 24px; letter-spacing: -0.5px; font-weight: 850;">Secure Verification</h2>
                         <p id="phone-qr-subtitle" style="font-size: 13.5px; opacity: 0.7; font-weight: 600; margin-top: 4px;">Connect your WhatsApp to confirm your identity</p>
@@ -986,14 +986,14 @@
 
                         <!-- Inline Error Container with Smooth Scale -->
                         <div id="wa-qr-error" class="hidden" style="width: 100%; margin-bottom: 16px; padding: 14px; background: rgba(255, 59, 48, 0.08); border: 1px solid rgba(255, 59, 48, 0.15); border-radius: var(--radius-md); text-align: center; display: flex; align-items: center; gap: 10px; justify-content: center;">
-                            <i data-lucide="alert-triangle" style="color: #ff3b30; width: 18px; height: 18px; flex-shrink: 0;"></i>
+                            <i class="fa-solid fa-triangle-exclamation danger-text"></i>
                             <span id="wa-qr-error-text" style="font-size: 12.5px; font-weight: 700; color: #ff3b30; line-height: 1.4;"></span>
                         </div>
 
                         <!-- Requirement Callout Container -->
                         <div style="width: 100%; padding: 16px 20px; background: var(--bg-primary); border-radius: var(--radius-lg); box-shadow: var(--nm-shadow-in); text-align: left; display: flex; align-items: flex-start; gap: 14px; border: 1px solid rgba(128, 128, 128, 0.05);">
                             <div style="width: 36px; height: 36px; background: rgba(37, 211, 102, 0.1); color: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);">
-                                <i data-lucide="info" style="width: 18px; height: 18px;"></i>
+                                <i class="fa-solid fa-circle-info"></i>
                             </div>
                             <div>
                                 <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">Important Requirement</div>
@@ -1020,7 +1020,7 @@
         
         <!-- Premium Syncing Indicator (Floating Pill) -->
         <div id="cloud-sync-indicator" class="cloud-sync-pill hidden">
-            <i data-lucide="refresh-cw" class="sync-icon"></i>
+            <i class="fa-solid fa-arrows-rotate sync-icon"></i>
             <span>Backing up...</span>
         </div>
     </div>
@@ -1029,7 +1029,7 @@
     <div id="lock-vessel" class="modal-overlay pin-overlay">
         <div class="pin-vessel animate-fade-in">
             <button id="btn-lock-close" class="auth-close-btn" title="Exit Application">
-                <i data-lucide="x"></i>
+                <i class="fa-solid fa-xmark"></i>
             </button>
 
             <!-- User Identity Section -->
@@ -1061,7 +1061,7 @@
                 <div class="pin-helper">Secure 4-Digit Master Code</div>
                 
                 <button type="submit" class="btn-primary pin-submit-btn">
-                    <i data-lucide="shield-check"></i>
+                    <i class="fa-solid fa-shield-halved"></i>
                     Confirm Identity
                 </button>
             </form>
@@ -1082,11 +1082,6 @@
 
     <!-- Scripts -->
     <script type="module" src="js/app.js"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.lucide) window.lucide.createIcons();
-        });
-    </script>
     <!-- Dynamic Grain Layer (CSS Optimized) -->
     <div class="grain-overlay"></div>
 </body>

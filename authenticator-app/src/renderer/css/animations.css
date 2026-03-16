@@ -176,7 +176,6 @@
 }
 
 .privacy-shield-icon i {
-    width: 64px;
-    height: 64px;
+    font-size: 64px;
     color: white;
 }

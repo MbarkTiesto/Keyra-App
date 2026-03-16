@@ -415,12 +415,13 @@ export class UIManager {
 
         this.updateSegmentedUI('theme-segmented', theme);
 
-        const themeIcon = document.getElementById('theme-icon-lucide');
+        const themeIcon = document.getElementById('theme-icon-fa');
         const themeText = document.getElementById('theme-text');
-        if (themeIcon) themeIcon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+        if (themeIcon) {
+            themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
         if (themeText) themeText.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
 
-        this.refreshLucide();
         if (!silent) this.pushSettings();
     }
 
@@ -531,7 +532,6 @@ export class UIManager {
         if (navBtn) navBtn.classList.toggle('hidden', this.menuExitIntegration);
         if (menuBtn) {
             menuBtn.classList.toggle('hidden', !this.menuExitIntegration);
-            this.refreshLucide(); // Re-render icon if it was hidden
         }
     }
 
@@ -578,7 +578,6 @@ export class UIManager {
             const overlay = document.getElementById('privacy-blur-overlay');
             if (overlay) {
                 overlay.classList.add('show');
-                this.refreshLucide();
             } else {
                 console.error("[Privacy] Overlay element NOT FOUND");
             }
@@ -670,7 +669,6 @@ export class UIManager {
 
         document.getElementById('btn-logout-trigger')?.addEventListener('click', () => {
             document.getElementById('modal-logout')?.classList.add('show');
-            this.refreshLucide();
         });
 
         // Logout Confirmation
@@ -868,8 +866,6 @@ export class UIManager {
         const savedAccent = localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple';
         this.setAccentColor(savedAccent, true);
 
-        window.addEventListener('resize', this.debounce(() => this.refreshLucide(), 250));
-
         // About Modal
         const brandBtn = document.getElementById('navbar-brand');
         const aboutModal = document.getElementById('about-modal');
@@ -979,7 +975,6 @@ export class UIManager {
                         modal.classList.add('show');
                     }
                     this.startEmailResendTimer();
-                    this.refreshLucide();
                     await this.loadAccountInfo();
                 } else {
                     this.showToast(res.message, "error");
@@ -1002,7 +997,6 @@ export class UIManager {
                         modal.classList.add('show');
                     }
                     this.startEmailResendTimer();
-                    this.refreshLucide();
                     this.showToast("New code sent", "success");
                 } else {
                     this.showToast(res.message, "error");
@@ -1260,8 +1254,6 @@ export class UIManager {
             badge?.classList.add('hidden');
             actionBox?.classList.add('hidden');
         }
-
-        this.refreshLucide();
     }
 
 
@@ -1271,7 +1263,6 @@ export class UIManager {
             modal.classList.remove('hidden');
             modal.classList.add('show');
             this.updateLastActivityDisplay();
-            this.refreshLucide();
         }
     }
 
@@ -1413,8 +1404,6 @@ export class UIManager {
         } else if (tab === 'settings') {
             this.updateLastActivityDisplay();
         }
-
-        this.refreshLucide();
     }
 
 
@@ -1467,7 +1456,6 @@ export class UIManager {
                 });
             });
         }
-        this.refreshLucide();
     }
 
     private createAccountCard(account: any, index: number): HTMLElement {
@@ -1478,27 +1466,27 @@ export class UIManager {
         card.innerHTML = `
             <div class="account-header">
                 <div class="account-icon">
-                    <i data-lucide="${this.getIcon(account.issuer)}"></i>
+                    <i class="${this.getIcon(account.issuer)}"></i>
                 </div>
                 <div class="account-info">
                     <div class="service-name">${account.issuer}</div>
                     <div class="account-identity">${account.account}</div>
                 </div>
                 <div class="card-actions">
-                    <button class="btn-card-more" title="More Options">
-                        <i data-lucide="more-vertical"></i>
-                    </button>
-                    <div class="card-dropdown">
-                        <div class="card-dropdown-item edit-btn">
-                            <i data-lucide="edit-3"></i>
-                            <span>Edit</span>
-                        </div>
-                        <div class="card-dropdown-item danger delete-btn">
-                            <i data-lucide="trash-2"></i>
-                            <span>Remove</span>
-                        </div>
+                <button class="btn-card-more">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="card-dropdown">
+                    <div class="card-dropdown-item edit-btn">
+                        <i class="fa-solid fa-pen-to-square icon-left"></i>
+                        <span>Edit</span>
+                    </div>
+                    <div class="card-dropdown-item danger delete-btn">
+                        <i class="fa-solid fa-trash-can icon-left"></i>
+                        <span>Delete</span>
                     </div>
                 </div>
+            </div>
             </div>
             
             <div class="otp-hero">
@@ -1512,7 +1500,7 @@ export class UIManager {
 
             <div class="card-footer" style="padding: 0;">
                 <button class="btn-primary copy-btn" style="width: 100%;">
-                    <i data-lucide="copy"></i>
+                    <i class="fa-solid fa-copy icon-left"></i>
                     <span>Copy Code</span>
                 </button>
             </div>
@@ -1635,20 +1623,20 @@ export class UIManager {
         
         // 1. Precise Brand Mapping (Top Tier)
         const icons: { [key: string]: string } = {
-            'google': 'search', 'github': 'github', 'microsoft': 'cloud', 'apple': 'apple',
-            'amazon': 'shopping-cart', 'facebook': 'facebook', 'twitter': 'twitter', 'discord': 'message-square',
-            'binance': 'coins', 'coinbase': 'wallet', 'stripe': 'credit-card', 'paypal': 'dollar-sign',
-            'slack': 'slack', 'instagram': 'instagram', 'linkedin': 'linkedin', 'twitch': 'twitch',
-            'spotify': 'music', 'netflix': 'tv', 'steam': 'gamepad-2', 'epic': 'gamepad',
-            'dropbox': 'box', 'figma': 'figma', 'canva': 'layout-template', 'adobe': 'pen-tool',
-            'shopify': 'shopping-bag', 'reddit': 'message-circle', 'bitbucket': 'bitbucket',
-            'gitlab': 'gitlab', 'heroku': 'server', 'digitalocean': 'clouds', 'cloudflare': 'shield-check',
-            'vercel': 'triangle', 'netlify': 'globe', 'firebase': 'flame', 'wordpress': 'globe-2',
-            'medium': 'book-open', 'patreon': 'heart', 'discordapp': 'message-square',
-            'protonmail': 'mail', 'nordvpn': 'shield', 'expressvpn': 'shield-alert',
-            'bitwarden': 'lock', '1password': 'key', 'lastpass': 'key-round',
-            'uber': 'car', 'lyft': 'car-front', 'airbnb': 'home', 'notion': 'file-text',
-            'zoom': 'video', 'trello': 'columns', 'asana': 'check-square', 'clickup': 'layers'
+            'google': 'fa-brands fa-google', 'github': 'fa-brands fa-github', 'microsoft': 'fa-brands fa-microsoft', 'apple': 'fa-brands fa-apple',
+            'amazon': 'fa-brands fa-amazon', 'facebook': 'fa-brands fa-facebook', 'twitter': 'fa-brands fa-twitter', 'discord': 'fa-brands fa-discord',
+            'binance': 'fa-solid fa-coins', 'coinbase': 'fa-solid fa-wallet', 'stripe': 'fa-brands fa-stripe', 'paypal': 'fa-brands fa-paypal',
+            'slack': 'fa-brands fa-slack', 'instagram': 'fa-brands fa-instagram', 'linkedin': 'fa-brands fa-linkedin', 'twitch': 'fa-brands fa-twitch',
+            'spotify': 'fa-brands fa-spotify', 'netflix': 'fa-solid fa-tv', 'steam': 'fa-brands fa-steam', 'epic': 'fa-solid fa-gamepad',
+            'dropbox': 'fa-brands fa-dropbox', 'figma': 'fa-brands fa-figma', 'canva': 'fa-solid fa-palette', 'adobe': 'fa-solid fa-pen-nib',
+            'shopify': 'fa-brands fa-shopify', 'reddit': 'fa-brands fa-reddit', 'bitbucket': 'fa-brands fa-bitbucket',
+            'gitlab': 'fa-brands fa-gitlab', 'heroku': 'fa-solid fa-server', 'digitalocean': 'fa-brands fa-digital-ocean', 'cloudflare': 'fa-brands fa-cloudflare',
+            'vercel': 'fa-solid fa-triangle-exclamation', 'netlify': 'fa-solid fa-globe', 'firebase': 'fa-solid fa-flame', 'wordpress': 'fa-brands fa-wordpress',
+            'medium': 'fa-brands fa-medium', 'patreon': 'fa-brands fa-patreon', 'discordapp': 'fa-brands fa-discord',
+            'protonmail': 'fa-solid fa-envelope', 'nordvpn': 'fa-solid fa-shield-halved', 'expressvpn': 'fa-solid fa-shield-halved',
+            'bitwarden': 'fa-solid fa-lock', '1password': 'fa-solid fa-key', 'lastpass': 'fa-solid fa-key',
+            'uber': 'fa-brands fa-uber', 'lyft': 'fa-solid fa-car', 'airbnb': 'fa-brands fa-airbnb', 'notion': 'fa-solid fa-file-lines',
+            'zoom': 'fa-solid fa-video', 'trello': 'fa-brands fa-trello', 'asana': 'fa-solid fa-list-check', 'clickup': 'fa-solid fa-layer-group'
         };
 
         if (icons[name]) return icons[name];
@@ -1656,36 +1644,36 @@ export class UIManager {
         // 2. Keyword-based Fuzzy Matching (Intelligent Heuristics)
         const keywords: [string | RegExp, string][] = [
             // Cloud & Infrastructure
-            [/aws|amazon|cloud/i, 'cloud'],
-            [/azure|microsoft/i, 'cloud'],
-            [/server|host|vps|deploy/i, 'server'],
-            [/db|database|mongo|sql|redis/i, 'database'],
+            [/aws|amazon|cloud/i, 'fa-solid fa-cloud'],
+            [/azure|microsoft/i, 'fa-brands fa-microsoft'],
+            [/server|host|vps|deploy/i, 'fa-solid fa-server'],
+            [/db|database|mongo|sql|redis/i, 'fa-solid fa-database'],
             
             // Communication & Social
-            [/mail|email|outlook|gmail/i, 'mail'],
-            [/chat|message|messenger|slack|discord/i, 'message-square'],
-            [/social|network|brand/i, 'share-2'],
+            [/mail|email|outlook|gmail/i, 'fa-solid fa-envelope'],
+            [/chat|message|messenger|slack|discord/i, 'fa-solid fa-comment-dots'],
+            [/social|network|brand/i, 'fa-solid fa-share-nodes'],
             
             // Finance
-            [/bank|finance|money|wallet|pay/i, 'wallet'],
-            [/crypto|coin|token|eth|btc/i, 'coins'],
-            [/card|credit|debit/i, 'credit-card'],
+            [/bank|finance|money|wallet|pay/i, 'fa-solid fa-wallet'],
+            [/crypto|coin|token|eth|btc/i, 'fa-solid fa-coins'],
+            [/card|credit|debit/i, 'fa-solid fa-credit-card'],
             
             // Security & Dev
-            [/auth|security|protect|shield|vault/i, 'shield-check'],
-            [/key|password|pass|login|access/i, 'key'],
-            [/code|dev|git|build|repo/i, 'code-2'],
-            [/api|endpoint|webhook/i, 'webhook'],
+            [/auth|security|protect|shield|vault/i, 'fa-solid fa-shield-halved'],
+            [/key|password|pass|login|access/i, 'fa-solid fa-key'],
+            [/code|dev|git|build|repo/i, 'fa-solid fa-code'],
+            [/api|endpoint|webhook/i, 'fa-solid fa-link'],
             
             // Media & Entertainment
-            [/video|movie|tv|stream|netflix|yt|youtube/i, 'video'],
-            [/music|audio|song|sound/i, 'music'],
-            [/game|play|epic|xbox|psn/i, 'gamepad-2'],
+            [/video|movie|tv|stream|netflix|yt|youtube/i, 'fa-solid fa-video'],
+            [/music|audio|song|sound/i, 'fa-solid fa-music'],
+            [/game|play|epic|xbox|psn/i, 'fa-solid fa-gamepad'],
             
             // Business & Identity
-            [/shop|store|cart|ebay|buy/i, 'shopping-cart'],
-            [/user|account|profile|id/i, 'user'],
-            [/work|corp|company|office/i, 'briefcase']
+            [/shop|store|cart|ebay|buy/i, 'fa-solid fa-cart-shopping'],
+            [/user|account|profile|id/i, 'fa-solid fa-user'],
+            [/work|corp|company|office/i, 'fa-solid fa-briefcase']
         ];
 
         for (const [pattern, icon] of keywords) {
@@ -1694,7 +1682,7 @@ export class UIManager {
         }
 
         // 3. Last Resort Fallback
-        return 'shield';
+        return 'fa-solid fa-shield';
     }
 
     private showModal(content: string) {
@@ -1702,7 +1690,6 @@ export class UIManager {
         if (!overlay) return;
         overlay.innerHTML = `<div class="modal animate-fade-in">${content}</div>`;
         overlay.classList.add('show');
-        this.refreshLucide();
     }
 
     public hideModal() {
@@ -1716,12 +1703,11 @@ export class UIManager {
     public showToast(message: string, type: 'info' | 'success' | 'error' = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
-        const iconMap = { success: 'check-circle', error: 'alert-circle', info: 'bell' };
+        const iconMap = { success: 'fa-solid fa-circle-check', error: 'fa-solid fa-circle-exclamation', info: 'fa-solid fa-bell' };
         const toast = document.createElement('div');
         toast.className = 'toast ' + type;
-        toast.innerHTML = `<i class="toast-icon" data-lucide="${iconMap[type]}"></i><span>${message}</span>`;
+        toast.innerHTML = `<i class="toast-icon ${iconMap[type]}"></i><span>${message}</span>`;
         container.appendChild(toast);
-        this.refreshLucide();
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateY(8px) scale(0.95)';
@@ -1773,7 +1759,6 @@ export class UIManager {
 
             vessel.classList.add('show');
             document.body.classList.add('vault-is-locked');
-            this.refreshLucide();
             const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
             if (pinIn) { pinIn.value = ''; pinIn.focus(); }
         }
@@ -1856,7 +1841,6 @@ export class UIManager {
 
         if (removeBtn) {
             removeBtn.classList.toggle('hidden', !hasPin);
-            this.refreshLucide();
         }
     }
 
@@ -1865,7 +1849,7 @@ export class UIManager {
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel danger">
-                        <i data-lucide="shield-off"></i>
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <div class="modal-title-vessel">
                         <h2 class="danger">Deactivate Security?</h2>
@@ -1876,7 +1860,7 @@ export class UIManager {
                 <div class="modal-body">
                     <div class="modal-entity-badge">
                         <div class="entity-icon">
-                            <i data-lucide="lock"></i>
+                            <i class="fa-solid fa-lock"></i>
                         </div>
                         <div class="entity-info">
                             <span class="entity-name">Master PIN Policy</span>
@@ -1887,7 +1871,7 @@ export class UIManager {
                 </div>
                 <div class="modal-footer">
                     <button class="btn-danger" id="confirm-remove-pin">
-                        <i data-lucide="trash-2"></i>
+                        <i class="fa-solid fa-trash-can"></i>
                         Remove Security
                     </button>
                     <button class="user-button" id="cancel-remove-pin" style="justify-content: center;">Keep PIN Active</button>
@@ -1906,9 +1890,6 @@ export class UIManager {
         document.getElementById('cancel-remove-pin')?.addEventListener('click', () => this.hideModal());
     }
 
-    private refreshLucide() {
-        if ((window as any).lucide) (window as any).lucide.createIcons();
-    }
 
     private debounce(func: Function, wait: number) {
         let timeout: any;
@@ -1928,7 +1909,7 @@ export class UIManager {
                 <div class="modal-content">
                     <div class="modal-header">
                         <div class="modal-icon-vessel">
-                            <i data-lucide="${isEntry ? 'shield-check' : 'check-circle'}"></i>
+                            <i class="fa-solid ${isEntry ? 'fa-shield-halved' : 'fa-circle-check'}"></i>
                         </div>
                         <div class="modal-title-vessel">
                             <h2>${isEntry ? 'Set Master PIN' : 'Verify PIN'}</h2>
@@ -1956,7 +1937,7 @@ export class UIManager {
                     </div>
                     <div class="modal-footer">
                         <button class="btn-primary" id="btn-next-step" disabled>
-                            <i data-lucide="${isEntry ? 'arrow-right' : 'shield-check'}"></i>
+                            <i class="fa-solid ${isEntry ? 'fa-arrow-right' : 'fa-shield-halved'}"></i>
                             ${isEntry ? 'Next Phase' : 'Activate Vault'}
                         </button>
                         <button class="user-button" id="cancel-pin-btn" style="justify-content: center;">Cancel</button>
@@ -1964,7 +1945,6 @@ export class UIManager {
                 </div>
             `;
             this.showModal(content);
-            this.refreshLucide();
 
             const input = document.getElementById('setup-pin-field') as HTMLInputElement;
             const dots = document.querySelectorAll('.pin-dot');
@@ -2012,7 +1992,7 @@ export class UIManager {
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel">
-                        <i data-lucide="plus-circle"></i>
+                        <i class="fa-solid fa-circle-plus"></i>
                     </div>
                     <div class="modal-title-vessel">
                         <h2>Add Token</h2>
@@ -2036,11 +2016,11 @@ export class UIManager {
                 </div>
                 <div class="modal-footer">
                     <button class="btn-primary" id="save-new-account">
-                        <i data-lucide="shield-plus"></i>
+                        <i class="fa-solid fa-shield-plus"></i>
                         Save Token
                     </button>
                     <button class="user-button" id="btn-scan-screen-trigger" style="justify-content: center; white-space: nowrap;">
-                        <i data-lucide="monitor"></i>
+                        <i class="fa-solid fa-desktop"></i>
                         Scan
                     </button>
                     <button class="user-button" id="cancel-add-btn" style="justify-content: center;">Cancel</button>
@@ -2077,7 +2057,7 @@ export class UIManager {
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel">
-                        <i data-lucide="settings-2"></i>
+                        <i class="fa-solid fa-sliders"></i>
                     </div>
                     <div class="modal-title-vessel">
                         <h2>Edit Identity</h2>
@@ -2088,7 +2068,7 @@ export class UIManager {
                 <div class="modal-body">
                     <div class="modal-entity-badge">
                         <div class="entity-icon">
-                            <i data-lucide="shield"></i>
+                            <i class="fa-solid fa-shield"></i>
                         </div>
                         <div class="entity-info">
                             <span class="entity-name">${account.issuer}</span>
@@ -2106,7 +2086,7 @@ export class UIManager {
                 </div>
                 <div class="modal-footer">
                     <button class="btn-primary" id="update-account">
-                        <i data-lucide="check"></i>
+                        <i class="fa-solid fa-check"></i>
                         Save Changes
                     </button>
                     <button class="user-button" id="cancel-edit-btn" style="justify-content: center;">Cancel</button>
@@ -2133,7 +2113,7 @@ export class UIManager {
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel danger">
-                        <i data-lucide="trash-2"></i>
+                        <i class="fa-solid fa-trash-can"></i>
                     </div>
                     <div class="modal-title-vessel">
                         <h2 class="danger">Delete Token?</h2>
@@ -2144,7 +2124,7 @@ export class UIManager {
                 <div class="modal-body">
                     <div class="modal-entity-badge">
                         <div class="entity-icon">
-                            <i data-lucide="shield"></i>
+                            <i class="fa-solid fa-shield"></i>
                         </div>
                         <div class="entity-info">
                             <span class="entity-name">${account.issuer}</span>
@@ -2155,7 +2135,7 @@ export class UIManager {
                 </div>
                 <div class="modal-footer">
                     <button class="btn-danger" id="confirm-delete">
-                        <i data-lucide="trash-2"></i>
+                        <i class="fa-solid fa-trash-can"></i>
                         Delete Token
                     </button>
                     <button class="user-button" id="cancel-delete-btn" style="justify-content: center;">Keep Token</button>
@@ -2179,7 +2159,7 @@ export class UIManager {
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-icon-vessel">
-                        <i data-lucide="upload"></i>
+                        <i class="fa-solid fa-upload"></i>
                     </div>
                     <div class="modal-title-vessel">
                         <h2>Restore Vault</h2>
@@ -2190,7 +2170,7 @@ export class UIManager {
                 <div class="modal-body">
                     <div class="modal-entity-badge">
                         <div class="entity-icon">
-                            <i data-lucide="hard-drive"></i>
+                            <i class="fa-solid fa-hard-drive"></i>
                         </div>
                         <div class="entity-info">
                             <span class="entity-name">Encrypted Backup</span>
@@ -2205,7 +2185,7 @@ export class UIManager {
                 </div>
                 <div class="modal-footer">
                     <button class="btn-primary" id="confirm-import">
-                        <i data-lucide="shield-check"></i>
+                        <i class="fa-solid fa-shield-halved"></i>
                         Restore Vault
                     </button>
                     <button class="user-button" id="cancel-import" style="justify-content: center;">Cancel</button>
@@ -2529,7 +2509,5 @@ export class UIManager {
                 }
             };
         }
-
-        this.refreshLucide();
     }
 }

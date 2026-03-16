@@ -144,8 +144,8 @@
     }
 }
 
-i[data-lucide] {
-    stroke-width: 2.2px;
+.fa-solid, .fa-brands, .fa-regular {
+    font-weight: 900;
 }
 
 /* Custom Logo System */
@@ -245,6 +245,13 @@ i[data-lucide] {
     transform: scale(0.97);
 }
 
+.user-button i {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .user-avatar {
     width: 30px;
     height: 30px;
@@ -277,7 +284,7 @@ i[data-lucide] {
     box-shadow: var(--nm-shadow-out);
     border: none;
     border-radius: var(--radius-xl);
-    padding: 12px;
+    padding: 8px 0;
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
@@ -296,6 +303,7 @@ i[data-lucide] {
     font-family: var(--font-main);
     padding: 16px 20px;
     border-bottom: 1px solid var(--border-color);
+    margin: 0 0 8px 0;
 }
 
 .dropdown-user-name {
@@ -317,14 +325,22 @@ i[data-lucide] {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 12px 20px;
+    margin: 0 8px 4px 8px;
     border-radius: var(--radius-md);
-    color: var(--text-primary);
+    color: var(--text-secondary);
     font-size: 13.5px;
-    font-weight: 700;
+    font-weight: 600;
     transition: all var(--transition-fast);
     cursor: pointer;
-    margin-bottom: 4px;
+}
+
+.dropdown-item i {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; /* Ensure uniform icon width in list */
 }
 
 .dropdown-item:hover {
@@ -332,6 +348,7 @@ i[data-lucide] {
     box-shadow: var(--nm-shadow-in-sm);
     color: var(--accent-primary);
     transform: scale(0.98);
+    font-weight: 700;
 }
 
 .dropdown-item:active {
@@ -419,10 +436,10 @@ body.dark-theme .dropdown-menu {
 }
 
 .account-icon {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     background: var(--nm-surface);
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -439,8 +456,11 @@ body.dark-theme .dropdown-menu {
 }
 
 .account-icon i {
-    width: 20px;
-    height: 20px;
+    font-size: 28px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .account-info {
@@ -545,8 +565,7 @@ body.dark-theme .dropdown-menu {
 }
 
 .card-dropdown-item i {
-    width: 16px;
-    height: 16px;
+    font-size: 16px;
 }
 
 .otp-hero {
@@ -627,9 +646,7 @@ body.dark-theme .dropdown-menu {
 }
 
 .btn-primary i {
-    width: 20px;
-    height: 20px;
-    stroke-width: 3px;
+    font-size: 20px;
 }
 
 .btn-primary:hover {
@@ -726,8 +743,7 @@ body.dark-theme .dropdown-menu {
 }
 
 .modal-icon-vessel i {
-    width: clamp(24px, 6vw, 30px);
-    height: clamp(24px, 6vw, 30px);
+    font-size: clamp(30px, 8vw, 36px);
 }
 
 /* Danger variant — used for delete, sign-out modals */
@@ -810,8 +826,7 @@ body.dark-theme .dropdown-menu {
 }
 
 .modal-entity-badge .entity-icon i {
-    width: 18px;
-    height: 18px;
+    font-size: 18px;
 }
 
 .modal-entity-badge .entity-info {
@@ -1083,8 +1098,10 @@ input:checked+.slider:before {
     left: 18px;
     top: 50%;
     transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--text-tertiary);
     opacity: 0.7;
     pointer-events: none;
@@ -1211,8 +1228,7 @@ input:checked+.slider:before {
 }
 
 .nm-search-icon-vessel i {
-    width: 40px;
-    height: 40px;
+    font-size: 40px;
     margin-bottom: 0 !important;
     filter: none !important;
     opacity: 0.8 !important;
@@ -1816,9 +1832,9 @@ body.light-theme .setting-row:hover {
 }
 
 .bento-icon {
-    width: clamp(44px, 12vw, 52px);
-    height: clamp(44px, 12vw, 52px);
-    border-radius: var(--radius-sm);
+    width: clamp(48px, 12vw, 56px);
+    height: clamp(48px, 12vw, 56px);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1830,8 +1846,11 @@ body.light-theme .setting-row:hover {
 }
 
 .bento-icon i {
-    width: clamp(20px, 5vw, 24px);
-    height: clamp(20px, 5vw, 24px);
+    font-size: 28px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .bento-title-vessel {
@@ -2158,10 +2177,12 @@ body.light-theme .setting-row:hover {
 }
 
 .btn-maintenance i {
-    width: clamp(18px, 4vw, 22px) !important;
-    height: clamp(18px, 4vw, 22px) !important;
+    font-size: 22px;
     margin-right: 12px;
     color: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-maintenance span {
@@ -2499,9 +2520,38 @@ body.light-theme .cloud-sync-pill {
 }
 
 .btn-close i {
-    width: 16px !important;
-    height: 16px !important;
-    stroke-width: 3.5px !important;
+    font-size: 16px;
+}
+
+/* Special Case Icons */
+.empty-state-icon {
+    font-size: 100px;
+    opacity: 0.8;
+    margin-bottom: 24px;
+}
+
+.footer-info-icon {
+    font-size: 12px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* Icon Spacing Utilities */
+.icon-left {
+    margin-right: 8px;
+}
+
+.icon-right {
+    margin-left: 8px;
+}
+
+/* Control Icons */
+#btn-change-avatar i {
+    font-size: 16px;
+}
+
+.modal-footer i {
+    font-size: 18px;
 }
 
 /* Responsive visibility */
@@ -2854,16 +2904,16 @@ body.light-theme .cloud-sync-pill {
 
 .auth-close-btn {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
+    top: 24px;
+    right: 24px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-out);
+    box-shadow: var(--nm-shadow-out-sm);
     border: none;
     cursor: pointer !important;
     color: var(--text-secondary);
@@ -2884,8 +2934,11 @@ body.light-theme .cloud-sync-pill {
 }
 
 .auth-close-btn i {
-    width: 18px;
-    height: 18px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
 }
 
 .auth-back-btn {
