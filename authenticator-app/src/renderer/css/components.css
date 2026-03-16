@@ -236,7 +236,7 @@ i[data-lucide] {
     font-weight: 800;
     font-size: 13px;
     color: var(--text-primary);
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out);
     transition: all var(--transition-fast);
 }
 
@@ -567,7 +567,8 @@ body.dark-theme .dropdown-menu {
     font-weight: 900;
     letter-spacing: 3px;
     color: var(--accent-primary);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-heading);
+    font-variant-numeric: tabular-nums;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -619,7 +620,7 @@ body.dark-theme .dropdown-menu {
     font-weight: 900;
     font-size: 15px;
     letter-spacing: 0.5px;
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out);
     position: relative;
     z-index: 1;
     transition: all var(--transition-fast);
@@ -716,7 +717,7 @@ body.dark-theme .dropdown-menu {
     height: clamp(52px, 12vw, 64px);
     border-radius: clamp(14px, 3.5vw, 18px);
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out); /* Deeper out shadow */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -735,7 +736,7 @@ body.dark-theme .dropdown-menu {
     background: var(--nm-surface);
     color: #ff3b30;
     box-shadow: 
-        var(--nm-shadow-out-sm),
+        var(--nm-shadow-in-sm), /* Inset for danger to feel pressed/recessed */
         0 0 0 4px rgba(255, 59, 48, 0.05); /* Very subtle danger glow */
 }
 
@@ -895,8 +896,9 @@ body.light-theme .modal-title-vessel p {
 
 [data-theme="light"] .modal-entity-badge,
 body.light-theme .modal-entity-badge {
-    background: #f1f3f4;
-    border-color: rgba(0, 0, 0, 0.08);
+    background: var(--nm-surface);
+    border: none;
+    box-shadow: var(--nm-shadow-in);
 }
 
 [data-theme="light"] .modal-entity-badge .entity-name,
@@ -911,7 +913,7 @@ body.light-theme .modal-entity-badge .entity-label {
 
 [data-theme="light"] .modal-divider,
 body.light-theme .modal-divider {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--nm-shadow-dark);
 }
 
 [data-theme="light"] .modal-help-text,
@@ -922,8 +924,8 @@ body.light-theme .modal-help-text {
 
 [data-theme="light"] .modal-content .form-input,
 body.light-theme .modal-content .form-input {
-    background: #f8f9fa;
-    border-color: rgba(0, 0, 0, 0.12);
+    background: var(--nm-surface);
+    border: none;
     color: #1a1a1a;
 }
 
@@ -940,8 +942,8 @@ body.light-theme .modal-content .form-label {
 
 [data-theme="light"] .user-button,
 body.light-theme .user-button {
-    background: #f1f3f4;
-    border-color: rgba(0, 0, 0, 0.10);
+    background: var(--nm-surface);
+    border: none;
     color: #1a1a1a;
 }
 
@@ -960,7 +962,7 @@ body.light-theme .user-button {
     font-weight: 850;
     font-size: 15px;
     letter-spacing: -0.2px;
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out);
     position: relative;
     z-index: 1;
     transition: all var(--transition-medium);
@@ -976,7 +978,7 @@ body.light-theme .user-button {
 
 .btn-danger:active {
     transform: scale(0.97);
-    box-shadow: var(--nm-shadow-in-sm);
+    box-shadow: var(--nm-shadow-in);
 }
 
 .btn-icon {
@@ -989,7 +991,7 @@ body.light-theme .user-button {
     color: var(--text-secondary);
     background: var(--nm-surface);
     border: none;
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out);
     transition: all var(--transition-medium);
     cursor: pointer;
 }
@@ -1461,7 +1463,7 @@ input:checked+.slider:before {
     width: 80px;
     height: 80px;
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out); /* Deeper out shadow */
     border-radius: 24px;
     display: flex;
     align-items: center;
@@ -1536,7 +1538,7 @@ input:checked+.slider:before {
     width: 24px;
     height: 24px;
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-in-sm);
+    box-shadow: var(--nm-shadow-in);
     border-radius: 50%;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: none;
@@ -1545,7 +1547,7 @@ input:checked+.slider:before {
 .pin-indicators .pin-dot.filled {
     background: var(--accent-primary);
     box-shadow: 
-        var(--nm-shadow-out-sm),
+        var(--nm-shadow-out),
         0 0 15px var(--accent-soft);
     transform: scale(1.1);
 }
@@ -1553,7 +1555,7 @@ input:checked+.slider:before {
 .pin-indicators .pin-dot.error {
     background: #ff3b30;
     box-shadow: 
-        var(--nm-shadow-out-sm),
+        var(--nm-shadow-out),
         0 0 15px rgba(255, 59, 48, 0.4);
     animation: shake 0.4s ease-in-out;
 }
@@ -1561,7 +1563,7 @@ input:checked+.slider:before {
 .pin-indicators .pin-dot.success {
     background: #28a745;
     box-shadow: 
-        var(--nm-shadow-out-sm),
+        var(--nm-shadow-out),
         0 0 15px rgba(40, 167, 69, 0.4);
     transform: scale(1.1);
 }
@@ -1581,12 +1583,12 @@ input:checked+.slider:before {
     background: var(--nm-surface);
     color: var(--accent-primary);
     border-radius: var(--radius-md);
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out);
     transition: all var(--transition-fast);
 }
 
 .pin-submit-btn:active {
-    box-shadow: var(--nm-shadow-in-sm);
+    box-shadow: var(--nm-shadow-in);
     transform: scale(0.98);
 }
   @media (max-width: 480px) {
@@ -1780,7 +1782,7 @@ input:checked+.slider:before {
 [data-theme="light"] .toast,
 body.light-theme .toast {
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-out), 0 1px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--nm-shadow-out);
     color: var(--text-primary);
 }
 
@@ -1797,7 +1799,8 @@ body.light-theme .setting-row {
 
 [data-theme="light"] .setting-row:hover,
 body.light-theme .setting-row:hover {
-    background: #f1f3f4;
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -1823,7 +1826,7 @@ body.light-theme .setting-row:hover {
     align-items: center;
     justify-content: center;
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-in-sm);
+    box-shadow: var(--nm-shadow-out-sm); /* Explicit extrusion for the icon vessel */
     flex-shrink: 0;
     transition: all var(--transition-medium);
     color: var(--accent-primary);
@@ -1925,7 +1928,8 @@ body.light-theme .setting-row:hover {
 .splash-loader {
     width: 240px;
     height: 4px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-in-sm);
     border-radius: var(--radius-full);
     position: relative;
     overflow: hidden;
@@ -2888,6 +2892,42 @@ body.light-theme .cloud-sync-pill {
     height: 18px;
 }
 
+.auth-back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out);
+    border: none;
+    cursor: pointer !important;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+}
+
+.auth-back-btn:hover {
+    transform: scale(1.1);
+    color: var(--accent-primary);
+    box-shadow: var(--nm-shadow-out);
+}
+
+.auth-back-btn:active {
+    transform: scale(0.95);
+    box-shadow: var(--nm-shadow-in);
+}
+
+.auth-back-btn i {
+    width: 18px;
+    height: 18px;
+}
+
 .auth-header {
     text-align: center;
     margin-bottom: 10px;
@@ -2901,8 +2941,8 @@ body.light-theme .cloud-sync-pill {
     -webkit-app-region: no-drag;
 }
 
-/* Ensure controls are still interactive */
 .auth-close-btn,
+.auth-back-btn,
 .auth-submit-btn,
 .auth-link,
 .form-input,
@@ -2953,7 +2993,7 @@ body.light-theme .cloud-sync-pill {
     border-radius: var(--radius-lg);
     background: var(--nm-surface);
     color: var(--accent-primary);
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out);
     transition: all var(--transition-medium);
 }
 
@@ -2964,7 +3004,7 @@ body.light-theme .cloud-sync-pill {
 }
 
 .auth-submit-btn:active {
-    box-shadow: var(--nm-shadow-in-sm);
+    box-shadow: var(--nm-shadow-in);
     transform: translateY(0) scale(0.98);
 }
 
@@ -3035,13 +3075,15 @@ body.light-theme .cloud-sync-pill {
     padding: 0;
     border-radius: var(--radius-lg);
     background: var(--nm-surface);
-    box-shadow: var(--nm-shadow-in-sm);
+    box-shadow: var(--nm-shadow-in);
     color: var(--accent-primary);
     transition: all var(--transition-medium);
+    border: none;
+    outline: none;
 }
 
 .verify-digit:focus {
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-out);
     transform: scale(1.08) translateY(-4px);
     color: var(--accent-hover);
 }

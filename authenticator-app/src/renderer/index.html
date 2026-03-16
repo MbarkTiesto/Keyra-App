@@ -15,12 +15,6 @@
             font-weight: 400 800;
             font-display: swap;
         }
-        @font-face {
-            font-family: 'JetBrains Mono';
-            src: url('fonts/JetBrainsMono-Bold.woff2') format('woff2');
-            font-weight: 700 800;
-            font-display: swap;
-        }
     </style>
     
     <!-- Lucide Icons (Local) -->
@@ -58,6 +52,9 @@
         <div class="auth-container animate-fade-in">
             <button id="btn-auth-close" class="auth-close-btn" title="Exit Application">
                 <i data-lucide="x"></i>
+            </button>
+            <button id="btn-auth-back" class="auth-back-btn hidden" title="Back to Login">
+                <i data-lucide="arrow-left"></i>
             </button>
             <div class="auth-container-scrollable">
                 <div class="auth-header">
@@ -985,15 +982,16 @@
                                 </p>
                             </div>
                     </div>
+                </div> <!-- Closes modal-body -->
                     
                     <div class="modal-footer" style="padding: 16px 0 0 0; border-top: none;">
                         <button class="user-button secondary" id="btn-cancel-phone-qr" style="width: 100%; justify-content: center; height: 48px; font-size: 13px; font-weight: 800;">
                             Cancel Verification
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
+                </div> <!-- Closes modal-content -->
+            </div> <!-- Closes modal -->
+        </div> <!-- Closes modal-phone-qr -->
 
 
 

@@ -57,16 +57,31 @@ export async function setupAuthUI() {
     }
 
     // Navigation
+    const btnBack = document.getElementById('btn-auth-back');
+
     document.getElementById('btn-show-signup')?.addEventListener('click', () => {
         switchState(boxLogin, boxSignup);
+        btnBack?.classList.remove('hidden');
     });
 
     document.getElementById('btn-show-login')?.addEventListener('click', () => {
         switchState(boxSignup, boxLogin);
+        btnBack?.classList.add('hidden');
     });
 
     document.getElementById('btn-show-login-from-verify')?.addEventListener('click', () => {
         switchState(boxVerify, boxLogin);
+        btnBack?.classList.add('hidden');
+    });
+
+    btnBack?.addEventListener('click', () => {
+        if (!boxSignup.classList.contains('hidden')) {
+            switchState(boxSignup, boxLogin);
+            btnBack.classList.add('hidden');
+        } else if (!boxVerify.classList.contains('hidden')) {
+            switchState(boxVerify, boxLogin);
+            btnBack.classList.add('hidden');
+        }
     });
 
     // Login Form

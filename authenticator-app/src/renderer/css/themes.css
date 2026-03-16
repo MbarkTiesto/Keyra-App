@@ -87,23 +87,23 @@
         0 24px 72px hsla(var(--h), 20%, 10%, 0.12),
         0 4px 20px hsla(var(--h), 20%, 10%, 0.06);
 
-    /* Crystalline Neumorphism - Surface Depth */
+    /* Crystalline Neumorphism - Premium Surface Depth */
     --nm-surface: #e0e5ec;
-    --nm-shadow-light: #ffffff;
-    --nm-shadow-dark: rgba(163, 177, 198, 0.5);
+    --nm-shadow-light: #ffffff; /* Brighter for crisper highlights */
+    --nm-shadow-dark: rgba(163, 177, 198, 0.65); /* Darker for deeper extrusion */
     
     --nm-shadow-out: 
-        12px 12px 24px var(--nm-shadow-dark), 
-        -12px -12px 24px var(--nm-shadow-light);
+        14px 14px 28px var(--nm-shadow-dark), 
+        -14px -14px 28px var(--nm-shadow-light);
     --nm-shadow-in: 
-        inset 10px 10px 20px var(--nm-shadow-dark), 
-        inset -10px -10px 20px var(--nm-shadow-light);
+        inset 12px 12px 24px var(--nm-shadow-dark), 
+        inset -12px -12px 24px var(--nm-shadow-light);
     --nm-shadow-out-sm: 
-        6px 6px 14px var(--nm-shadow-dark), 
-        -6px -6px 14px var(--nm-shadow-light);
+        7px 7px 16px var(--nm-shadow-dark), 
+        -7px -7px 16px var(--nm-shadow-light);
     --nm-shadow-in-sm: 
-        inset 6px 6px 12px var(--nm-shadow-dark), 
-        inset -6px -6px 12px var(--nm-shadow-light);
+        inset 7px 7px 14px var(--nm-shadow-dark), 
+        inset -7px -7px 14px var(--nm-shadow-light);
     
     /* Radius System */
     --radius-sm: 12px;
@@ -112,6 +112,7 @@
     --radius-xl: 32px;
     --radius-2xl: 48px;
     --radius-full: 1000px;
+
     
     --transition-fast: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     --transition-medium: 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -169,20 +170,20 @@
 
     /* Neuomorphic Design System - Dark (Deep Graphite) */
     --nm-surface: #121214;
-    --nm-shadow-light: rgba(255, 255, 255, 0.03);
-    --nm-shadow-dark: rgba(0, 0, 0, 0.6);
+    --nm-shadow-light: rgba(255, 255, 255, 0.05); /* Slightly brighter for better definition */
+    --nm-shadow-dark: rgba(0, 0, 0, 0.85); /* Darker for pronounced depth */
     --nm-shadow-out: 
-        6px 6px 14px var(--nm-shadow-dark), 
-        -6px -6px 14px var(--nm-shadow-light);
+        8px 8px 20px var(--nm-shadow-dark), 
+        -8px -8px 20px var(--nm-shadow-light);
     --nm-shadow-in: 
-        inset 5px 5px 12px var(--nm-shadow-dark), 
-        inset -5px -5px 12px var(--nm-shadow-light);
+        inset 6px 6px 16px var(--nm-shadow-dark), 
+        inset -6px -6px 16px var(--nm-shadow-light);
     --nm-shadow-out-sm: 
-        4px 4px 10px var(--nm-shadow-dark), 
-        -4px -4px 10px var(--nm-shadow-light);
+        5px 5px 12px var(--nm-shadow-dark), 
+        -5px -5px 12px var(--nm-shadow-light);
     --nm-shadow-in-sm: 
-        inset 4px 4px 8px var(--nm-shadow-dark), 
-        inset -4px -4px 8px var(--nm-shadow-light);
+        inset 5px 5px 10px var(--nm-shadow-dark), 
+        inset -5px -5px 10px var(--nm-shadow-light);
 }
 
 * {
@@ -212,13 +213,13 @@ button {
     transition: all var(--transition-fast);
 }
 
-input {
+input, textarea, select {
     font-family: inherit;
     outline: none;
 }
 
 /* Base Headings - Premium Hierarchy */
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     font-weight: var(--weight-bold);
     letter-spacing: var(--ls-tight);
@@ -230,6 +231,8 @@ h1 { font-size: var(--font-size-2xl); }
 h2 { font-size: var(--font-size-xl); }
 h3 { font-size: var(--font-size-lg); }
 h4 { font-size: var(--font-size-md); }
+h5 { font-size: var(--font-size-sm); }
+h6 { font-size: var(--font-size-xs); }
 
 .bento-title {
     font-family: var(--font-heading);
@@ -344,7 +347,7 @@ body.light-theme {
     --accent-hover: hsl(var(--dynamic-accent-hue, 258), 85%, 52%);
     --accent-soft: hsla(var(--dynamic-accent-hue, 258), 85%, 58%, 0.08);
 
-    --border-color: rgba(0, 0, 0, 0.06);
+    --border-color: rgba(0, 0, 0, 0.05); /* Softer borders for pure neumorphism */
 
     --aura-1: hsla(var(--dynamic-accent-hue, 258), 80%, 55%, 0.22);
     --aura-2: hsla(calc(var(--dynamic-accent-hue, 258) + 30), 80%, 62%, 0.16);
@@ -353,6 +356,24 @@ body.light-theme {
     --shadow-soft:   0 2px 12px rgba(0, 0, 0, 0.06);
     --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.10);
     --shadow-hard:   0 20px 60px rgba(0, 0, 0, 0.16);
+
+    /* Dedicated Light Mode Neumorphic Shadows */
+    --nm-surface: #e0e5ec;
+    --nm-shadow-light: #ffffff;
+    --nm-shadow-dark: rgba(163, 177, 198, 0.65); /* Deeper shadow for clear extrusion */
+    
+    --nm-shadow-out: 
+        14px 14px 28px var(--nm-shadow-dark), 
+        -14px -14px 28px var(--nm-shadow-light);
+    --nm-shadow-in: 
+        inset 12px 12px 24px var(--nm-shadow-dark), 
+        inset -12px -12px 24px var(--nm-shadow-light);
+    --nm-shadow-out-sm: 
+        7px 7px 16px var(--nm-shadow-dark), 
+        -7px -7px 16px var(--nm-shadow-light);
+    --nm-shadow-in-sm: 
+        inset 7px 7px 14px var(--nm-shadow-dark), 
+        inset -7px -7px 14px var(--nm-shadow-light);
 }
 
 /* OLED Optimization Classes - Force True Black #000000 */

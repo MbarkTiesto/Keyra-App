@@ -1652,13 +1652,13 @@ export class UIManager {
         if (!container) return;
         const iconMap = { success: 'check-circle', error: 'alert-circle', info: 'bell' };
         const toast = document.createElement('div');
-        toast.className = 'toast animate-fade-in ' + type;
+        toast.className = 'toast ' + type;
         toast.innerHTML = `<i class="toast-icon" data-lucide="${iconMap[type]}"></i><span>${message}</span>`;
         container.appendChild(toast);
         this.refreshLucide();
         setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transform = 'translateX(-50%) translateY(8px) scale(0.95)';
+            toast.style.transform = 'translateY(8px) scale(0.95)';
             setTimeout(() => toast.remove(), 350);
         }, 2800);
     }
