@@ -1015,22 +1015,27 @@
         </div>
     </div>
 
-    <!-- Lock Screen PIN (Premium Glassmorphic Redesign) -->
+    <!-- Lock Screen PIN (Premium Neumorphic Redesign) -->
     <div id="lock-vessel" class="modal-overlay pin-overlay">
         <div class="pin-vessel animate-fade-in">
             <button id="btn-lock-close" class="auth-close-btn" title="Exit Application">
                 <i data-lucide="x"></i>
             </button>
+
+            <!-- User Identity Section -->
             <div class="pin-brand">
-                <div class="pin-lock-icon">
-                    <img src="assets/logo.png" class="app-logo-medium nm-logo">
+                <div class="pin-avatar-ring">
+                    <div class="pin-avatar-inner" id="pin-avatar">
+                        <img id="pin-avatar-img" class="hidden" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <img id="pin-avatar-fallback" src="assets/logo.png" class="app-logo-medium nm-logo" style="width: 60%; height: auto;">
+                    </div>
                     <div class="lock-glow"></div>
                 </div>
             </div>
-            
+
             <div class="pin-header">
-                <h2 class="pin-title">Vault Locked</h2>
-                <p class="pin-subtitle">Identity verification required to resume session</p>
+                <h2 class="pin-title" id="pin-greeting">Vault Locked</h2>
+                <p class="pin-subtitle">Enter your PIN to resume session</p>
             </div>
 
             <form id="form-unlock">

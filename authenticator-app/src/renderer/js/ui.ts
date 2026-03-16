@@ -1740,9 +1740,37 @@ export class UIManager {
         }, 1000);
     }
 
-    public lockVault() {
+    public async lockVault() {
         const vessel = document.getElementById('lock-vessel');
         if (vessel) {
+            // Populate the user's identity on the lock screen
+            try {
+                const user = await (window as any).api.getCurrentUser();
+                if (user) {
+                    const pinAvatarImg = document.getElementById('pin-avatar-img') as HTMLImageElement;
+                    const pinAvatarFallback = document.getElementById('pin-avatar-fallback') as HTMLImageElement;
+                    const pinGreeting = document.getElementById('pin-greeting');
+
+                    if (pinAvatarImg && pinAvatarFallback) {
+                        if (user.profilePicture) {
+                            pinAvatarImg.src = user.profilePicture;
+                            pinAvatarImg.classList.remove('hidden');
+                            pinAvatarFallback.classList.add('hidden');
+                        } else {
+                            pinAvatarImg.classList.add('hidden');
+                            pinAvatarFallback.classList.remove('hidden');
+                        }
+                    }
+
+                    if (pinGreeting) {
+                        const firstName = user.username.split(' ')[0];
+                        pinGreeting.textContent = `Welcome back, ${firstName}`;
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to load user for lock screen:", e);
+            }
+
             vessel.classList.add('show');
             document.body.classList.add('vault-is-locked');
             this.refreshLucide();
