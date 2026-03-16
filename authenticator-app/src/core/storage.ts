@@ -45,6 +45,10 @@ export interface UserRecord {
     pendingEmail?: string;
     emailChangeCode?: string;
     encryptedVaultData: string;
+    phone?: string;
+    isPhoneVerified?: boolean;
+    phoneVerificationCode?: string;
+    pendingPhone?: string;
     settings?: UserSettings;
     "Desktop Settings"?: UserSettings;
     "Web Settings"?: any;

@@ -313,13 +313,22 @@ body {
     padding: clamp(20px, 4vw, 32px);
     gap: 0;
     overflow-y: auto;
-    scrollbar-width: none;
     flex: 1;
     min-height: 0;
 }
 
 .modal-content::-webkit-scrollbar {
-    display: none;
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary);
+    opacity: 0.6;
 }
 
 /* Light mode: force solid background so text always contrasts cleanly */

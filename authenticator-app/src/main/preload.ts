@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('api', {
     // Auth System
+    logToMain: (msg: string) => ipcRenderer.send('log-to-main', msg),
     signup: (user: string, email: string, pass: string) => ipcRenderer.invoke('signup', user, email, pass),
     resendCode: (email: string) => ipcRenderer.invoke('resend-code', email),
     verifyEmail: (email: string, code: string) => ipcRenderer.invoke('verify-email', email, code),
@@ -17,6 +18,32 @@ contextBridge.exposeInMainWorld('api', {
     confirmEmailChange: (code: string) => ipcRenderer.invoke('confirm-email-change', code),
     resendEmailChangeCode: () => ipcRenderer.invoke('resend-email-change-code'),
     cancelEmailChange: () => ipcRenderer.invoke('cancel-email-change'),
+    requestPhoneVerification: (phone: string) => ipcRenderer.invoke('request-phone-verification', phone),
+    startWhatsAppLinking: () => ipcRenderer.invoke('start-whatsapp-linking'),
+    getWaStatus: () => ipcRenderer.invoke('get-wa-status'),
+    logoutWhatsApp: () => ipcRenderer.invoke('logout-whatsapp'),
+    removePhone: () => ipcRenderer.invoke('remove-phone'),
+    verifyPhoneByWhatsAppMatch: (waNumber: string) => ipcRenderer.invoke('verify-phone-wa-match', waNumber),
+    onWaInitializing: (callback: () => void) => {
+        ipcRenderer.removeAllListeners('wa-initializing');
+        ipcRenderer.on('wa-initializing', () => callback());
+    },
+    onWaAuthFailure: (callback: (error: string) => void) => {
+        ipcRenderer.removeAllListeners('wa-auth-failure');
+        ipcRenderer.on('wa-auth-failure', (_event, err) => callback(err));
+    },
+    onWaQrCode: (callback: (qr: string) => void) => {
+        ipcRenderer.removeAllListeners('wa-qr-code');
+        ipcRenderer.on('wa-qr-code', (_event, qr) => callback(qr));
+    },
+    onWaAuthenticated: (callback: () => void) => {
+        ipcRenderer.removeAllListeners('wa-authenticated');
+        ipcRenderer.on('wa-authenticated', () => callback());
+    },
+    onWaReady: (callback: (waNumber?: string) => void) => {
+        ipcRenderer.removeAllListeners('wa-ready');
+        ipcRenderer.on('wa-ready', (_event, num) => callback(num));
+    },
 
 
     // Operations

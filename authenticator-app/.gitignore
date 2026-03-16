@@ -63,3 +63,8 @@ desktop.ini
 # Testing
 coverage/
 .nyc_output/
+
+
+# WhatsApp Web
+.wwebjs_cache/*
+.wwebjs_auth/*

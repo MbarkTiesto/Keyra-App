@@ -35,7 +35,9 @@ export function getCurrentUser() {
         id: currentUser.id,
         username: currentUser.username,
         email: currentUser.email,
-        pendingEmail: currentUser.pendingEmail,
+        phone: currentUser.phone,
+        isPhoneVerified: !!currentUser.isPhoneVerified,
+        pendingPhone: currentUser.pendingPhone,
         settings: currentUser["Desktop Settings"],
         autolock: currentUser.autolock
     };
@@ -507,6 +509,106 @@ export async function resendEmailChangeCode(): Promise<{ success: boolean, messa
 
     deliverActivationCode(user.pendingEmail, newCode);
     return { success: true, message: "New verification code sent." };
+}
+
+// ─── Phone Verification Logic ───────────────────────────────────────
+
+import { sendPhoneVerification } from './notifier';
+
+export async function requestPhoneVerification(phoneNumber: string): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    // Robust validation: Starts with + and contains 8 to 15 digits
+    const phoneRegex = /^\+[0-9]{8,15}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+        return { success: false, message: "Invalid phone format. Please use international format (e.g. +123456789)." };
+    }
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    user.pendingPhone = phoneNumber;
+    delete user.phoneVerificationCode; // Cleanup old system
+
+    // Sync local session
+    if (currentUser) {
+        currentUser.pendingPhone = phoneNumber;
+        delete currentUser.phoneVerificationCode;
+    }
+
+    await saveUsers(users);
+    await syncUserData(currentUser.username, user);
+
+    return { success: true, message: "Phone number updated. Please link WhatsApp to verify." };
+}
+
+// remove confirmPhoneVerification...
+
+export async function removePhone(): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    delete user.phone;
+    delete user.pendingPhone;
+    delete user.isPhoneVerified;
+    delete user.phoneVerificationCode;
+    
+    // Sync local session
+    delete currentUser.phone;
+    delete currentUser.pendingPhone;
+    delete currentUser.isPhoneVerified;
+    delete currentUser.phoneVerificationCode;
+
+    await saveUsers(users);
+    await syncUserData(currentUser.username, user);
+
+    return { success: true, message: "Phone number removed successfully." };
+}
+
+export async function verifyPhoneByWhatsAppMatch(waNumber: string): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    if (!user.pendingPhone) return { success: false, message: "No pending phone verification." };
+
+    console.log(`[Auth] Comparison Trace - Pending: "${user.pendingPhone}" (len: ${user.pendingPhone.length}), Received WA: "${waNumber}" (len: ${waNumber.length})`);
+
+    // Normalize both numbers (remove +, spaces, and any non-digit chars)
+    const normalizedPending = user.pendingPhone.replace(/\D/g, '');
+    const normalizedWA = waNumber.replace(/\D/g, '');
+
+    console.log(`[Auth] Comparison Trace - Normalized Pending: "${normalizedPending}" vs Normalized WA: "${normalizedWA}"`);
+
+    // For safety, we check if one is contained in the other or exact match.
+    // We also ensure both numbers have at least 8 digits to avoid false positives on short fragments.
+    if (normalizedPending.length >= 8 && normalizedWA.length >= 8 && 
+        (normalizedWA.endsWith(normalizedPending) || normalizedPending.endsWith(normalizedWA))) {
+        user.phone = user.pendingPhone;
+        user.isPhoneVerified = true;
+        delete user.pendingPhone;
+        delete user.phoneVerificationCode;
+        
+        // Sync local session
+        currentUser.phone = user.phone;
+        currentUser.isPhoneVerified = true;
+
+        await saveUsers(users);
+        await syncUserData(currentUser.username, user);
+
+        return { success: true, message: "Phone matched and auto-verified via WhatsApp!" };
+    }
+
+    return { success: false, message: "WhatsApp number does not match entered phone." };
 }
 
 export async function pollForUpdates(): Promise<{ changed: boolean, settings?: any, accounts?: AuthenticatorAccount[] }> {
