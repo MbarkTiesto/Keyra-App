@@ -2136,35 +2136,53 @@ body.light-theme .setting-row:hover {
 
 /* Premium Maintenance Buttons */
 .btn-maintenance {
-    height: clamp(48px, 12vw, 60px) !important;
+    height: clamp(52px, 12vw, 64px) !important;
     width: 100%;
     justify-content: flex-start !important;
-    padding-left: clamp(16px, 4vw, 24px) !important;
-    background: var(--bg-secondary) !important;
+    padding: 0 clamp(20px, 4vw, 28px) !important;
+    background: var(--nm-surface) !important;
     color: var(--text-primary) !important;
-    border: 1px solid var(--border-color) !important;
-    box-shadow: none !important;
+    border: none !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--nm-shadow-out) !important;
     transition: all var(--transition-medium) !important;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
 }
 
 .btn-maintenance:hover {
-    background: var(--bg-tertiary) !important;
-    border-color: var(--accent-primary) !important;
-    transform: translateX(4px);
+    background: var(--nm-surface) !important;
+    box-shadow: 
+        16px 16px 32px var(--nm-shadow-dark), 
+        -16px -16px 32px var(--nm-shadow-light) !important;
+    transform: translateX(4px) translateY(-1px);
+}
+
+.btn-maintenance:active {
+    box-shadow: var(--nm-shadow-in) !important;
+    transform: translateX(2px) translateY(0);
 }
 
 .btn-maintenance i {
-    font-size: 22px;
-    margin-right: 12px;
+    font-size: 20px;
+    margin-right: 16px;
     color: var(--accent-primary);
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+    border-radius: 50%;
 }
 
 .btn-maintenance span {
-    font-size: clamp(13px, 3.5vw, 15px);
-    font-weight: 750;
+    font-size: 14px;
+    font-weight: 850;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
 }
 
 /* Wallpaper Gallery Layout */

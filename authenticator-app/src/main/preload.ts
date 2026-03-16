@@ -57,7 +57,8 @@ contextBridge.exposeInMainWorld('api', {
     parseURI: (uri: string) => ipcRenderer.invoke('parse-uri', uri),
     exportVault: () => ipcRenderer.invoke('export-vault'),
     importVault: () => ipcRenderer.invoke('import-vault'),
-    performVaultImport: (salt: string, encryptedVaultData: string, pass: string) => ipcRenderer.invoke('perform-vault-import', salt, encryptedVaultData, pass),
+    performVaultImport: (salt: string, encryptedVaultData: string, pass: string, autolock: string, desktopSettings: any, webSettings: any) => 
+        ipcRenderer.invoke('perform-vault-import', salt, encryptedVaultData, pass, autolock, desktopSettings, webSettings),
     setContentProtection: (enabled: boolean) => ipcRenderer.invoke('set-content-protection', enabled),
     getDesktopSources: () => ipcRenderer.invoke('get-desktop-sources'),
     openCaptureWindow: () => ipcRenderer.send('open-capture-window'),
