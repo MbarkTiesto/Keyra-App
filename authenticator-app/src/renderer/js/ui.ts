@@ -1921,12 +1921,8 @@ export class UIManager {
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn-primary" id="btn-verify-proceed" disabled>
-                        <i class="fa-solid fa-arrow-right"></i>
-                        Verify & Proceed
-                    </button>
-                    <button class="user-button" id="cancel-verify-btn" style="justify-content: center;">Cancel</button>
+                <div class="modal-footer" style="padding: 0; min-height: 48px;">
+                    <button class="user-button" id="cancel-verify-btn" style="width: 100%; justify-content: center;">Cancel</button>
                 </div>
             </div>
         `;
@@ -1934,19 +1930,20 @@ export class UIManager {
 
         const input = document.getElementById('verify-pin-field') as HTMLInputElement;
         const dots = document.querySelectorAll('.pin-dot');
-        const nextBtn = document.getElementById('btn-verify-proceed') as HTMLButtonElement;
 
         input?.focus();
         
-        input?.addEventListener('input', (e) => {
+        input?.addEventListener('input', async (e) => {
             const val = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, '');
             input.value = val;
             dots.forEach((dot, i) => dot.classList.toggle('filled', i < val.length));
-            if (nextBtn) nextBtn.disabled = val.length !== 4;
+            
+            if (val.length === 4) {
+                await performVerify();
+            }
         });
 
         const performVerify = async () => {
-            if (input.value.length !== 4) return;
             const enteredPin = input.value;
             try {
                 let isCorrect = false;
@@ -1963,7 +1960,6 @@ export class UIManager {
                     this.showToast("Incorrect PIN", "error");
                     input.value = '';
                     dots.forEach(dot => dot.classList.remove('filled'));
-                    nextBtn.disabled = true;
                     input.focus();
                 }
             } catch (e) {
@@ -1972,7 +1968,6 @@ export class UIManager {
             }
         };
 
-        nextBtn?.addEventListener('click', performVerify);
         input?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') performVerify();
         });
