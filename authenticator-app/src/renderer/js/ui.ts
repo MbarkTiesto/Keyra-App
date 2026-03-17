@@ -22,6 +22,7 @@ export class UIManager {
     private launchOnStartup: boolean = false;
     private minimizeToTray: boolean = false;
     private globalHotkey: boolean = false;
+    private autoCheckUpdates: boolean = true;
 
     constructor(public userId: string = 'default') {
         this.initTheme();
@@ -124,8 +125,18 @@ export class UIManager {
             this.showToast("Update ready to install!", "success");
         });
         
+        const autoToggle = document.getElementById('auto-update-toggle') as HTMLInputElement;
+        autoToggle?.addEventListener('change', () => {
+            this.autoCheckUpdates = autoToggle.checked;
+            this.pushSettings();
+        });
+
         // Initial silent check
-        setTimeout(() => (window as any).api.checkForUpdates(), 3000);
+        setTimeout(() => {
+            if (this.autoCheckUpdates) {
+                (window as any).api.checkForUpdates();
+            }
+        }, 3000);
     }
 
     private initConnectivityStatus() {
@@ -266,6 +277,7 @@ export class UIManager {
             launchOnStartup: this.launchOnStartup,
             minimizeToTray: this.minimizeToTray,
             globalHotkey: this.globalHotkey,
+            autoCheckUpdates: this.autoCheckUpdates,
             vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
         };
     }
@@ -351,6 +363,12 @@ export class UIManager {
             const blurToggle = document.getElementById('privacy-blur-toggle') as HTMLInputElement;
             if (blurToggle) blurToggle.checked = this.privacyBlur;
         }
+
+        if (settings.autoCheckUpdates !== undefined) {
+            this.autoCheckUpdates = !!settings.autoCheckUpdates;
+            const autoToggle = document.getElementById('auto-update-toggle') as HTMLInputElement;
+            if (autoToggle) autoToggle.checked = this.autoCheckUpdates;
+        }
         
         if (settings.windowResizable !== undefined) {
             this.windowResizable = !!settings.windowResizable;
@@ -371,6 +389,7 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('menu_exit_integration'), String(this.menuExitIntegration));
             localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacyBlur));
             localStorage.setItem(this.getStorageKey('window_resizable'), String(this.windowResizable));
+            localStorage.setItem(this.getStorageKey('auto_check_updates'), String(this.autoCheckUpdates));
             if (settings.vaultPin !== undefined) localStorage.setItem(this.getStorageKey('vault_pin'), settings.vaultPin);
         }
 

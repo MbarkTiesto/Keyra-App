@@ -31,6 +31,7 @@ export interface UserSettings {
     performanceMode: boolean;
     menuExitIntegration: boolean;
     privacyBlur: boolean;
+    autoCheckUpdates?: boolean;
     vaultPin?: string;
 }
 
