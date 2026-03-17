@@ -1578,18 +1578,23 @@ export class UIManager {
                 return;
             }
 
-            const parsed = await (window as any).api.parseURI(data);
-            await (window as any).api.generateTOTP(parsed.secret);
+            this.setLoading(true, "Processing QR", "DECODING SECURE URI");
+            try {
+                const parsed = await (window as any).api.parseURI(data);
+                await (window as any).api.generateTOTP(parsed.secret);
 
-            this.accounts = await (window as any).api.saveAccount({
-                id: Date.now().toString(),
-                issuer: parsed.issuer,
-                account: parsed.account,
-                secret: parsed.secret
-            });
-            this.renderAccounts();
-            this.showToast(`Account added!`, "success");
-            this.updateLastActivity('Added token via Scan');
+                this.accounts = await (window as any).api.saveAccount({
+                    id: Date.now().toString(),
+                    issuer: parsed.issuer,
+                    account: parsed.account,
+                    secret: parsed.secret
+                });
+                this.renderAccounts();
+                this.showToast(`Account added!`, "success");
+                this.updateLastActivity('Added token via Scan');
+            } finally {
+                this.setLoading(false);
+            }
         } catch (err) {
             console.error("Invalid QR Format", err);
             this.showToast("Invalid QR Format", "error");
@@ -2011,13 +2016,18 @@ export class UIManager {
                 </div>
             `;
             this.showModal(content);
-            document.getElementById('confirm-remove-pin')?.addEventListener('click', () => {
-                localStorage.removeItem(this.getStorageKey('vault_pin'));
-                this.pushSettings();
-                this.updateLockVaultVisibility();
-                this.updatePinStatus();
-                this.showToast("Security code removed", "info");
-                this.hideModal();
+            document.getElementById('confirm-remove-pin')?.addEventListener('click', async () => {
+                this.setLoading(true, "Removing Security", "DEACTIVATING MASTER KEY");
+                try {
+                    localStorage.removeItem(this.getStorageKey('vault_pin'));
+                    await this.pushSettings();
+                    this.updateLockVaultVisibility();
+                    this.updatePinStatus();
+                    this.showToast("Security code removed", "info");
+                    this.hideModal();
+                } finally {
+                    this.setLoading(false);
+                }
             });
             document.getElementById('cancel-remove-pin')?.addEventListener('click', () => this.hideModal());
         });
@@ -2100,6 +2110,7 @@ export class UIManager {
                     renderModal();
                 } else {
                     if (input.value === firstEntry) {
+                        this.setLoading(true, "Securing Vault", "GENERATING MASTER KEY");
                         try {
                             const encrypted = await (window as any).api.encryptPIN(input.value);
                             localStorage.setItem(this.getStorageKey('vault_pin'), encrypted);
@@ -2111,6 +2122,8 @@ export class UIManager {
                         } catch (e) {
                             console.error("PIN Setup encryption failed", e);
                             this.showToast("Security setup failed", "error");
+                        } finally {
+                            this.setLoading(false);
                         }
                     } else {
                         this.showToast("PIN Matching Failed", "error");
@@ -2178,18 +2191,35 @@ export class UIManager {
         // Listen for capture results (globally once or every time? Better in constructor or persistent)
         // I'll add handleScannedData to UIManager for reuse
 
-        document.getElementById('save-new-account')?.addEventListener('click', async () => {
-            const issuer = (document.getElementById('new-issuer') as HTMLInputElement).value;
-            const account = (document.getElementById('new-account') as HTMLInputElement).value;
-            const secret = (document.getElementById('new-secret') as HTMLInputElement).value;
+        const saveAccountAction = async () => {
+            const issuer = (document.getElementById('new-issuer') as HTMLInputElement).value.trim();
+            const account = (document.getElementById('new-account') as HTMLInputElement).value.trim();
+            const secret = (document.getElementById('new-secret') as HTMLInputElement).value.replace(/\s/g, '').toUpperCase();
+            
             if (issuer && secret) {
-                this.accounts = await (window as any).api.saveAccount({ id: Date.now().toString(), issuer, account, secret });
-                this.renderAccounts();
-                this.hideModal();
-                this.showToast("Account saved!", "success");
-                this.updateLastActivity('Added token');
+                this.setLoading(true, "Securing Token", "ENCRYPTING NEW IDENTITY");
+                try {
+                    this.accounts = await (window as any).api.saveAccount({ id: Date.now().toString(), issuer, account, secret });
+                    this.renderAccounts();
+                    this.hideModal();
+                    this.showToast("Account saved!", "success");
+                    this.updateLastActivity('Added token');
+                } finally {
+                    this.setLoading(false);
+                }
+            } else {
+                this.showToast("Service and Secret are required", "error");
             }
+        };
+
+        document.getElementById('save-new-account')?.addEventListener('click', saveAccountAction);
+        
+        ['new-issuer', 'new-account', 'new-secret'].forEach(id => {
+            document.getElementById(id)?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') saveAccountAction();
+            });
         });
+
         document.getElementById('cancel-add-btn')?.addEventListener('click', () => this.hideModal());
     }
 
@@ -2235,17 +2265,31 @@ export class UIManager {
             </div>
         `;
         this.showModal(content);
-        document.getElementById('update-account')?.addEventListener('click', async () => {
-            const issuer = (document.getElementById('edit-issuer') as HTMLInputElement).value;
-            const accName = (document.getElementById('edit-account') as HTMLInputElement).value;
+        const updateAccountAction = async () => {
+            const issuer = (document.getElementById('edit-issuer') as HTMLInputElement).value.trim();
+            const accName = (document.getElementById('edit-account') as HTMLInputElement).value.trim();
             if (issuer) {
-                this.accounts = await (window as any).api.saveAccount({ ...account, issuer, account: accName });
-                this.renderAccounts();
-                this.hideModal();
-                this.showToast("Account updated!", "success");
-                this.updateLastActivity('Edited token');
+                this.setLoading(true, "Updating Identity", "SYNCHRONIZING CHANGES");
+                try {
+                    this.accounts = await (window as any).api.saveAccount({ ...account, issuer, account: accName });
+                    this.renderAccounts();
+                    this.hideModal();
+                    this.showToast("Account updated!", "success");
+                    this.updateLastActivity('Edited token');
+                } finally {
+                    this.setLoading(false);
+                }
             }
+        };
+
+        document.getElementById('update-account')?.addEventListener('click', updateAccountAction);
+        
+        ['edit-issuer', 'edit-account'].forEach(id => {
+            document.getElementById(id)?.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') updateAccountAction();
+            });
         });
+
         document.getElementById('cancel-edit-btn')?.addEventListener('click', () => this.hideModal());
     }
 
@@ -2285,11 +2329,16 @@ export class UIManager {
         `;
         this.showModal(content);
         document.getElementById('confirm-delete')?.addEventListener('click', async () => {
-            this.accounts = await (window as any).api.deleteAccount(account.id);
-            this.renderAccounts();
-            this.hideModal();
-            this.showToast("Account removed", "info");
-            this.updateLastActivity('Deleted token');
+            this.setLoading(true, "Removing Token", "PERMANENT DELETION IN PROGRESS");
+            try {
+                this.accounts = await (window as any).api.deleteAccount(account.id);
+                this.renderAccounts();
+                this.hideModal();
+                this.showToast("Account removed", "info");
+                this.updateLastActivity('Deleted token');
+            } finally {
+                this.setLoading(false);
+            }
         });
         document.getElementById('cancel-delete-btn')?.addEventListener('click', () => this.hideModal());
     }
@@ -2336,12 +2385,20 @@ export class UIManager {
         this.showModal(content);
         document.getElementById('confirm-import')?.addEventListener('click', async () => {
             const pass = (document.getElementById('import-pass') as HTMLInputElement).value;
-            const res = await (window as any).api.performVaultImport(salt, encryptedVaultData, pass, autolock, desktopSettings, webSettings);
-            if (res.success) {
-                this.hideModal();
-                this.showToast("Vault restored!", "success");
-                await this.refreshAccounts();
-            } else this.showToast(res.message, "error");
+            this.setLoading(true, "Restoring Vault", "DECRYPTING BACKUP ARCHIVE");
+            try {
+                const res = await (window as any).api.performVaultImport(salt, encryptedVaultData, pass, autolock, desktopSettings, webSettings);
+                if (res.success) {
+                    this.hideModal();
+                    this.showToast("Vault restored!", "success");
+                    await this.refreshAccounts();
+                } else this.showToast(res.message, "error");
+            } finally {
+                this.setLoading(false);
+            }
+        });
+        document.getElementById('import-pass')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('confirm-import')?.click();
         });
         document.getElementById('cancel-import')?.addEventListener('click', () => this.hideModal());
     }
