@@ -3324,3 +3324,244 @@ body.light-theme .cloud-sync-pill {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PIN RECOVERY SYSTEM
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.recovery-modal {
+    max-width: 480px;
+    position: relative;
+}
+
+.modal-top-left {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 10;
+}
+
+.recovery-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.recovery-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: -4px;
+}
+
+.recovery-error {
+    color: #ff3b30;
+    font-size: 12px;
+    margin: -4px 0 0 0;
+    font-weight: 600;
+}
+
+.recovery-footer {
+    padding: 0 !important;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.recovery-btn {
+    width: 100%;
+    min-height: 56px;
+    white-space: nowrap;
+    justify-content: center !important;
+    font-size: 14px !important;
+}
+
+.recovery-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin: 4px 0;
+}
+
+.recovery-divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.recovery-divider-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.wa-color {
+    color: #25d366 !important;
+}
+
+.wa-vessel {
+    background: rgba(37, 211, 102, 0.1) !important;
+}
+
+.wa-text {
+    color: #25d366 !important;
+}
+
+.centered-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.recovery-qr {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    background: var(--nm-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--nm-shadow-in);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.qr-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 8px;
+}
+
+.qr-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.qr-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: loader-spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+.qr-overlay-text {
+    font-size: 12px;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.wa-status-text {
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: 1.5px;
+    color: var(--accent-primary);
+    margin-bottom: 16px;
+}
+
+.recovery-error-banner {
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 14px;
+    background: rgba(255, 59, 48, 0.08);
+    border: 1px solid rgba(255, 59, 48, 0.15);
+    border-radius: var(--radius-md);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.error-banner-text {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #ff3b30;
+    line-height: 1.4;
+}
+
+.recovery-instruction-box {
+    width: 100%;
+    padding: 16px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--nm-shadow-in);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.instruction-icon-wa {
+    width: 36px;
+    height: 36px;
+    background: rgba(37, 211, 102, 0.1);
+    color: #25d366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.instruction-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.instruction-text {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.spaced-top {
+    margin-top: 16px !important;
+}
+
+.wa-badge {
+    margin-bottom: 16px;
+}
+
+.recovery-success-box {
+    width: 100%;
+    padding: 16px;
+    background: rgba(37, 211, 102, 0.05);
+    border: 1px solid rgba(37, 211, 102, 0.15);
+    border-radius: var(--radius-lg);
+    margin-top: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.btn-success-wa {
+    background: linear-gradient(135deg, #25d366 0%, #128C7E 100%) !important;
+    color: white !important;
+    border: none !important;
+}

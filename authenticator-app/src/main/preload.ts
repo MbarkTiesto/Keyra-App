@@ -25,6 +25,10 @@ contextBridge.exposeInMainWorld('api', {
     logoutWhatsApp: () => ipcRenderer.invoke('logout-whatsapp'),
     removePhone: () => ipcRenderer.invoke('remove-phone'),
     verifyMasterPassword: (password: string) => ipcRenderer.invoke('verify-master-password', password),
+    generatePinResetCode: () => ipcRenderer.invoke('generate-pin-reset-code'),
+    verifyPinResetCode: (code: string) => ipcRenderer.invoke('verify-pin-reset-code', code),
+    clearPinResetCode: () => ipcRenderer.invoke('clear-pin-reset-code'),
+    sendPinResetCode: (phone: string, message: string) => ipcRenderer.invoke('send-pin-reset-code', phone, message),
     verifyPhoneByWhatsAppMatch: (waNumber: string) => ipcRenderer.invoke('verify-phone-wa-match', waNumber),
     onWaInitializing: (callback: () => void) => {
         ipcRenderer.removeAllListeners('wa-initializing');

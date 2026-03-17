@@ -649,6 +649,49 @@ export async function verifyMasterPassword(password: string): Promise<{ success:
     return { success: true, message: "Password verified successfully." };
 }
 
+// ─── PIN Reset via WhatsApp ────────────────────────────────────────
+
+let pinResetCode: string | null = null;
+let pinResetCodeExpiry: number | null = null;
+
+export function generatePinResetCode(): { code: string, phone: string } | null {
+    if (!currentUser) return null;
+    if (!currentUser.phone || !currentUser.isPhoneVerified) return null;
+    
+    pinResetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    pinResetCodeExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
+    
+    return { code: pinResetCode, phone: currentUser.phone };
+}
+
+export function verifyPinResetCode(code: string): { success: boolean, message: string } {
+    if (!currentUser) return { success: false, message: "No active user session." };
+    if (!pinResetCode || !pinResetCodeExpiry) {
+        return { success: false, message: "No verification code pending." };
+    }
+    
+    if (Date.now() > pinResetCodeExpiry) {
+        pinResetCode = null;
+        pinResetCodeExpiry = null;
+        return { success: false, message: "Verification code expired. Please try again." };
+    }
+    
+    if (code !== pinResetCode) {
+        return { success: false, message: "Incorrect verification code." };
+    }
+    
+    // Clear the code after successful verification
+    pinResetCode = null;
+    pinResetCodeExpiry = null;
+    
+    return { success: true, message: "Code verified successfully." };
+}
+
+export function clearPinResetCode(): void {
+    pinResetCode = null;
+    pinResetCodeExpiry = null;
+}
+
 export async function pollForUpdates(): Promise<{ changed: boolean, settings?: any, accounts?: AuthenticatorAccount[] }> {
     if (!currentUser || !currentKey) return { changed: false };
 

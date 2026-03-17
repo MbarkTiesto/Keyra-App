@@ -2769,119 +2769,312 @@ export class UIManager {
     }
 
     private showForgotPinConfirm() {
-        console.log("[UI] Showing static Forgot PIN confirmation modal...");
+        console.log("[UI] Showing Forgot PIN modal...");
         const modal = document.getElementById('modal-forgot-pin');
         if (!modal) {
-            console.error("[UI] Static Forgot PIN modal NOT FOUND!");
+            console.error("[UI] Forgot PIN modal NOT FOUND!");
             return;
         }
 
-        // Reset modal state
+        // View elements
+        const mainView = document.getElementById('forgot-pin-main-view');
+        const waView = document.getElementById('forgot-pin-wa-view');
+        const codeView = document.getElementById('forgot-pin-code-view');
+        const waDivider = document.getElementById('forgot-pin-wa-divider');
+        const waButton = document.getElementById('btn-forgot-pin-whatsapp');
+
+        // Helper to switch views
+        const showView = (view: 'main' | 'wa' | 'code') => {
+            mainView?.classList.toggle('hidden', view !== 'main');
+            waView?.classList.toggle('hidden', view !== 'wa');
+            codeView?.classList.toggle('hidden', view !== 'code');
+        };
+
+        // Reset to main view
+        showView('main');
+
+        // Reset all inputs and errors
         const passwordInput = document.getElementById('forgot-pin-password') as HTMLInputElement;
-        const errorEl = document.getElementById('forgot-pin-error');
+        const passForm = document.getElementById('form-forgot-pin');
+        const confirmBtn = document.getElementById('confirm-forgot-pin-btn');
+        const codeInput = document.getElementById('forgot-pin-verify-code') as HTMLInputElement;
+        
         if (passwordInput) passwordInput.value = '';
-        if (errorEl) {
-            errorEl.textContent = '';
-            errorEl.classList.add('hidden');
+        if (codeInput) codeInput.value = '';
+        
+        // Hide password form by default
+        passForm?.classList.add('hidden');
+        if (confirmBtn) {
+            confirmBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Reset PIN & Sign Out';
         }
+
+        document.querySelectorAll('#modal-forgot-pin .hidden[id$="-error"]').forEach(el => el.classList.add('hidden'));
 
         modal.classList.remove('hidden');
         modal.classList.add('show');
         modal.style.zIndex = "99999";
+        // Remove immediate focus since the input is now hidden initially
+        // setTimeout(() => passwordInput?.focus(), 100);
 
-        // Focus on password input
-        setTimeout(() => passwordInput?.focus(), 100);
-
-        const showError = (msg: string) => {
-            const err = document.getElementById('forgot-pin-error');
-            if (err) {
-                err.textContent = msg;
-                err.classList.remove('hidden');
-            }
+        // Error helpers
+        const showError = (id: string, msg: string) => {
+            const el = document.getElementById(id);
+            if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+        };
+        const hideError = (id: string) => {
+            const el = document.getElementById(id);
+            if (el) { el.textContent = ''; el.classList.add('hidden'); }
         };
 
-        const hideError = () => {
-            const err = document.getElementById('forgot-pin-error');
-            if (err) {
-                err.textContent = '';
-                err.classList.add('hidden');
-            }
+        // Common PIN reset completion
+        const completePinReset = async () => {
+            this.setLoading(true, "Resetting Security", "REMOVING PIN & SYNCING");
+            localStorage.removeItem(this.getStorageKey('vault_pin'));
+            await this.pushSettings();
+            this.updateLockVaultVisibility();
+            this.updatePinStatus();
+            modal.classList.remove('show');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            this.setLoading(true, "Signing Out", "RETURNING TO LOGIN");
+            await (window as any).api.logout();
+            window.location.reload();
         };
 
+        // --- Master Password Handler ---
         const confirmHandler = async (e?: Event) => {
             e?.preventDefault();
-            const passInput = document.getElementById('forgot-pin-password') as HTMLInputElement;
-            const password = passInput?.value || '';
-            
-            hideError();
+            const pForm = document.getElementById('form-forgot-pin');
+            const pInput = document.getElementById('forgot-pin-password') as HTMLInputElement;
+            const cBtn = document.getElementById('confirm-forgot-pin-btn');
+
+            // If form is hidden, show it first (Requirement: box shouldn't appear till button click)
+            if (pForm?.classList.contains('hidden')) {
+                pForm.classList.remove('hidden');
+                if (cBtn) {
+                    cBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirm Reset & Sign Out';
+                }
+                setTimeout(() => pInput?.focus(), 100);
+                return;
+            }
+
+            const password = pInput?.value || '';
+            hideError('forgot-pin-error');
             
             if (!password) {
-                showError('Please enter your master password.');
-                passInput?.focus();
+                showError('forgot-pin-error', 'Please enter your master password.');
+                pInput?.focus();
                 return;
             }
 
             this.setLoading(true, "Verifying Identity", "CHECKING MASTER PASSWORD");
             try {
-                const verifyResult = await (window as any).api.verifyMasterPassword(password);
-                
-                if (!verifyResult.success) {
+                const result = await (window as any).api.verifyMasterPassword(password);
+                if (!result.success) {
                     this.setLoading(false);
-                    showError(verifyResult.message || 'Incorrect password.');
-                    passInput?.select();
+                    showError('forgot-pin-error', result.message || 'Incorrect password.');
+                    pInput?.select();
                     return;
                 }
-
-                this.setLoading(true, "Resetting Security", "REMOVING PIN & SYNCING");
-                
-                localStorage.removeItem(this.getStorageKey('vault_pin'));
-                await this.pushSettings();
-                this.updateLockVaultVisibility();
-                this.updatePinStatus();
-                
-                modal.classList.remove('show');
-                setTimeout(() => modal.classList.add('hidden'), 300);
-                
-                this.setLoading(true, "Signing Out", "RETURNING TO LOGIN");
-                await (window as any).api.logout();
-                window.location.reload();
+                await completePinReset();
             } catch (err) {
                 this.setLoading(false);
-                showError('An error occurred. Please try again.');
-                console.error("[UI] Forgot PIN reset error:", err);
+                showError('forgot-pin-error', 'An error occurred. Please try again.');
             }
         };
 
+        // --- Cancel/Close Handler ---
         const cancelHandler = () => {
+            (window as any).api.clearPinResetCode();
+            modal.classList.remove('show');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            document.getElementById('unlock-pin')?.focus();
+        };
+
+        // --- WhatsApp Flow ---
+        let verifiedPhone: string | null = null;
+
+        const startWhatsAppFlow = async () => {
+            showView('wa');
+            const qrImg = document.getElementById('forgot-pin-wa-qr') as HTMLImageElement;
+            const loader = document.getElementById('forgot-pin-wa-loader');
+            const overlay = document.getElementById('forgot-pin-wa-overlay');
+            const status = document.getElementById('forgot-pin-wa-status');
+            const errorEl = document.getElementById('forgot-pin-wa-error');
+            const errorText = document.getElementById('forgot-pin-wa-error-text');
+
+            // Reset state
+            loader?.classList.remove('hidden');
+            qrImg?.classList.add('hidden');
+            overlay?.classList.add('hidden');
+            errorEl?.classList.add('hidden');
+            if (status) status.textContent = 'INITIALIZING...';
+
+            const showWaError = (msg: string) => {
+                if (errorText) errorText.textContent = msg;
+                errorEl?.classList.remove('hidden');
+            };
+
+            const updateWaUI = (state: { qr?: string, initializing?: boolean, authenticated?: boolean, ready?: boolean, waNumber?: string }) => {
+                errorEl?.classList.add('hidden');
+                
+                if (state.authenticated) {
+                    overlay?.classList.remove('hidden');
+                    if (status) status.textContent = 'VERIFYING IDENTITY';
+                } else if (state.ready && state.waNumber) {
+                    // Check phone match
+                    checkPhoneMatch(state.waNumber);
+                } else if (state.qr) {
+                    if (qrImg) qrImg.src = state.qr;
+                    loader?.classList.add('hidden');
+                    qrImg?.classList.remove('hidden');
+                    overlay?.classList.add('hidden');
+                    if (status) status.textContent = 'SCAN QR CODE';
+                } else if (state.initializing) {
+                    loader?.classList.remove('hidden');
+                    qrImg?.classList.add('hidden');
+                    overlay?.classList.add('hidden');
+                    if (status) status.textContent = 'INITIALIZING...';
+                }
+            };
+
+            const checkPhoneMatch = async (waNumber: string) => {
+                try {
+                    const user = await (window as any).api.getCurrentUser();
+                    if (!user?.phone) {
+                        showWaError('No verified phone number found.');
+                        overlay?.classList.add('hidden');
+                        return;
+                    }
+
+                    // Normalize for comparison
+                    const normalizedAccount = user.phone.replace(/\D/g, '');
+                    const normalizedWa = waNumber.replace(/\D/g, '');
+
+                    if (normalizedAccount.length >= 8 && normalizedWa.length >= 8 &&
+                        (normalizedWa.endsWith(normalizedAccount) || normalizedAccount.endsWith(normalizedWa))) {
+                        // Phone matches! Get the PIN and send it
+                        verifiedPhone = user.phone;
+                        if (status) status.textContent = 'SENDING PIN...';
+                        
+                        // Get the encrypted PIN from localStorage and decrypt it
+                        const encryptedPin = localStorage.getItem(this.getStorageKey('vault_pin'));
+                        if (!encryptedPin) {
+                            showWaError('No PIN found to recover.');
+                            overlay?.classList.add('hidden');
+                            return;
+                        }
+
+                        let pin: string;
+                        try {
+                            pin = await (window as any).api.decryptPIN(encryptedPin);
+                        } catch (e) {
+                            showWaError('Failed to retrieve PIN.');
+                            overlay?.classList.add('hidden');
+                            return;
+                        }
+
+                        // Send PIN via WhatsApp
+                        const sendResult = await (window as any).api.sendPinResetCode(
+                            user.phone, 
+                            `🔐 Your Keyra Vault PIN is: ${pin}\n\n⚠️ For security, please delete this message after reading.`
+                        );
+                        
+                        if (!sendResult.success) {
+                            showWaError(sendResult.message || 'Failed to send PIN.');
+                            overlay?.classList.add('hidden');
+                            return;
+                        }
+
+                        // Show success view
+                        const phoneDisplay = document.getElementById('forgot-pin-code-phone');
+                        if (phoneDisplay) {
+                            const digits = user.phone.replace(/\D/g, '');
+                            phoneDisplay.textContent = `XXXX XXX XX${digits.slice(-2)}`;
+                        }
+                        showView('code');
+                        this.showToast('PIN sent to your WhatsApp!', 'success');
+                    } else {
+                        showWaError('WhatsApp number does not match your verified phone.');
+                        overlay?.classList.add('hidden');
+                        if (status) status.textContent = 'MISMATCH';
+                    }
+                } catch (err) {
+                    console.error('[UI] Phone match check error:', err);
+                    showWaError('Verification failed. Please try again.');
+                    overlay?.classList.add('hidden');
+                }
+            };
+
+            // Set up WhatsApp listeners
+            (window as any).api.onWaInitializing(() => updateWaUI({ initializing: true }));
+            (window as any).api.onWaQrCode((qr: string) => updateWaUI({ qr }));
+            (window as any).api.onWaAuthenticated(() => updateWaUI({ authenticated: true }));
+            (window as any).api.onWaReady((waNumber?: string) => updateWaUI({ ready: true, waNumber }));
+            (window as any).api.onWaAuthFailure((err: string) => {
+                showWaError(`WhatsApp error: ${err}`);
+                if (status) status.textContent = 'ERROR';
+            });
+
+            // Start WhatsApp
+            (window as any).api.startWhatsAppLinking();
+            const currentStatus = await (window as any).api.getWaStatus();
+            updateWaUI(currentStatus);
+        };
+
+        // --- Done Handler (close modal and return to PIN entry) ---
+        const doneHandler = () => {
             modal.classList.remove('show');
             setTimeout(() => modal.classList.add('hidden'), 300);
             const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
-            pinIn?.focus();
+            if (pinIn) {
+                pinIn.value = '';
+                pinIn.focus();
+            }
         };
 
-        // Remove old listeners by cloning elements
-        const confirmBtn = document.getElementById('confirm-forgot-pin-btn');
-        const cancelBtn = document.getElementById('cancel-forgot-pin-btn');
-        const form = document.getElementById('form-forgot-pin');
-        
-        if (confirmBtn) {
-            const newBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode?.replaceChild(newBtn, confirmBtn);
-            newBtn.addEventListener('click', confirmHandler);
-        }
-        
-        if (cancelBtn) {
-            const newBtn = cancelBtn.cloneNode(true);
-            cancelBtn.parentNode?.replaceChild(newBtn, cancelBtn);
-            newBtn.addEventListener('click', cancelHandler);
-        }
+        // --- Attach Event Listeners (clone to remove old) ---
+        const attachListener = (id: string, handler: (e?: Event) => void, event = 'click') => {
+            const el = document.getElementById(id);
+            if (el) {
+                const newEl = el.cloneNode(true);
+                el.parentNode?.replaceChild(newEl, el);
+                newEl.addEventListener(event, handler);
+            }
+        };
 
-        if (form) {
-            const newForm = form.cloneNode(true);
-            form.parentNode?.replaceChild(newForm, form);
+        attachListener('confirm-forgot-pin-btn', confirmHandler);
+        attachListener('cancel-forgot-pin-btn', cancelHandler);
+        attachListener('btn-forgot-pin-whatsapp', startWhatsAppFlow);
+        attachListener('btn-pin-sent-done', doneHandler);
+
+        // Form submissions
+        const form1 = document.getElementById('form-forgot-pin');
+        if (form1) {
+            const newForm = form1.cloneNode(true);
+            form1.parentNode?.replaceChild(newForm, form1);
             newForm.addEventListener('submit', confirmHandler);
-            // Re-focus after clone
             setTimeout(() => (document.getElementById('forgot-pin-password') as HTMLInputElement)?.focus(), 150);
         }
+
+        // Check if user has verified phone for WhatsApp option (AFTER cloning)
+        (window as any).api.getCurrentUser().then((user: any) => {
+            const hasVerifiedPhone = user?.phone && user?.isPhoneVerified;
+            const divider = document.getElementById('forgot-pin-wa-divider');
+            const waBtn = document.getElementById('btn-forgot-pin-whatsapp');
+            
+            if (hasVerifiedPhone) {
+                divider?.classList.remove('hidden');
+                waBtn?.classList.remove('hidden');
+                if (divider) (divider as HTMLElement).style.display = 'flex';
+                const phoneHint = document.getElementById('forgot-pin-wa-phone-hint');
+                if (phoneHint) {
+                    const digits = user.phone.replace(/\D/g, '');
+                    phoneHint.textContent = `Use the WhatsApp account linked to XX${digits.slice(-2)}`;
+                }
+            } else {
+                divider?.classList.add('hidden');
+                waBtn?.classList.add('hidden');
+            }
+        });
     }
 }

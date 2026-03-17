@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, globalShortcut, screen, desktopCapturer, Menu, Tray, nativeImage, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import * as path from 'path';
-import { signup, resendCode, verifyEmail, login, logout, getCurrentUser, getActiveAccounts, saveActiveAccounts, updateUserSettings, checkSession, getBackupData, importVaultData, pollForUpdates, changeUsername, changePassword, requestEmailChange, confirmEmailChange, resendEmailChangeCode, cancelEmailChange, requestPhoneVerification, removePhone, verifyPhoneByWhatsAppMatch, verifyMasterPassword } from '../core/auth';
+import { signup, resendCode, verifyEmail, login, logout, getCurrentUser, getActiveAccounts, saveActiveAccounts, updateUserSettings, checkSession, getBackupData, importVaultData, pollForUpdates, changeUsername, changePassword, requestEmailChange, confirmEmailChange, resendEmailChangeCode, cancelEmailChange, requestPhoneVerification, removePhone, verifyPhoneByWhatsAppMatch, verifyMasterPassword, generatePinResetCode, verifyPinResetCode, clearPinResetCode } from '../core/auth';
 import { service } from '../core/notifier';
 import { generateTOTP, getRemainingSeconds, getBatchOTPs } from '../core/totp';
 import * as fs from 'fs';
@@ -128,6 +128,17 @@ ipcMain.handle('request-phone-verification', (event, phone) => requestPhoneVerif
 ipcMain.handle('remove-phone', () => removePhone()),
 ipcMain.handle('verify-phone-wa-match', (_event, waNumber) => verifyPhoneByWhatsAppMatch(waNumber)),
 ipcMain.handle('verify-master-password', (_event, password) => verifyMasterPassword(password)),
+ipcMain.handle('generate-pin-reset-code', () => generatePinResetCode()),
+ipcMain.handle('verify-pin-reset-code', (_event, code) => verifyPinResetCode(code)),
+ipcMain.handle('clear-pin-reset-code', () => clearPinResetCode()),
+ipcMain.handle('send-pin-reset-code', async (_event, phone: string, message: string) => {
+    const { sendPhoneVerification } = require('../core/notifier');
+    return sendPhoneVerification({
+        to: phone,
+        message: message,
+        code: ''
+    });
+}),
 ipcMain.handle('logout-whatsapp', () => service.logoutWhatsApp()),
 ipcMain.handle('start-whatsapp-linking', () => service.ensureWhatsAppStarted()),
 
