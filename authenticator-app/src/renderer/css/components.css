@@ -3462,7 +3462,7 @@ body.light-theme .cloud-sync-pill {
     border: 3px solid rgba(255, 255, 255, 0.2);
     border-top-color: #ffffff;
     border-radius: 50%;
-    animation: loader-spin 1s linear infinite;
+    animation: nm-spin 1s linear infinite;
     margin-bottom: 12px;
 }
 
@@ -3570,7 +3570,7 @@ body.light-theme .cloud-sync-pill {
    UNIVERSAL SPINNER SYSTEM
    ───────────────────────────────────────────────────────────────────────────── */
 
-.nm-spinner {
+.wa-loading-spinner {
     width: 40px;
     height: 40px;
     border: 3px solid var(--nm-shadow-in-sm);
@@ -3586,11 +3586,6 @@ body.light-theme .cloud-sync-pill {
 }
 
 /* Ensure other spinners use this too if needed */
-.qr-spinner {
-    width: 36px;
-    height: 36px;
-    border: 3px solid rgba(255, 255, 255, 0.2);
-    border-top-color: #ffffff;
-    border-radius: 50%;
+.qr-spinner-vessel .qr-spinner {
     animation: nm-spin 1s linear infinite;
 }
