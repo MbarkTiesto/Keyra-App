@@ -63,6 +63,7 @@ export class UIManager {
         }
 
         checkBtn?.addEventListener('click', () => {
+            this.setLoading(true, "Checking Updates", "CONTACTING KEYRA SERVERS");
             if (message) message.textContent = 'Checking for updates...';
             nmLoader?.classList.remove('hidden');
             (window as any).api.checkForUpdates();
@@ -96,12 +97,14 @@ export class UIManager {
         });
 
         (window as any).api.onUpdateNotAvailable(() => {
+            this.setLoading(false);
             nmLoader?.classList.add('hidden');
             if (message) message.textContent = 'Your app is up to date.';
             checkBtn?.classList.remove('hidden');
         });
 
         (window as any).api.onUpdateError((err: string) => {
+            this.setLoading(false);
             nmLoader?.classList.add('hidden');
             if (message) message.textContent = `Update check failed.`;
             console.error("Update Error:", err);
@@ -675,13 +678,18 @@ export class UIManager {
         });
 
         document.getElementById('btn-logout-trigger')?.addEventListener('click', () => {
-            document.getElementById('modal-logout')?.classList.add('show');
+            this.showStaticModal('modal-logout');
         });
 
         // Logout Confirmation
         document.getElementById('btn-confirm-logout')?.addEventListener('click', async () => {
-            await (window as any).api.logout();
-            window.location.reload();
+            this.setLoading(true, "Ending Session", "SECURING VAULT & CLEARING KEY");
+            try {
+                await (window as any).api.logout();
+                window.location.reload();
+            } finally {
+                this.setLoading(false);
+            }
         });
         document.getElementById('btn-cancel-logout')?.addEventListener('click', () => {
             document.getElementById('modal-logout')?.classList.remove('show');
@@ -831,16 +839,26 @@ export class UIManager {
 
         // Vault Maintenance
         document.getElementById('btn-export-vault')?.addEventListener('click', async () => {
-            const res = await (window as any).api.exportVault();
-            if (res.success) {
-                this.showToast("Vault backup created", "success");
-                this.updateLastActivity('Backed up vault');
+            this.setLoading(true, "Encrypting Backup", "PREPARING OFFLINE ARCHIVE");
+            try {
+                const res = await (window as any).api.exportVault();
+                if (res.success) {
+                    this.showToast("Vault backup created", "success");
+                    this.updateLastActivity('Backed up vault');
+                }
+            } finally {
+                this.setLoading(false);
             }
         });
         document.getElementById('btn-import-vault')?.addEventListener('click', async () => {
-            const res = await (window as any).api.importVault();
-            if (res.success && res.data) {
-                this.showImportPasswordModal(res.data);
+            this.setLoading(true, "Opening Explorer", "SELECTING BACKUP FILE");
+            try {
+                const res = await (window as any).api.importVault();
+                if (res.success && res.data) {
+                    this.showImportPasswordModal(res.data);
+                }
+            } finally {
+                this.setLoading(false);
             }
         });
 
@@ -1307,6 +1325,7 @@ export class UIManager {
             this.showToast("Cannot sync while offline", "error");
             return;
         }
+        this.setLoading(true, "Synchronizing Vault", "CLOUD BACKUP IN PROGRESS");
         this.setSyncing(true);
         const btn = document.getElementById('btn-sync-now');
         const icon = btn?.querySelector('i');
@@ -1328,6 +1347,7 @@ export class UIManager {
         } finally {
             if (icon) icon.classList.remove('sync-spin');
             this.setSyncing(false);
+            this.setLoading(false);
             this.updateLastActivityDisplay();
         }
     }
@@ -1708,6 +1728,24 @@ export class UIManager {
         if (!overlay) return;
         overlay.innerHTML = `<div class="modal animate-fade-in">${content}</div>`;
         overlay.classList.add('show');
+        
+        // Premium Auto-Focus: Target the first primary input
+        this.focusFirstInput(overlay);
+    }
+
+    private showStaticModal(id: string) {
+        const modal = document.getElementById(id);
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+        this.focusFirstInput(modal);
+    }
+
+    private focusFirstInput(container: HTMLElement) {
+        setTimeout(() => {
+            const firstInput = container.querySelector('input:not([type="hidden"]), button:not(.auth-close-btn)') as HTMLElement;
+            if (firstInput) firstInput.focus();
+        }, 50);
     }
 
     public hideModal() {
