@@ -191,51 +191,91 @@
             </div>
         </div>
 
-        <!-- Crystalline Bento About Modal -->
+        <!-- Premium Neumorphic About Modal -->
         <div id="about-modal" class="modal-overlay hidden">
-            <div class="modal about-bento-container animate-crystalline-in">
-                <div class="about-bento-header">
-                    <div class="about-bento-logo">
-                        <img src="assets/logo.png" class="app-logo-medium">
+            <div class="modal about-modal-card animate-fade-in">
+                <div class="about-header-hero">
+                    <div class="about-hero-vessel">
+                        <img src="assets/logo.png" alt="Keyra Logo" class="app-logo-medium">
                     </div>
-                    <h2 class="about-bento-title">Keyra Authenticator</h2>
-                    <p class="about-bento-mission">Professional Security Made Simple</p>
+                    <div class="about-title-group">
+                        <h1 class="about-app-name">Keyra Authenticator</h1>
+                        <p class="about-mission-tag">Professional Security Made Simple</p>
+                    </div>
                 </div>
 
-                <div class="about-bento-grid">
-                    <!-- Version Block -->
-                    <div class="bento-item bento-version">
-                        <div class="bento-item-label">APP VERSION</div>
-                        <div class="bento-item-value">v1.2.0 <span class="pro-tag">PRO</span></div>
-                        <div class="bento-item-hint">UP TO DATE</div>
-                    </div>
+                <div class="modal-divider"></div>
 
-                    <!-- Sync Status Block -->
-                    <div class="bento-item bento-status">
-                        <div class="bento-item-label">SYSTEM STATUS</div>
-                        <div class="bento-item-value success-text">
-                            <i class="fa-solid fa-circle-check"></i>
-                            RUNNING WELL
+                <div class="about-info-sections">
+                    <!-- App Status Row -->
+                    <div class="about-info-row">
+                        <div class="info-row-label">
+                            <i class="fa-solid fa-code-branch"></i>
+                            <span class="label-text">VERSION</span>
                         </div>
-                        <div class="bento-item-hint">PROTECTION IS ON</div>
+                        <div class="info-row-content">
+                            <span class="version-badge">v1.2.0</span>
+                            <span class="pro-tag">PRO</span>
+                        </div>
                     </div>
 
-                    <!-- Activity Block (Full Width on small, 2-col on large) -->
-                    <div class="bento-item bento-activity">
-                        <div class="bento-item-label">LAST ACTION</div>
-                        <div class="bento-item-value" id="about-last-action">Nothing yet</div>
-                        <div class="bento-item-hint" id="about-last-activity">No history recorded</div>
+                    <!-- System Status Row -->
+                    <div class="about-info-row">
+                        <div class="info-row-label">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span class="label-text">STATUS</span>
+                        </div>
+                        <div class="info-row-content">
+                            <span class="status-indicator online">
+                                <span class="status-dot"></span>
+                                PROTECTED
+                            </span>
+                        </div>
                     </div>
 
-                    <!-- Sync Block (Replaces Tech) -->
-                    <div class="bento-item bento-sync">
-                        <div class="bento-item-label">CLOUD SYNC</div>
-                        <div class="bento-item-value" id="about-last-sync">Checking...</div>
-                        <div class="bento-item-hint">SAFELY BACKED UP</div>
+                    <!-- Action Row -->
+                    <div class="about-info-row">
+                        <div class="info-row-label">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span class="label-text">ACTIVITY</span>
+                        </div>
+                        <div class="info-row-content">
+                            <span id="about-last-action" style="font-size: 11px; font-weight: 700;">Nothing yet</span>
+                        </div>
+                    </div>
+
+                    <!-- Sync Row -->
+                    <div class="about-info-row">
+                        <div class="info-row-label">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span class="label-text">CLOUD SYNC</span>
+                        </div>
+                        <div class="info-row-content">
+                            <span id="about-last-sync" style="font-size: 11px; font-weight: 700;">Never Secured</span>
+                        </div>
                     </div>
                 </div>
 
+                <div class="modal-divider"></div>
+
+                <div class="about-footer-actions">
+                    <p class="footer-label">Connect with us</p>
+                    <div class="about-social-group">
+                        <button class="social-btn" title="GitHub" onclick="window.api.openExternal('https://github.com/MbarkT3STO/Keyra-App')">
+                            <i class="fa-brands fa-github"></i>
+                        </button>
+                        <button class="social-btn" title="X (Twitter)" onclick="window.api.openExternal('https://x.com/mbarkt3sto')">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </button>
+                        <button class="social-btn" title="Website" onclick="window.api.openExternal('https://keyraauth.netlify.app/')">
+                            <i class="fa-solid fa-globe"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <button class="auth-close-btn" onclick="document.getElementById('about-modal').classList.remove('show'); setTimeout(() => document.getElementById('about-modal').classList.add('hidden'), 300)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
         </div>
 
@@ -1085,7 +1125,7 @@
 
             <form id="form-unlock">
                 <div class="pin-input-vessel">
-                    <input type="password" id="unlock-pin" maxlength="4" class="pin-field" autocomplete="off">
+                    <input type="password" id="unlock-pin" maxlength="4" class="pin-field" autocomplete="off" autofocus>
                     <div class="pin-indicators">
                         <div class="pin-dot" data-digit="1"></div>
                         <div class="pin-dot" data-digit="2"></div>
@@ -1095,10 +1135,59 @@
                 </div>
                 
                 <div class="pin-helper">Secure 4-Digit Master Code</div>
-                
             </form>
+            
+            <div class="pin-footer-actions">
+                <button type="button" id="btn-forgot-pin" class="forgot-pin-link">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Forgot PIN? Use Master Password</span>
+                </button>
+            </div>
         </div>
     </div>
+
+    <!-- Static Recovery Modal -->
+    <div id="modal-forgot-pin" class="modal-overlay hidden">
+        <div class="modal animate-fade-in" style="max-width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon-vessel danger">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <div class="modal-title-vessel">
+                        <h2 class="danger">Reset PIN?</h2>
+                        <p>SECURITY ACTION REQUIRED</p>
+                    </div>
+                </div>
+                <div class="modal-divider"></div>
+                <div class="modal-body">
+                    <div class="modal-entity-badge">
+                        <div class="entity-icon">
+                            <i class="fa-solid fa-unlock-keyhole"></i>
+                        </div>
+                        <div class="entity-info">
+                            <span class="entity-name">Reset Identity PIN</span>
+                            <span class="entity-label">Requires Sign In</span>
+                        </div>
+                    </div>
+                    <p class="modal-help-text" style="margin-top: 16px;">If you've forgotten your PIN, you will need to sign out and sign back in using your Master Password to verify your identity.</p>
+                </div>
+                <div class="modal-footer" style="flex-direction: column; gap: 12px; padding: 0;">
+                    <button class="btn-danger" id="confirm-forgot-pin-btn" style="width: 100%; min-height: 56px; white-space: nowrap; justify-content: center; font-size: 14px;">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Sign Out & Reset Security PIN
+                    </button>
+                    <button class="user-button" id="cancel-forgot-pin-btn" style="width: 100%; min-height: 56px; white-space: nowrap; justify-content: center; border-radius: var(--radius-lg); font-size: 14px;">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Back to PIN Entry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Dynamic Modal System -->
+    <div id="modal-overlay" class="modal-overlay"></div>
 
     <!-- Global Loading Overlay (Premium Neuomorphic) -->
     <div id="loading-overlay" class="modal-overlay hidden" style="z-index: 99999;">

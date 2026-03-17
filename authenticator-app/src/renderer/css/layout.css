@@ -220,12 +220,16 @@ body {
     align-items: center;
     justify-content: center;
     padding: 20px 0;
-    z-index: 2000;
+    z-index: 5000;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity var(--transition-medium), visibility var(--transition-medium);
     overflow-y: auto;
+}
+
+#modal-overlay {
+    z-index: 99999 !important;
 }
 
 .modal-overlay.show {

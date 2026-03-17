@@ -880,6 +880,7 @@ export class UIManager {
         pinInput?.addEventListener('input', (e) => {
             const value = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, '');
             pinInput.value = value;
+            console.log("[Lock] Input value changed:", value);
             this.validateAndAutoUnlock(value);
         });
 
@@ -915,6 +916,20 @@ export class UIManager {
         document.getElementById('remove-pin-btn')?.addEventListener('click', () => {
             this.showRemovePinConfirm();
         });
+
+        // Forgot PIN Logic
+        const forgotPinBtn = document.getElementById('btn-forgot-pin');
+        if (forgotPinBtn) {
+            console.log("[Auth] Forgot PIN button found, attaching listener.");
+            forgotPinBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("[Auth] Forgot PIN clicked!");
+                this.showForgotPinConfirm();
+            });
+        } else {
+            console.warn("[Auth] Forgot PIN button NOT FOUND in DOM.");
+        }
 
         this.setupAccountEvents();
     }
@@ -1383,14 +1398,9 @@ export class UIManager {
         }
 
         // Sync About Modal (if open or for next time)
-        const aboutActivity = document.getElementById('about-last-activity');
         const aboutAction = document.getElementById('about-last-action');
         const aboutSync = document.getElementById('about-last-sync');
 
-        if (aboutActivity) {
-            const lastActivityVal = lastActivity ? this.formatSyncTime(new Date(lastActivity)) : 'Never';
-            aboutActivity.textContent = lastActivityVal;
-        }
         if (aboutAction) aboutAction.textContent = lastAction;
 
         if (aboutSync) {
@@ -1816,7 +1826,13 @@ export class UIManager {
             vessel.classList.add('show');
             document.body.classList.add('vault-is-locked');
             const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
-            if (pinIn) { pinIn.value = ''; pinIn.focus(); }
+            if (pinIn) { 
+                pinIn.value = ''; 
+                setTimeout(() => pinIn.focus(), 100);
+            }
+            // Reset dots
+            const dots = vessel.querySelectorAll('.pin-dot');
+            dots.forEach(dot => dot.classList.remove('filled', 'success', 'error'));
         }
     }
 
@@ -1827,9 +1843,14 @@ export class UIManager {
 
     private async validateAndAutoUnlock(pinValue: string) {
         const saved = localStorage.getItem(this.getStorageKey('vault_pin'));
-        const dots = document.querySelectorAll('.pin-dot');
+        
+        // Target only the dots inside the lock vessel to avoid conflicts with other modals
+        const lockVessel = document.getElementById('lock-vessel');
+        const dots = lockVessel?.querySelectorAll('.pin-dot');
 
-        dots.forEach((dot, i) => dot.classList.toggle('filled', i < pinValue.length));
+        if (dots) {
+            dots.forEach((dot, i) => dot.classList.toggle('filled', i < pinValue.length));
+        }
 
         if (pinValue.length === 4) {
             let isCorrect = false;
@@ -1851,20 +1872,20 @@ export class UIManager {
             }
 
             if (isCorrect) {
-                dots.forEach(dot => dot.classList.add('success'));
+                if (dots) dots.forEach(dot => dot.classList.add('success'));
                 setTimeout(() => {
                     document.getElementById('lock-vessel')?.classList.remove('show');
                     document.body.classList.remove('vault-is-locked');
                     (document.getElementById('unlock-pin') as HTMLInputElement).value = '';
-                    dots.forEach(dot => dot.classList.remove('filled', 'success'));
+                    if (dots) dots.forEach(dot => dot.classList.remove('filled', 'success'));
                 }, 500);
                 this.showToast("Vault unlocked!", "success");
                 this.updateLastActivity('Vault unlocked');
             } else {
-                dots.forEach(dot => dot.classList.add('error'));
+                if (dots) dots.forEach(dot => dot.classList.add('error'));
                 setTimeout(() => {
                     (document.getElementById('unlock-pin') as HTMLInputElement).value = '';
-                    dots.forEach(dot => dot.classList.remove('filled', 'error'));
+                    if (dots) dots.forEach(dot => dot.classList.remove('filled', 'error'));
                 }, 800);
                 this.showToast("Incorrect PIN", "error");
             }
@@ -2745,5 +2766,36 @@ export class UIManager {
                 }
             };
         }
+    }
+
+    private showForgotPinConfirm() {
+        console.log("[UI] Showing static Forgot PIN confirmation modal...");
+        const modal = document.getElementById('modal-forgot-pin');
+        if (!modal) {
+            console.error("[UI] Static Forgot PIN modal NOT FOUND!");
+            return;
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+        modal.style.zIndex = "99999"; // Ensure it's on top of EVERYTHING
+
+        document.getElementById('confirm-forgot-pin-btn')?.addEventListener('click', async () => {
+            this.setLoading(true, "Signing Out", "RESETTING PIN SESSION");
+            try {
+                await (window as any).api.logout();
+                window.location.reload();
+            } catch (err) {
+                this.setLoading(false);
+                this.showToast("Logout failed", "error");
+            }
+        }, { once: true });
+
+        document.getElementById('cancel-forgot-pin-btn')?.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
+            pinIn?.focus();
+        }, { once: true });
     }
 }
