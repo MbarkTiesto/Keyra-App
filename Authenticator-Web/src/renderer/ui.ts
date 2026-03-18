@@ -489,7 +489,7 @@ export class UIManager {
 
         // Forgot PIN button
         document.getElementById('btn-forgot-pin')?.addEventListener('click', () => {
-            this.showToast("Please sign out and use your Master Password to sign in again", "info");
+            this.showForgotPinConfirm();
         });
 
         // Auto-unlock on PIN input
@@ -2143,6 +2143,148 @@ export class UIManager {
         });
 
         document.getElementById('cancel-remove-pin')?.addEventListener('click', () => this.hideModal());
+    }
+
+    private showForgotPinConfirm() {
+        const modal = document.getElementById('modal-forgot-pin');
+        if (!modal) return;
+
+        // Reset to main view
+        const mainView = document.getElementById('forgot-pin-main-view');
+        mainView?.classList.remove('hidden');
+
+        // Reset inputs and errors
+        const passwordInput = document.getElementById('forgot-pin-password') as HTMLInputElement;
+        const passForm = document.getElementById('form-forgot-pin');
+        const confirmBtn = document.getElementById('confirm-forgot-pin-btn');
+        
+        if (passwordInput) passwordInput.value = '';
+        passForm?.classList.add('hidden');
+        if (confirmBtn) {
+            confirmBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Reset PIN & Sign Out';
+        }
+
+        const errorEl = document.getElementById('forgot-pin-error');
+        if (errorEl) {
+            errorEl.textContent = '';
+            errorEl.classList.add('hidden');
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+
+        // Error helpers
+        const showError = (msg: string) => {
+            if (errorEl) {
+                errorEl.textContent = msg;
+                errorEl.classList.remove('hidden');
+            }
+        };
+        const hideError = () => {
+            if (errorEl) {
+                errorEl.textContent = '';
+                errorEl.classList.add('hidden');
+            }
+        };
+
+        // Complete PIN reset
+        const completePinReset = async () => {
+            this.showToast("Resetting Security...", "info");
+            localStorage.removeItem(this.getStorageKey('vault_pin'));
+            await this.pushSettings();
+            this.updateLockVaultVisibility();
+            modal.classList.remove('show');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            this.showToast("Signing Out...", "info");
+            await (window as any).api.logout();
+            window.location.reload();
+        };
+
+        // Master Password Handler
+        const confirmHandler = async (e?: Event) => {
+            e?.preventDefault();
+            const pForm = document.getElementById('form-forgot-pin');
+            const pInput = document.getElementById('forgot-pin-password') as HTMLInputElement;
+            const cBtn = document.getElementById('confirm-forgot-pin-btn');
+
+            // If form is hidden, show it first
+            if (pForm?.classList.contains('hidden')) {
+                pForm.classList.remove('hidden');
+                if (cBtn) {
+                    cBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirm Reset & Sign Out';
+                }
+                setTimeout(() => pInput?.focus(), 100);
+                return;
+            }
+
+            const password = pInput?.value || '';
+            hideError();
+            
+            if (!password) {
+                showError('Please enter your master password.');
+                pInput?.focus();
+                return;
+            }
+
+            this.showToast("Verifying Identity...", "info");
+            try {
+                const result = await (window as any).api.verifyMasterPassword(password);
+                if (!result.success) {
+                    showError(result.message || 'Incorrect password.');
+                    pInput?.select();
+                    return;
+                }
+                // Clear password on success for security
+                if (pInput) pInput.value = '';
+                await completePinReset();
+            } catch (err) {
+                showError('An error occurred. Please try again.');
+            }
+        };
+
+        // Cancel Handler
+        const cancelHandler = () => {
+            // If password form is visible, reset it and return to initial state
+            const pForm = document.getElementById('form-forgot-pin');
+            const pInput = document.getElementById('forgot-pin-password') as HTMLInputElement;
+            const cBtn = document.getElementById('confirm-forgot-pin-btn');
+            
+            if (pForm && !pForm.classList.contains('hidden')) {
+                pForm.classList.add('hidden');
+                if (pInput) pInput.value = '';
+                if (cBtn) {
+                    cBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i> Reset PIN & Sign Out';
+                }
+                hideError();
+                return;
+            }
+
+            // Otherwise, close the modal and return to PIN entry
+            modal.classList.remove('show');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            this.clearPinInput();
+        };
+
+        // Attach Event Listeners (clone to remove old)
+        const attachListener = (id: string, handler: (e?: Event) => void, event = 'click') => {
+            const el = document.getElementById(id);
+            if (el) {
+                const newEl = el.cloneNode(true);
+                el.parentNode?.replaceChild(newEl, el);
+                newEl.addEventListener(event, handler);
+            }
+        };
+
+        attachListener('confirm-forgot-pin-btn', confirmHandler);
+        attachListener('cancel-forgot-pin-btn', cancelHandler);
+
+        // Form submission
+        const form = document.getElementById('form-forgot-pin');
+        if (form) {
+            const newForm = form.cloneNode(true);
+            form.parentNode?.replaceChild(newForm, form);
+            newForm.addEventListener('submit', confirmHandler);
+        }
     }
 
     private showDeleteConfirm(account: any) {

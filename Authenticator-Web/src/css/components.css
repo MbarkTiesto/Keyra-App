@@ -521,6 +521,214 @@ i.fa-solid, i.fa-brands, i.fa-regular {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   MODAL COMPONENTS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(20px, 4vw, 32px);
+    gap: 0;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary);
+    opacity: 0.6;
+}
+
+.modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: clamp(14px, 3vw, 20px);
+    gap: 12px;
+}
+
+.modal-icon-vessel {
+    width: clamp(52px, 12vw, 64px);
+    height: clamp(52px, 12vw, 64px);
+    border-radius: clamp(14px, 3.5vw, 18px);
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-out);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.modal-icon-vessel i {
+    font-size: clamp(30px, 8vw, 36px);
+}
+
+.modal-icon-vessel.danger {
+    background: var(--bg-primary);
+    color: #ff3b30;
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.modal-title-vessel {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.modal-title-vessel h2 {
+    font-size: clamp(20px, 4vw, 24px);
+    font-weight: 900;
+    letter-spacing: -0.8px;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-title-vessel h2.danger {
+    color: #ff3b30;
+}
+
+.modal-title-vessel p {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 0;
+    opacity: 0.75;
+}
+
+.modal-divider {
+    height: 1px;
+    background: var(--nm-shadow-dark);
+    margin: 12px 0;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+}
+
+.modal-entity-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in);
+    border: none;
+    border-radius: var(--radius-md);
+    margin-bottom: clamp(16px, 3vw, 22px);
+}
+
+.modal-entity-badge .entity-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in-sm);
+    border: none;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    flex-shrink: 0;
+}
+
+.modal-entity-badge .entity-icon i {
+    font-size: 18px;
+}
+
+.modal-entity-badge .entity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.modal-entity-badge .entity-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-entity-badge .entity-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: clamp(16px, 3vw, 22px);
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.modal-footer .btn-primary,
+.modal-footer .user-button,
+.modal-footer .btn-danger {
+    flex: 1;
+    height: clamp(44px, 9vw, 52px);
+    font-size: clamp(13px, 2vw, 14px);
+    border-radius: var(--radius-lg);
+    font-weight: 800;
+}
+
+.modal-footer .btn-primary {
+    flex: 2;
+}
+
+.modal-content .form-group {
+    margin-bottom: 12px;
+}
+
+.modal-content .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.modal-content .form-input {
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.modal-content .form-label {
+    font-size: 11px;
+    margin-bottom: 6px;
+}
+
+.modal-help-text {
+    margin-top: 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    SCIENTIFIC BUTTONS & FORMS
    ───────────────────────────────────────────────────────────────────────────── */
 
@@ -571,6 +779,46 @@ i.fa-solid, i.fa-brands, i.fa-regular {
     transform: translateY(-3px) scale(1.02);
     box-shadow: var(--nm-shadow-out);
     color: var(--accent-hover);
+}
+
+/* Danger Button — used for destructive actions */
+.btn-danger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--bg-primary);
+    color: #ff3b30;
+    border: none;
+    padding: 0 var(--btn-px);
+    height: var(--btn-h-md);
+    border-radius: var(--radius-full);
+    font-weight: 850;
+    font-size: 15px;
+    letter-spacing: -0.2px;
+    box-shadow: var(--nm-shadow-out);
+    position: relative;
+    z-index: 1;
+    transition: all var(--transition-medium);
+    cursor: pointer;
+}
+
+.btn-danger i {
+    font-size: 16px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--nm-shadow-out);
+    background: #ff3b30;
+    color: white;
+}
+
+.btn-danger:active {
+    transform: scale(0.97);
+    box-shadow: var(--nm-shadow-in);
 }
 
 .btn-icon {
@@ -2402,6 +2650,62 @@ body.vault-is-locked .main-app-content,
     font-size: 14px;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   FORGOT PIN RECOVERY MODAL
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.recovery-modal {
+    max-width: 520px;
+    position: relative;
+}
+
+.modal-top-left {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 10;
+}
+
+.recovery-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.recovery-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: -4px;
+}
+
+.recovery-error {
+    color: #ff3b30;
+    font-size: 12px;
+    margin: -4px 0 0 0;
+    font-weight: 600;
+}
+
+.recovery-footer {
+    padding: 0 !important;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.recovery-btn {
+    width: 100%;
+    min-height: 56px;
+    white-space: nowrap;
+    justify-content: center !important;
+    font-size: 14px !important;
+}
+
+.spaced-top {
+    margin-top: 12px;
+}
+
 .pin-submit-btn {
     width: 100%;
     height: 64px;
@@ -2425,6 +2729,72 @@ body.vault-is-locked .main-app-content,
     letter-spacing: -1.2px;
     margin-bottom: 8px;
     color: var(--text-primary);
+}
+
+.auth-modal p {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+.auth-title {
+    font-size: clamp(32px, 8vw, 42px);
+    font-weight: 950;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin: 0;
+}
+
+.auth-subtitle {
+    color: var(--text-secondary);
+    margin-top: 6px;
+    font-weight: 850;
+    font-size: 12px;
+    opacity: 0.6;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+/* Auth Modal Close/Back Button */
+.auth-close-btn {
+    position: absolute;
+    top: 28px;
+    right: 28px;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-out-sm);
+    border: none;
+    cursor: pointer !important;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    z-index: 1000 !important;
+    pointer-events: auto !important;
+}
+
+.auth-close-btn:hover {
+    transform: scale(1.1);
+    color: #ff3b30;
+    box-shadow: var(--nm-shadow-out);
+}
+
+.auth-close-btn:active {
+    transform: scale(0.95);
+    box-shadow: var(--nm-shadow-in);
+}
+
+.auth-close-btn i {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+    line-height: 1;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -2457,13 +2827,6 @@ body.vault-is-locked .main-app-content,
     font-size: 56px;
     line-height: 1;
     color: var(--accent-primary);
-}
-
-.auth-modal p {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    opacity: 0.8;
 }
 
 /* Neumorphic Extra Utilities */

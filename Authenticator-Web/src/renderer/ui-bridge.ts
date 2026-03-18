@@ -22,6 +22,7 @@ export const bridge = {
     logout: async () => auth.logout(),
     getCurrentUser: async () => auth.getCurrentUser(),
     updateUserSettings: async (settings: any) => syncWrapper(() => auth.updateUserSettings(settings)),
+    verifyMasterPassword: async (password: string) => syncWrapper(() => auth.verifyMasterPassword(password)),
 
     // Account Management
     changeUsername: async (newName: string) => syncWrapper(() => auth.changeUsername(newName)),

@@ -835,6 +835,55 @@
             </div>
         </div>
 
+        <!-- Forgot PIN Recovery Modal -->
+        <div id="modal-forgot-pin" class="modal-overlay hidden">
+            <div class="modal animate-fade-in recovery-modal">
+                <button id="cancel-forgot-pin-btn" class="auth-close-btn modal-top-left" title="Back to PIN Entry">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+
+                <!-- Main View -->
+                <div id="forgot-pin-main-view" class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-icon-vessel danger">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <div class="modal-title-vessel">
+                            <h2 class="danger">Reset PIN?</h2>
+                            <p>SECURITY ACTION REQUIRED</p>
+                        </div>
+                    </div>
+                    <div class="modal-divider"></div>
+                    <div class="modal-body">
+                        <div class="modal-entity-badge">
+                            <div class="entity-icon">
+                                <i class="fa-solid fa-unlock-keyhole"></i>
+                            </div>
+                            <div class="entity-info">
+                                <span class="entity-name">Reset Identity PIN</span>
+                                <span class="entity-label">Requires Verification</span>
+                            </div>
+                        </div>
+                        <p class="modal-help-text spaced-top">Enter your master password to verify your identity and reset your PIN.</p>
+
+                        <!-- Master Password Form -->
+                        <form id="form-forgot-pin" class="settings-form hidden recovery-form">
+                            <div class="form-label recovery-label">Master Password</div>
+                            <input type="password" id="forgot-pin-password" class="form-input"
+                                placeholder="Enter your master password" autocomplete="current-password" required>
+                            <p id="forgot-pin-error" class="hidden recovery-error"></p>
+                        </form>
+                    </div>
+                    <div class="modal-footer recovery-footer">
+                        <button class="btn-danger recovery-btn" id="confirm-forgot-pin-btn">
+                            <i class="fa-solid fa-trash-can"></i>
+                            Reset PIN & Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Simulation Toast (Dynamic Backup) -->
         <div id="simulation-toast" class="hidden nm-card simulation-toast">
             <div class="simulation-toast-header">

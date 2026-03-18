@@ -187,6 +187,16 @@ export async function login(username: string, password: string): Promise<{ succe
     }
 }
 
+export async function verifyMasterPassword(password: string): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) return { success: false, message: "No active user session." };
+
+    if (!verifyPassword(password, currentUser.hash, currentUser.salt)) {
+        return { success: false, message: "Incorrect password." };
+    }
+
+    return { success: true, message: "Password verified." };
+}
+
 export async function checkSession(): Promise<{ success: boolean, message: string }> {
     const savedUser = localStorage.getItem('active_session_user');
     const savedKey = localStorage.getItem('active_session_key');
