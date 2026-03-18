@@ -2120,42 +2120,39 @@ export class UIManager {
 
     private showPinRemoval() {
         const content = `
-            <div class="pin-removal-modal">
-                <div class="pin-header">
-                    <div class="pin-brand-icon danger" style="width: 140px !important; height: 140px !important; margin-bottom: 48px !important;">
-                        <i class="fa-solid fa-shield" style="font-size: 72px !important;"></i>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon-vessel danger">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <h2 class="pin-title danger">Deactivate Security?</h2>
-                    <p class="pin-subtitle">VAULT WILL BE UNPROTECTED</p>
-                </div>
-
-                <div class="modal-entity-badge" style="margin: 20px 0;">
-                    <div class="entity-icon">
-                        <i class="fa-solid fa-lock"></i>
-                    </div>
-                    <div class="entity-info">
-                        <span class="entity-name">Master PIN Policy</span>
-                        <span class="entity-label">Active Protection</span>
+                    <div class="modal-title-vessel">
+                        <h2 class="danger">Deactivate Security?</h2>
+                        <p>VAULT WILL BE UNPROTECTED</p>
                     </div>
                 </div>
-
-                <div class="pin-warning-container">
-                    <div class="pin-warning-icon">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
+                
+                <div class="modal-divider"></div>
+                
+                <div class="modal-body">
+                    <div class="modal-entity-badge">
+                        <div class="entity-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div class="entity-info">
+                            <span class="entity-name">Master PIN Policy</span>
+                            <span class="entity-label">Active Protection</span>
+                        </div>
                     </div>
-                    <div class="pin-warning-text">
-                        Removing the PIN means anyone with access to this device can view your identities. This action is immediate.
-                    </div>
+                    
+                    <p class="modal-help-text">Removing the PIN means anyone with access to this device can view your identities. This action is immediate.</p>
                 </div>
-
-                <div class="pin-actions">
-                    <button class="btn-primary danger" id="confirm-remove-pin">
+                
+                <div class="modal-footer">
+                    <button class="btn-danger" id="confirm-remove-pin">
                         <i class="fa-solid fa-trash-can"></i>
                         Remove Security
                     </button>
-                    <button class="user-button" id="cancel-remove-pin">
-                        Keep PIN Active
-                    </button>
+                    <button class="user-button" id="cancel-remove-pin" style="justify-content: center;">Keep PIN Active</button>
                 </div>
             </div>
         `;
