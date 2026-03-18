@@ -311,13 +311,6 @@ export async function updateUserSettings(settings: any): Promise<void> {
     const userIndex = users.findIndex(u => u.id === currentUser!.id);
     if (userIndex === -1) throw new Error("User missing from storage.");
 
-    // Move autolock and vaultPin to root if they exist in the settings object, and remove them from the nested object
-    if (settings["Web Settings"] && settings["Web Settings"].autolock !== undefined) {
-        users[userIndex].autolock = String(settings["Web Settings"].autolock);
-        currentUser.autolock = String(settings["Web Settings"].autolock);
-        delete settings["Web Settings"].autolock;
-    }
-
     // Always target Web Settings for updates from this platform
     if (settings["Web Settings"]) {
         users[userIndex]["Web Settings"] = settings["Web Settings"];

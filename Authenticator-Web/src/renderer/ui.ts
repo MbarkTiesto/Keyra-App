@@ -88,6 +88,8 @@ export class UIManager {
 
     private getSettingsObject(): any {
         const vPin = localStorage.getItem(this.getStorageKey('vault_pin'));
+        const aLock = localStorage.getItem(this.getStorageKey('autolock')) || '0';
+        
         const obj: any = {
             Settings: {
                 theme: this.currentTheme,
@@ -103,12 +105,10 @@ export class UIManager {
                 privacyMode: this.privacyMode,
                 screenGuardian: this.screenGuardian,
                 vaultViewStyle: this.vaultViewStyle,
+                autolock: aLock,
                 vaultPin: vPin
             }
         };
-
-        const aLock = localStorage.getItem(this.getStorageKey('autolock'));
-        if (aLock !== null) obj.autolock = aLock;
 
         return obj;
     }
@@ -156,6 +156,8 @@ export class UIManager {
 
     private getWebSettingsObject(): any {
         const vPin = localStorage.getItem(this.getStorageKey('vault_pin'));
+        const aLock = localStorage.getItem(this.getStorageKey('autolock'));
+        
         const obj: any = {
             "Web Settings": {
                 theme: this.currentTheme,
@@ -163,12 +165,10 @@ export class UIManager {
                 privacyMode: this.privacyMode,
                 screenGuardian: this.screenGuardian,
                 vaultViewStyle: this.vaultViewStyle,
+                autolock: aLock || '0',
                 vaultPin: vPin
             }
         };
-
-        const aLock = localStorage.getItem(this.getStorageKey('autolock'));
-        if (aLock !== null) obj.autolock = aLock;
 
         return obj;
     }
@@ -198,7 +198,7 @@ export class UIManager {
         }
 
         // Apply to localStorage if requested (e.g. on initial sync from cloud)
-        if (saveLocal || settings.vaultPin !== undefined || settings.autolock !== undefined || settingsToApply.privacyMode !== undefined) {
+        if (saveLocal || settings.vaultPin !== undefined || settingsToApply.autolock !== undefined || settingsToApply.privacyMode !== undefined) {
             if (settingsToApply.theme) localStorage.setItem(this.getStorageKey('theme'), settingsToApply.theme);
             if (settingsToApply.accentColor) localStorage.setItem(this.getStorageKey('accent_color'), settingsToApply.accentColor);
 
@@ -209,7 +209,8 @@ export class UIManager {
                 localStorage.setItem(this.getStorageKey('vault_view_style'), settingsToApply.vaultViewStyle);
             }
 
-            const finalAutolock = settings.autolock !== undefined ? settings.autolock : settingsToApply.autolock;
+            // Read autolock from Web Settings (platform-specific)
+            const finalAutolock = webSettingsToApply.autolock !== undefined ? webSettingsToApply.autolock : settingsToApply.autolock;
             if (finalAutolock !== undefined) localStorage.setItem(this.getStorageKey('autolock'), String(finalAutolock));
 
             // Critical, Ensure the PIN is persisted to local storage

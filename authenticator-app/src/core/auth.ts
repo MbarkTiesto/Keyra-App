@@ -387,15 +387,16 @@ export async function updateUserSettings(settings: any, force: boolean = false):
     const userIndex = users.findIndex(u => u.id === currentUser!.id);
     if (userIndex === -1) throw new Error("User missing from storage.");
 
-    if (settings.autolock !== undefined) {
-        users[userIndex].autolock = String(settings.autolock);
-        currentUser.autolock = String(settings.autolock);
-        delete settings.autolock;
+    // Always target Desktop Settings for updates from this platform
+    if (settings["Desktop Settings"]) {
+        users[userIndex]["Desktop Settings"] = settings["Desktop Settings"];
+        currentUser["Desktop Settings"] = settings["Desktop Settings"];
+    } else {
+        // If it's a flat object, wrap it and avoid touching other platform blocks
+        delete settings["Web Settings"];
+        users[userIndex]["Desktop Settings"] = settings;
+        currentUser["Desktop Settings"] = settings;
     }
-
-    // Always target Desktop Settings
-    users[userIndex]["Desktop Settings"] = settings;
-    currentUser["Desktop Settings"] = settings;
 
     await saveUsers(users);
     return await syncUserData(currentUser.username, users[userIndex], force);

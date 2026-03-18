@@ -323,33 +323,33 @@ export class UIManager {
     private async initFromCloud() {
         const user = await (window as any).api.getCurrentUser();
         if (user) {
-            const settings = { 
-                ...(user.settings || {}),
-                autolock: user.autolock
-            };
-            this.applySettings(settings, false);
+            // Use Desktop Settings for this platform
+            const desktopSettings = user["Desktop Settings"] || user.settings || {};
+            this.applySettings(desktopSettings, false);
         }
     }
 
     private getSettingsObject(): any {
         return {
-            theme: localStorage.getItem(this.getStorageKey('theme')) || 'auto',
-            accentColor: localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple',
-            wallpaperPreset: this.wallpaperPreset,
-            privacyMode: this.privacyMode,
-            screenGuardian: this.screenGuardian,
-            autolock: localStorage.getItem(this.getStorageKey('autolock')) || '0',
-            oledMode: this.oledMode,
-            performanceMode: this.performanceMode,
-            menuExitIntegration: this.menuExitIntegration,
-            privacyBlur: this.privacyBlur,
-            windowResizable: this.windowResizable,
-            launchOnStartup: this.launchOnStartup,
-            minimizeToTray: this.minimizeToTray,
-            globalHotkey: this.globalHotkey,
-            autoCheckUpdates: this.autoCheckUpdates,
-            vaultViewStyle: this.vaultViewStyle,
-            vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
+            "Desktop Settings": {
+                theme: localStorage.getItem(this.getStorageKey('theme')) || 'auto',
+                accentColor: localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple',
+                wallpaperPreset: this.wallpaperPreset,
+                privacyMode: this.privacyMode,
+                screenGuardian: this.screenGuardian,
+                autolock: localStorage.getItem(this.getStorageKey('autolock')) || '0',
+                oledMode: this.oledMode,
+                performanceMode: this.performanceMode,
+                menuExitIntegration: this.menuExitIntegration,
+                privacyBlur: this.privacyBlur,
+                windowResizable: this.windowResizable,
+                launchOnStartup: this.launchOnStartup,
+                minimizeToTray: this.minimizeToTray,
+                globalHotkey: this.globalHotkey,
+                autoCheckUpdates: this.autoCheckUpdates,
+                vaultViewStyle: this.vaultViewStyle,
+                vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
+            }
         };
     }
 
