@@ -29,7 +29,8 @@ export function getCurrentUser() {
         email: currentUser.email,
         pendingEmail: currentUser.pendingEmail,
         settings: currentUser["Web Settings"],
-        autolock: currentUser.autolock
+        autolock: currentUser.autolock,
+        profilePicture: currentUser.profilePicture
     };
 }
 
@@ -151,6 +152,27 @@ export async function login(username: string, password: string): Promise<{ succe
         const decryptedJson = decryptVault(user.encryptedVaultData, key);
         JSON.parse(decryptedJson);
 
+        // Fetch latest user data from cloud (including profilePicture)
+        const cloudData = await getUserData(username);
+        if (cloudData) {
+            // Merge cloud data with local user, preserving critical fields
+            user = {
+                ...user,
+                ...cloudData,
+                // Ensure we keep the local encryption key-related fields
+                hash: user.hash,
+                salt: user.salt,
+                encryptedVaultData: cloudData.encryptedVaultData || user.encryptedVaultData
+            };
+            
+            // Update local storage with synced data
+            const userIndex = users.findIndex(u => u.username === username);
+            if (userIndex >= 0) {
+                users[userIndex] = user;
+                await saveUsers(users);
+            }
+        }
+
         currentUser = user;
         currentKey = key;
 
@@ -172,8 +194,30 @@ export async function checkSession(): Promise<{ success: boolean, message: strin
     if (savedUser && savedKey) {
         try {
             const users = await getUsers();
-            const user = users.find(u => u.username === savedUser);
+            let user = users.find(u => u.username === savedUser);
+            
             if (user) {
+                // Fetch latest user data from cloud (including profilePicture)
+                const cloudData = await getUserData(savedUser);
+                if (cloudData) {
+                    // Merge cloud data with local user
+                    user = {
+                        ...user,
+                        ...cloudData,
+                        // Ensure we keep the local encryption key-related fields
+                        hash: user.hash,
+                        salt: user.salt,
+                        encryptedVaultData: cloudData.encryptedVaultData || user.encryptedVaultData
+                    };
+                    
+                    // Update local storage with synced data
+                    const userIndex = users.findIndex(u => u.username === savedUser);
+                    if (userIndex >= 0) {
+                        users[userIndex] = user;
+                        await saveUsers(users);
+                    }
+                }
+                
                 currentUser = user;
                 currentKey = Buffer.from(savedKey, 'base64');
                 return { success: true, message: "Session resumed." };
@@ -391,6 +435,23 @@ export async function changeUsername(newUsername: string): Promise<{ success: bo
     localStorage.setItem('active_session_user', newUsername);
 
     return { success: true, message: "Display name updated." };
+}
+
+export async function updateProfilePicture(base64Image: string): Promise<{ success: boolean, message: string }> {
+    if (!currentUser) throw new Error("No active user session.");
+    
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const user = users[userIndex];
+    user.profilePicture = base64Image;
+    currentUser.profilePicture = base64Image; // Sync local session
+
+    await saveUsers(users);
+    await syncUserData(currentUser.username, user);
+
+    return { success: true, message: "Profile photo updated." };
 }
 
 export async function requestEmailChange(newEmail: string): Promise<{ success: boolean, message: string, code?: string }> {

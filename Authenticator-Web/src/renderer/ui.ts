@@ -862,21 +862,34 @@ export class UIManager {
             }
 
             const userNameDisplay = document.getElementById('user-name-display');
-            const userAvatar = document.getElementById('user-avatar');
             const dropdownName = document.getElementById('dropdown-user-name');
             const dropdownEmail = document.getElementById('dropdown-user-email');
 
             if (userNameDisplay && user) {
                 userNameDisplay.textContent = user.username;
             }
-            if (userAvatar && user) {
-                userAvatar.textContent = user.username.charAt(0).toUpperCase();
-            }
             if (dropdownName && user) {
                 dropdownName.textContent = user.username;
             }
             if (dropdownEmail && user) {
                 dropdownEmail.textContent = user.email || '';
+            }
+
+            // Navbar avatar: show profile picture or initials
+            if (user) {
+                const navbarAvatarImg = document.getElementById('navbar-avatar-img') as HTMLImageElement;
+                const navbarAvatarInitials = document.getElementById('navbar-avatar-initials');
+                if (navbarAvatarImg && navbarAvatarInitials) {
+                    if (user.profilePicture) {
+                        navbarAvatarImg.src = user.profilePicture;
+                        navbarAvatarImg.classList.remove('hidden');
+                        navbarAvatarInitials.classList.add('hidden');
+                    } else {
+                        navbarAvatarImg.classList.add('hidden');
+                        navbarAvatarInitials.classList.remove('hidden');
+                        navbarAvatarInitials.textContent = user.username.charAt(0).toUpperCase();
+                    }
+                }
             }
 
             await this.refreshAccounts();
@@ -1572,6 +1585,39 @@ export class UIManager {
         if (nameDisplay) nameDisplay.textContent = user.username;
         if (emailDisplay) emailDisplay.textContent = user.email;
 
+        // Account page avatar
+        const initialsEl = document.getElementById('acc-initials');
+        const avatarImgEl = document.getElementById('acc-avatar-img') as HTMLImageElement;
+        if (avatarImgEl && initialsEl) {
+            if (user.profilePicture) {
+                avatarImgEl.src = user.profilePicture;
+                avatarImgEl.classList.remove('hidden');
+                initialsEl.classList.add('hidden');
+            } else {
+                avatarImgEl.classList.add('hidden');
+                initialsEl.classList.remove('hidden');
+                const names = user.username.split(' ');
+                initialsEl.textContent = names.length > 1
+                    ? (names[0][0] + names[1][0]).toUpperCase()
+                    : user.username.slice(0, 2).toUpperCase();
+            }
+        }
+
+        // Sync navbar avatar
+        const navbarAvatarImg = document.getElementById('navbar-avatar-img') as HTMLImageElement;
+        const navbarAvatarInitials = document.getElementById('navbar-avatar-initials');
+        if (navbarAvatarImg && navbarAvatarInitials) {
+            if (user.profilePicture) {
+                navbarAvatarImg.src = user.profilePicture;
+                navbarAvatarImg.classList.remove('hidden');
+                navbarAvatarInitials.classList.add('hidden');
+            } else {
+                navbarAvatarImg.classList.add('hidden');
+                navbarAvatarInitials.classList.remove('hidden');
+                navbarAvatarInitials.textContent = user.username.charAt(0).toUpperCase();
+            }
+        }
+
         if (user.pendingEmail) {
             if (pendingContainer) pendingContainer.classList.remove('hidden');
             if (pendingEmailDisplay) pendingEmailDisplay.textContent = user.pendingEmail;
@@ -1593,6 +1639,39 @@ export class UIManager {
     private setupAccountEvents() {
         document.getElementById('account-settings-btn')?.addEventListener('click', () => {
             this.switchTab('account');
+        });
+
+        // Change Avatar
+        document.getElementById('btn-change-avatar')?.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/png, image/jpeg, image/webp';
+            input.onchange = async (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024) {
+                    this.showToast('Image must be less than 2MB', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    const base64 = ev.target?.result as string;
+                    try {
+                        const res = await (window as any).api.updateProfilePicture(base64);
+                        if (res.success) {
+                            this.showToast(res.message || 'Profile photo updated', 'success');
+                            await this.loadAccountInfo();
+                        } else {
+                            this.showToast(res.message || 'Failed to update photo', 'error');
+                        }
+                    } catch (err: any) {
+                        this.showToast(err.message || 'Failed to update profile picture', 'error');
+                    }
+                };
+                reader.onerror = () => this.showToast('Failed to read image file', 'error');
+                reader.readAsDataURL(file);
+            };
+            input.click();
         });
 
         document.getElementById('form-change-name')?.addEventListener('submit', async (e) => {
@@ -2042,7 +2121,7 @@ export class UIManager {
     private showDeleteConfirm(account: any) {
         const content = `
             <div style="padding: clamp(32px, 8vw, 48px); text-align: center;">
-                <div style="margin: 0 auto 24px; width: 96px; height: 96px; border-radius: 50%; background: var(--bg-primary); box-shadow: var(--nm-raised); display: flex; align-items: center; justify-content: center;">
+                <div style="margin: 0 auto 24px; width: 96px; height: 96px; border-radius: 50%; background: var(--bg-primary); box-shadow: var(--nm-shadow-out); display: flex; align-items: center; justify-content: center;">
                     <i class="fa-solid fa-trash-can" style="font-size: 36px; color: #ff3b30;"></i>
                 </div>
                 <h2 style="font-weight: 850; font-size: 24px; margin-bottom: 4px; color: var(--text-primary);" class="danger">Delete Token?</h2>

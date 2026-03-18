@@ -26,6 +26,7 @@ export const bridge = {
     // Account Management
     changeUsername: async (newName: string) => syncWrapper(() => auth.changeUsername(newName)),
     changePassword: async (newPassword: string) => syncWrapper(() => auth.changePassword(newPassword)),
+    updateProfilePicture: async (base64Image: string) => syncWrapper(() => auth.updateProfilePicture(base64Image)),
     requestEmailChange: async (newEmail: string) => syncWrapper(() => auth.requestEmailChange(newEmail)),
     confirmEmailChange: async (code: string) => syncWrapper(() => auth.confirmEmailChange(code)),
     cancelEmailChange: async () => syncWrapper(() => auth.cancelEmailChange()),

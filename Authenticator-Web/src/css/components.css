@@ -177,6 +177,53 @@ i.fa-solid, i.fa-brands, i.fa-regular {
     font-weight: 900;
     flex-shrink: 0;
     border: none;
+    overflow: hidden;
+    position: relative;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-avatar span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.acc-avatar-vessel {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-out);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.acc-avatar-vessel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.acc-avatar-vessel span {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--accent-primary);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 /* User Account Dropdown - Premium Glass */

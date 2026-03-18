@@ -189,7 +189,10 @@
                 <div class="navbar-section navbar-right">
                     <div class="user-menu">
                         <button class="user-button" id="user-dropdown-btn">
-                            <div class="user-avatar" id="user-avatar">?</div>
+                            <div class="user-avatar" id="user-avatar">
+                                <img id="navbar-avatar-img" class="hidden">
+                                <span id="navbar-avatar-initials">?</span>
+                            </div>
                             <span class="user-name" id="user-name-display">User</span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </button>
@@ -608,6 +611,7 @@
                 </div>
 
                 <div class="settings-grid">
+                    <!-- Profile Avatar Card -->
                     <!-- Profile info -->
                     <div class="account-card bento-card">
                         <div class="bento-header">
@@ -620,6 +624,21 @@
                             </div>
                         </div>
                         <div class="bento-content">
+                            <!-- Avatar Section -->
+                            <div style="display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-lg); padding: var(--space-md); background: var(--bg-primary); border-radius: var(--radius-md); box-shadow: var(--nm-shadow-in-sm);">
+                                <div class="acc-avatar-vessel">
+                                    <img id="acc-avatar-img" class="hidden">
+                                    <span id="acc-initials">?</span>
+                                </div>
+                                <div style="flex: 1;">
+                                    <button class="btn-primary" id="btn-change-avatar" style="height: 44px; font-size: 14px; padding: 0 24px;">
+                                        <i class="fa-solid fa-camera"></i>
+                                        <span>Change Photo</span>
+                                    </button>
+                                    <div class="modal-help-text" style="margin-top: 8px;">PNG, JPG or WebP. Max 2MB.</div>
+                                </div>
+                            </div>
+                            
                             <div class="setting-row">
                                 <div class="setting-info">
                                     <div class="setting-name">Vault Name</div>

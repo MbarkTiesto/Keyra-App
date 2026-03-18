@@ -32,6 +32,7 @@ export interface UserRecord {
     "Desktop Settings"?: any;
     "Web Settings"?: UserSettings;
     autolock: string;
+    profilePicture?: string;
 }
 
 const USERS_KEY = 'keyra_users';
