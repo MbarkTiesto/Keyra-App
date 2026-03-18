@@ -54,6 +54,25 @@ export class UIManager {
         this.updateLockVaultVisibility(); // Check PIN on startup
         this.startTimer();
         this.loadInitialData();
+        this.migratePinToEncrypted().catch(err => console.error("PIN migration error:", err)); // Migrate legacy plaintext PINs
+    }
+
+    /**
+     * Migrate legacy plaintext PINs to encrypted format
+     */
+    private async migratePinToEncrypted() {
+        const pin = localStorage.getItem(this.getStorageKey('vault_pin'));
+        if (pin && pin.length === 4 && /^\d+$/.test(pin)) {
+            console.log("Migrating legacy plaintext PIN to encrypted storage...");
+            try {
+                const encrypted = (window as any).api.encryptPIN(pin);
+                localStorage.setItem(this.getStorageKey('vault_pin'), encrypted);
+                await this.pushWebSettings();
+                console.log("PIN migration successful");
+            } catch (err) {
+                console.error("PIN migration failed:", err);
+            }
+        }
     }
 
     private async initFromCloud() {
@@ -1568,7 +1587,7 @@ export class UIManager {
         this.validateAndAutoUnlock(pinIn.value);
     }
 
-    private validateAndAutoUnlock(pinValue: string) {
+    private async validateAndAutoUnlock(pinValue: string) {
         const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
         const saved = localStorage.getItem(this.getStorageKey('vault_pin'));
         const progressDots = document.querySelectorAll('.pin-input-vessel .pin-dot');
@@ -1582,43 +1601,61 @@ export class UIManager {
         });
 
         if (pinValue.length === 4) {
-            if (pinValue === saved) {
-                // Success feedback
-                progressDots.forEach((dot, index) => {
+            try {
+                let isCorrect = false;
+                
+                // Check if it's a legacy plaintext PIN (4 digits)
+                if (saved && saved.length === 4 && /^\d+$/.test(saved)) {
+                    isCorrect = (pinValue === saved);
+                } else if (saved) {
+                    // Decrypt the encrypted PIN
+                    const decrypted = (window as any).api.decryptPIN(saved);
+                    isCorrect = (pinValue === decrypted);
+                }
+
+                if (isCorrect) {
+                    // Success feedback
+                    progressDots.forEach((dot, index) => {
+                        setTimeout(() => {
+                            dot.classList.remove('filled');
+                            dot.classList.add('success');
+                        }, index * 80);
+                    });
+
                     setTimeout(() => {
+                        document.getElementById('lock-vessel')?.classList.remove('show');
+                        document.body.classList.remove('vault-is-locked'); // Restore performance
+                        pinIn.value = '';
+                        progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
+
+                        // Security: Restore OTP codes after successful unlock
+                        this.renderAccounts();
+                    }, 800);
+
+                    this.showToast("Identity Verified", "success");
+                } else {
+                    // Error feedback
+                    const vessel = document.querySelector('.pin-input-vessel');
+                    vessel?.classList.add('animate-shake');
+                    progressDots.forEach(dot => {
                         dot.classList.remove('filled');
-                        dot.classList.add('success');
-                    }, index * 80);
-                });
+                        dot.classList.add('error');
+                    });
 
-                setTimeout(() => {
-                    document.getElementById('lock-vessel')?.classList.remove('show');
-                    document.body.classList.remove('vault-is-locked'); // Restore performance
-                    pinIn.value = '';
-                    progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
+                    setTimeout(() => {
+                        vessel?.classList.remove('animate-shake');
+                        pinIn.value = '';
+                        pinIn.focus();
+                        progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
+                    }, 1000);
 
-                    // Security: Restore OTP codes after successful unlock
-                    this.renderAccounts();
-                }, 800);
-
-                this.showToast("Identity Verified", "success");
-            } else {
-                // Error feedback
-                const vessel = document.querySelector('.pin-input-vessel');
-                vessel?.classList.add('animate-shake');
-                progressDots.forEach(dot => {
-                    dot.classList.remove('filled');
-                    dot.classList.add('error');
-                });
-
-                setTimeout(() => {
-                    vessel?.classList.remove('animate-shake');
-                    pinIn.value = '';
-                    pinIn.focus();
-                    progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
-                }, 1000);
-
-                this.showToast("Verification Failed", "error");
+                    this.showToast("Verification Failed", "error");
+                }
+            } catch (err) {
+                console.error("PIN validation error:", err);
+                this.showToast("PIN validation failed", "error");
+                if (pinIn) pinIn.value = '';
+                progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
             }
         }
     }
@@ -2099,8 +2136,9 @@ export class UIManager {
         continueBtn?.addEventListener('click', () => {
             if (pinField && pinField.value.length === 4) {
                 if (pinField.value === this.tempPin) {
-                    // PIN confirmed - save it
-                    localStorage.setItem(this.getStorageKey('vault_pin'), this.tempPin);
+                    // PIN confirmed - encrypt and save it
+                    const encryptedPin = (window as any).api.encryptPIN(this.tempPin);
+                    localStorage.setItem(this.getStorageKey('vault_pin'), encryptedPin);
                     this.pushWebSettings();
                     this.updateLockVaultVisibility();
                     this.showToast("PIN security activated successfully", "success");

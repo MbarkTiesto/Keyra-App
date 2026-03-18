@@ -156,7 +156,7 @@ export async function login(username: string, password: string): Promise<{ succe
         const cloudData = await getUserData(username);
         if (cloudData) {
             // Merge cloud data with local user, preserving critical fields
-            user = {
+            const mergedUser: UserRecord = {
                 ...user,
                 ...cloudData,
                 // Ensure we keep the local encryption key-related fields
@@ -168,16 +168,19 @@ export async function login(username: string, password: string): Promise<{ succe
             // Update local storage with synced data
             const userIndex = users.findIndex(u => u.username === username);
             if (userIndex >= 0) {
-                users[userIndex] = user;
+                users[userIndex] = mergedUser;
                 await saveUsers(users);
             }
+            
+            currentUser = mergedUser;
+        } else {
+            currentUser = user;
         }
-
-        currentUser = user;
+        
         currentKey = key;
 
         // Persist session for "Remember Me"
-        localStorage.setItem('active_session_user', user.username);
+        localStorage.setItem('active_session_user', currentUser.username);
         localStorage.setItem('active_session_key', key.toString('base64'));
 
         return { success: true, message: "Login successful." };
@@ -197,6 +200,24 @@ export async function verifyMasterPassword(password: string): Promise<{ success:
     return { success: true, message: "Password verified." };
 }
 
+// ─── PIN Encryption/Decryption ─────────────────────────────────────────────
+
+/**
+ * Encrypts a PIN using the current user's master key
+ */
+export function encryptPIN(pin: string): string {
+    if (!currentKey) throw new Error("No active user session.");
+    return encryptVault(pin, currentKey);
+}
+
+/**
+ * Decrypts an encrypted PIN using the current user's master key
+ */
+export function decryptPIN(encryptedPin: string): string {
+    if (!currentKey) throw new Error("No active user session.");
+    return decryptVault(encryptedPin, currentKey);
+}
+
 export async function checkSession(): Promise<{ success: boolean, message: string }> {
     const savedUser = localStorage.getItem('active_session_user');
     const savedKey = localStorage.getItem('active_session_key');
@@ -211,7 +232,7 @@ export async function checkSession(): Promise<{ success: boolean, message: strin
                 const cloudData = await getUserData(savedUser);
                 if (cloudData) {
                     // Merge cloud data with local user
-                    user = {
+                    const mergedUser: UserRecord = {
                         ...user,
                         ...cloudData,
                         // Ensure we keep the local encryption key-related fields
@@ -223,12 +244,15 @@ export async function checkSession(): Promise<{ success: boolean, message: strin
                     // Update local storage with synced data
                     const userIndex = users.findIndex(u => u.username === savedUser);
                     if (userIndex >= 0) {
-                        users[userIndex] = user;
+                        users[userIndex] = mergedUser;
                         await saveUsers(users);
                     }
+                    
+                    currentUser = mergedUser;
+                } else {
+                    currentUser = user;
                 }
                 
-                currentUser = user;
                 currentKey = Buffer.from(savedKey, 'base64');
                 return { success: true, message: "Session resumed." };
             }

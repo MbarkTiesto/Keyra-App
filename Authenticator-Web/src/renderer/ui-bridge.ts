@@ -32,6 +32,10 @@ export const bridge = {
     updateUserSettings: async (settings: any) => syncWrapper(() => auth.updateUserSettings(settings), "Saving Changes", "SYNCHRONIZING SECURE DATA"),
     verifyMasterPassword: async (password: string) => syncWrapper(() => auth.verifyMasterPassword(password), "Verifying", "MASTER KEY VALIDATION"),
 
+    // PIN Encryption/Decryption
+    encryptPIN: (pin: string) => auth.encryptPIN(pin),
+    decryptPIN: (encryptedPin: string) => auth.decryptPIN(encryptedPin),
+
     // Account Management
     changeUsername: async (newName: string) => syncWrapper(() => auth.changeUsername(newName), "Updating Profile", "SYNCHRONIZING CHANGES"),
     changePassword: async (newPassword: string) => syncWrapper(() => auth.changePassword(newPassword), "Re-encrypting Vault", "MASTER KEY ROTATION"),
