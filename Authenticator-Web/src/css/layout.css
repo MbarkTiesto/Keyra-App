@@ -450,6 +450,15 @@ body:has(.settings-container:not(.hidden)) .main-content {
         max-width: none;
     }
 
+    .search-add-group {
+        flex: 1;
+        gap: 6px;
+    }
+
+    .vault-view-toggle .segment {
+        width: 34px;
+    }
+
     .btn-primary#add-account-btn {
         width: var(--btn-h-lg);
         height: var(--btn-h-lg);

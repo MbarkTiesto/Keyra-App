@@ -233,16 +233,40 @@
                         <p class="section-subtitle">YOUR SAVED ACCOUNTS</p>
                     </div>
 
-                    <div class="search-vessel">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="vault-search" class="form-input search-input"
-                            placeholder="Search your accounts...">
+                    <div class="search-add-group">
+                        <div class="segmented-control vault-view-toggle" id="vault-view-segmented">
+                            <button class="segment" data-val="unified" title="Unified Progress Bar">
+                                <i class="fa-solid fa-grip-lines"></i>
+                            </button>
+                            <button class="segment active" data-val="compact" title="Individual Progress Bars">
+                                <i class="fa-solid fa-grip"></i>
+                            </button>
+                            <button class="segment" data-val="secure" title="Secure Hidden Codes">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </button>
+                            <div class="segment-indicator"></div>
+                        </div>
+                        <div class="search-vessel">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="vault-search" class="form-input search-input"
+                                placeholder="Search your accounts...">
+                        </div>
+                        <button class="btn-primary" id="add-account-btn">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Account</span>
+                        </button>
                     </div>
+                </div>
 
-                    <button class="btn-primary" id="add-account-btn">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Add Account</span>
-                    </button>
+                <!-- Global Timer Bar (Unified mode) -->
+                <div class="global-timer-vessel hidden" id="global-timer-vessel">
+                    <div class="global-timer-label">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Security Sync</span>
+                    </div>
+                    <div class="timer-linear-vessel global-bar">
+                        <div class="timer-linear-progress" id="global-otp-timer"></div>
+                    </div>
                 </div>
 
                 <div class="accounts-grid" id="accounts-grid">
@@ -733,8 +757,8 @@
         <!-- Logout Confirm -->
         <div id="modal-logout" class="modal-overlay">
             <div class="modal animate-fade-in" style="padding: clamp(32px, 8vw, 48px); text-align: center;">
-                <div style="margin-bottom: 24px; color: #ff3b30;">
-                    <i class="fa-solid fa-right-from-bracket" style="font-size: 64px;"></i>
+                <div style="margin: 0 auto 24px; width: 96px; height: 96px; border-radius: 50%; background: var(--bg-primary); box-shadow: var(--nm-raised); display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-right-from-bracket" style="font-size: 36px; color: #ff3b30;"></i>
                 </div>
                 <h2 style="margin-bottom: 12px; font-weight: 850; font-size: 26px; color: var(--text-primary);">Sign
                     Out?</h2>

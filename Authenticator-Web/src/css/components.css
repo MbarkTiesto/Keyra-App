@@ -2647,3 +2647,124 @@ body.vault-is-locked .main-app-content,
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   VAULT VIEW STYLE — TOGGLE & GLOBAL TIMER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* View toggle in section header */
+.vault-view-toggle {
+    flex-shrink: 0;
+}
+
+.vault-view-toggle .segment {
+    width: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vault-view-toggle .segment i {
+    font-size: 14px;
+    pointer-events: none;
+}
+
+/* search-add-group: wraps toggle + search + add button */
+.search-add-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex: 1;
+    min-width: 0;
+}
+
+.search-add-group .search-vessel {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Global timer vessel (unified mode) */
+.global-timer-vessel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: 12px 20px;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-pressed);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.global-timer-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.global-timer-label i {
+    font-size: 13px;
+    color: var(--accent-primary);
+}
+
+/* Linear progress bar (compact + unified modes) */
+.timer-linear-vessel {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.timer-linear-vessel.global-bar {
+    height: 8px;
+}
+
+.timer-linear-progress {
+    height: 100%;
+    width: 100%;
+    background: var(--accent-primary);
+    border-radius: 99px;
+    transform-origin: left;
+    transform: scaleX(1);
+    transition: transform 1s linear, background-color 0.3s ease;
+}
+
+/* Compact mode: linear bar inside otp-box */
+.otp-box {
+    position: relative;
+}
+
+.otp-box .timer-linear-vessel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    height: 4px;
+}
+
+/* Secure view button */
+.secure-view-btn {
+    background: var(--bg-primary) !important;
+    box-shadow: var(--nm-raised) !important;
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+}
+
+.secure-view-btn:hover {
+    box-shadow: var(--nm-raised-hover) !important;
+    color: var(--accent-primary) !important;
+}
+
+.secure-view-btn i {
+    color: var(--accent-primary);
+    font-size: 16px;
+}

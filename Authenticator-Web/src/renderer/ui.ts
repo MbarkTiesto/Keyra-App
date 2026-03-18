@@ -9,6 +9,7 @@ export class UIManager {
     private screenGuardian: boolean = false;
     private searchQuery: string = '';
     private syncCount: number = 0;
+    private vaultViewStyle: 'unified' | 'compact' | 'secure' = 'compact';
 
     public setSyncing(isSyncing: boolean) {
         if (isSyncing) this.syncCount++;
@@ -27,6 +28,7 @@ export class UIManager {
         this.initTheme();
         this.initPrivacyMode();
         this.initScreenGuardian();
+        this.initVaultViewStyle();
         this.initSegmentedStates();
         this.setupEventListeners();
         this.updateLockVaultVisibility(); // Check PIN on startup
@@ -173,6 +175,9 @@ export class UIManager {
         // Autolock
         const autolock = localStorage.getItem(this.getStorageKey('autolock')) || '0';
         this.updateSegmentedUI('autolock-segmented', autolock);
+
+        // Vault View Style
+        this.updateSegmentedUI('vault-view-segmented', this.vaultViewStyle);
     }
 
     private updateSegmentedUI(containerId: string, value: string) {
@@ -212,6 +217,15 @@ export class UIManager {
         if (toggle) {
             toggle.checked = this.screenGuardian;
         }
+    }
+
+    private initVaultViewStyle() {
+        const saved = localStorage.getItem(this.getStorageKey('vault_view_style')) as any;
+        if (saved && ['unified', 'compact', 'secure'].includes(saved)) {
+            this.vaultViewStyle = saved;
+        }
+        const globalVessel = document.getElementById('global-timer-vessel');
+        if (globalVessel) globalVessel.classList.toggle('hidden', this.vaultViewStyle !== 'unified');
     }
 
 
@@ -347,6 +361,22 @@ export class UIManager {
                 this.updateSegmentedUI('autolock-segmented', val);
                 this.pushWebSettings();
                 this.showToast(val === '0' ? "Auto-lock is off" : `Auto-lock set to ${val}m`, "info");
+            });
+        });
+
+        // Vault View Style Toggle
+        document.querySelectorAll('#vault-view-segmented .segment').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = btn.getAttribute('data-val') as 'unified' | 'compact' | 'secure';
+                if (!val) return;
+                this.vaultViewStyle = val;
+                localStorage.setItem(this.getStorageKey('vault_view_style'), val);
+                this.updateSegmentedUI('vault-view-segmented', val);
+                const globalVessel = document.getElementById('global-timer-vessel');
+                if (globalVessel) globalVessel.classList.toggle('hidden', val !== 'unified');
+                this.renderAccounts();
+                const labels: Record<string, string> = { unified: 'Unified', compact: 'Compact', secure: 'Secure' };
+                this.showToast(`View: ${labels[val]}`, "info");
             });
         });
 
@@ -960,23 +990,38 @@ export class UIManager {
             </div>
             
             <div class="otp-box">
+                ${this.vaultViewStyle !== 'secure' ? `
                 <div class="otp-code ${this.privacyMode ? 'privacy-hidden' : ''}" data-id="${account.id}" style="cursor: pointer;" title="Click to copy">
                     ${this.privacyMode ? '••••••' : '------'}
                 </div>
+                ` : `
+                <button class="btn-primary secure-view-btn" style="width: 100%; height: 50px;">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Secure View</span>
+                </button>
+                `}
+                ${this.vaultViewStyle === 'compact' ? `
+                <div class="timer-linear-vessel" style="position: absolute; bottom: 0; left: 0; right: 0;">
+                    <div class="timer-linear-progress"></div>
+                </div>
+                ` : this.vaultViewStyle === 'unified' || this.vaultViewStyle === 'secure' ? '' : `
                 <div class="timer-container" style="position: absolute; right: 12px; width: 24px; height: 24px;">
                     <svg viewBox="0 0 60 60">
                         <circle cx="30" cy="30" r="26" fill="none" class="timer-bg" style="stroke: var(--bg-secondary); stroke-width: 4;"></circle>
                         <circle class="timer-progress" cx="30" cy="30" r="26" fill="none" stroke-dasharray="163.36" stroke-dashoffset="0" style="stroke: var(--accent-primary); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s linear;"></circle>
                     </svg>
                 </div>
+                `}
             </div>
 
+            ${this.vaultViewStyle !== 'secure' ? `
             <div style="display: flex; gap: 10px;">
                 <button class="btn-primary copy-btn" style="flex: 1; height: 44px; font-size: 14px;">
                     <i class="fa-solid fa-copy"></i>
                     <span class="btn-text">Secure Copy</span>
                 </button>
             </div>
+            ` : ''}
         `;
 
         // 3-dot dropdown toggle
@@ -1001,7 +1046,7 @@ export class UIManager {
         }, { once: true });
 
         const codeElement = card.querySelector('.otp-code') as HTMLElement;
-        codeElement.addEventListener('click', async () => {
+        codeElement?.addEventListener('click', async () => {
             if (document.body.classList.contains('vault-is-locked')) {
                 this.showToast("Vault Locked - Enter PIN to Access", "error");
                 return;
@@ -1011,7 +1056,7 @@ export class UIManager {
         });
 
         const copyBtn = card.querySelector('.copy-btn') as HTMLElement;
-        copyBtn.onclick = async () => {
+        if (copyBtn) copyBtn.onclick = async () => {
             if (document.body.classList.contains('vault-is-locked')) {
                 this.showToast("Vault Locked - Enter PIN to Access", "error");
                 return;
@@ -1039,38 +1084,64 @@ export class UIManager {
             this.showDeleteConfirm(account);
         });
 
+        card.querySelector('.secure-view-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (document.body.classList.contains('vault-is-locked')) {
+                this.showToast("Vault Locked - Enter PIN to Access", "error");
+                return;
+            }
+            this.showOtpModal(account);
+        });
+
         this.updateCardOTP(card, account.secret, 30);
         return card;
     }
 
     private async updateCardOTP(card: HTMLElement, secret: string, remainingSeconds: number) {
-        const codeElement = card.querySelector('.otp-code');
-        if (!codeElement) return;
+        const codeElement = card.querySelector('.otp-code') as HTMLElement;
 
         // Security: Don't generate or display OTP codes if vault is locked
         if (document.body.classList.contains('vault-is-locked')) {
-            codeElement.textContent = '••••••';
+            if (codeElement) codeElement.textContent = '••••••';
             return;
         }
 
-        if (this.privacyMode) {
-            if (codeElement.textContent !== '••••••') {
-                codeElement.textContent = '••••••';
-            }
-        } else {
-            const otp = await (window as any).api.generateTOTP(secret);
-            const displayOtp = otp.substring(0, 3) + ' ' + otp.substring(3);
-            if (codeElement.textContent !== displayOtp) {
-                codeElement.textContent = displayOtp;
+        if (codeElement) {
+            if (this.privacyMode) {
+                if (codeElement.textContent !== '••••••') codeElement.textContent = '••••••';
+            } else {
+                const otp = await (window as any).api.generateTOTP(secret);
+                const displayOtp = otp.substring(0, 3) + ' ' + otp.substring(3);
+                if (codeElement.textContent !== displayOtp) codeElement.textContent = displayOtp;
             }
         }
 
-        // Update timer
-        const dashOffset = 163.36 * (1 - remainingSeconds / 30);
-        const progressCircle = card.querySelector('.timer-progress') as HTMLElement;
-        if (progressCircle) {
-            progressCircle.style.strokeDashoffset = dashOffset.toString();
-            progressCircle.style.stroke = remainingSeconds <= 5 ? '#ff3b30' : 'var(--accent-primary)';
+        // Mode 1: Unified — update global bar only
+        if (this.vaultViewStyle === 'unified') {
+            const globalBar = document.getElementById('global-otp-timer') as HTMLElement;
+            if (globalBar) {
+                const scale = remainingSeconds / 30;
+                globalBar.style.transform = `scaleX(${scale})`;
+                globalBar.style.backgroundColor = remainingSeconds <= 5 ? '#ff3b30' : 'var(--accent-primary)';
+            }
+        }
+        // Mode 2: Compact — individual linear bar
+        else if (this.vaultViewStyle === 'compact') {
+            const progressBar = card.querySelector('.timer-linear-progress') as HTMLElement;
+            if (progressBar) {
+                const scale = remainingSeconds / 30;
+                progressBar.style.transform = `scaleX(${scale})`;
+                progressBar.style.backgroundColor = remainingSeconds <= 5 ? '#ff3b30' : 'var(--accent-primary)';
+            }
+        }
+        // Mode 3: Secure — SVG circle timer (fallback, no code shown)
+        else {
+            const dashOffset = 163.36 * (1 - remainingSeconds / 30);
+            const progressCircle = card.querySelector('.timer-progress') as HTMLElement;
+            if (progressCircle) {
+                progressCircle.style.strokeDashoffset = dashOffset.toString();
+                progressCircle.style.stroke = remainingSeconds <= 5 ? '#ff3b30' : 'var(--accent-primary)';
+            }
         }
     }
 
@@ -1971,8 +2042,8 @@ export class UIManager {
     private showDeleteConfirm(account: any) {
         const content = `
             <div style="padding: clamp(32px, 8vw, 48px); text-align: center;">
-                <div style="color: #ff3b30; margin-bottom: 24px;">
-                    <i class="fa-solid fa-trash-can" style="font-size: 64px;"></i>
+                <div style="margin: 0 auto 24px; width: 96px; height: 96px; border-radius: 50%; background: var(--bg-primary); box-shadow: var(--nm-raised); display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-trash-can" style="font-size: 36px; color: #ff3b30;"></i>
                 </div>
                 <h2 style="font-weight: 850; font-size: 24px; margin-bottom: 4px; color: var(--text-primary);" class="danger">Delete Token?</h2>
                 <div class="modal-help-text" style="font-weight: 800; opacity: 0.8; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; margin-bottom: 24px;">PERMANENT ACTION</div>
@@ -2008,6 +2079,80 @@ export class UIManager {
             this.showToast("Identity destroyed", "info");
         });
         document.getElementById('cancel-delete-btn')?.addEventListener('click', () => this.hideModal());
+    }
+
+    private async showOtpModal(account: any) {
+        const otp = await (window as any).api.generateTOTP(account.secret);
+        const formatted = otp.substring(0, 3) + ' ' + otp.substring(3);
+        const remaining = await (window as any).api.getRemainingSeconds();
+        const circumference = 2 * Math.PI * 54;
+        const offset = circumference - (remaining / 30) * circumference;
+
+        const content = `
+            <div style="padding: clamp(var(--space-md), 8vw, var(--space-xl)); text-align: center;">
+                <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); text-align: left;">
+                    <div class="account-icon nm-icon-large" style="width: 64px; height: 64px; flex-shrink: 0;">
+                        <i class="${this.getIcon(account.issuer)}"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-weight: 900; font-size: clamp(20px, 4vw, 26px); color: var(--text-primary); letter-spacing: -0.5px;">${account.issuer}</h2>
+                        <div style="color: var(--text-secondary); font-size: 13px; font-weight: 600;">${account.account}</div>
+                    </div>
+                </div>
+
+                <div style="position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto var(--space-lg); width: 220px; height: 220px;">
+                    <svg viewBox="0 0 120 120" style="position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg);">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="var(--bg-secondary)" stroke-width="5"></circle>
+                        <circle class="otp-modal-circle" cx="60" cy="60" r="54" fill="none"
+                            stroke="var(--accent-primary)" stroke-width="7" stroke-linecap="round"
+                            stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+                            style="transition: stroke-dashoffset 1s linear;"></circle>
+                    </svg>
+                    <div style="position: relative; text-align: center; width: 100%; padding: 0 24px; box-sizing: border-box;">
+                        <div class="otp-modal-code" style="font-size: clamp(24px, 6vw, 30px); font-weight: 900; letter-spacing: 6px; color: var(--accent-primary); line-height: 1; white-space: nowrap;">${formatted}</div>
+                        <div class="otp-modal-timer" style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-top: 6px;">${remaining}s</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: var(--space-md);">
+                    <button class="btn-primary otp-modal-copy-btn" style="flex: 2; height: var(--btn-h-lg); font-size: 16px;">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>Copy Code</span>
+                    </button>
+                    <button class="user-button" id="otp-modal-close" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Close</button>
+                </div>
+            </div>
+        `;
+        this.showModal(content);
+
+        document.getElementById('otp-modal-close')?.addEventListener('click', () => this.hideModal());
+        document.querySelector('.otp-modal-copy-btn')?.addEventListener('click', async () => {
+            const code = await (window as any).api.generateTOTP(account.secret);
+            await navigator.clipboard.writeText(code);
+            this.showToast("Code copied!", "success");
+        });
+
+        // Live update the modal timer
+        const modalInterval = setInterval(async () => {
+            const overlay = document.getElementById('modal-overlay');
+            if (!overlay?.classList.contains('show')) { clearInterval(modalInterval); return; }
+            const rem = await (window as any).api.getRemainingSeconds();
+            const newOtp = await (window as any).api.generateTOTP(account.secret);
+            const newFormatted = newOtp.substring(0, 3) + ' ' + newOtp.substring(3);
+            const codeEl = overlay.querySelector('.otp-modal-code') as HTMLElement;
+            const timerEl = overlay.querySelector('.otp-modal-timer') as HTMLElement;
+            const circle = overlay.querySelector('.otp-modal-circle') as SVGCircleElement;
+            if (codeEl) codeEl.textContent = newFormatted;
+            if (timerEl) {
+                timerEl.textContent = `${rem}s`;
+                timerEl.style.color = rem <= 5 ? '#ff3b30' : 'var(--text-secondary)';
+            }
+            if (circle) {
+                const circ = 2 * Math.PI * 54;
+                circle.style.strokeDashoffset = String(circ - (rem / 30) * circ);
+                circle.style.stroke = rem <= 5 ? '#ff3b30' : 'var(--accent-primary)';
+            }
+        }, 1000);
     }
 
     private showImportPasswordModal(data: any) {
