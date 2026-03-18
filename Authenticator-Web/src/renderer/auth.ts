@@ -53,6 +53,19 @@ export async function setupAuthUI() {
         }
     }
 
+    function setAuthLoading(show: boolean, text: string = "Unlocking Vault...") {
+        const overlay = document.getElementById('auth-loading-overlay');
+        const label = document.getElementById('auth-loading-text');
+        if (overlay) {
+            if (show) {
+                if (label) label.textContent = text;
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+    }
+
     function switchState(toHide: HTMLElement, toShow: HTMLElement) {
         toHide.classList.add('hidden');
         toShow.classList.remove('hidden');
@@ -97,6 +110,7 @@ export async function setupAuthUI() {
             return;
         }
 
+        setAuthLoading(true, "Unlocking Vault...");
         try {
             const result = await window.api.login(user, pass);
             if (result.success) {
@@ -111,6 +125,8 @@ export async function setupAuthUI() {
             err.textContent = "Vault access denied.";
             err.style.opacity = '1';
             err.classList.add('animate-shake');
+        } finally {
+            setAuthLoading(false);
         }
     });
 
@@ -141,6 +157,7 @@ export async function setupAuthUI() {
             return;
         }
 
+        setAuthLoading(true, "Creating Vault...");
         try {
             const result = await window.api.signup(user, email, pass);
             if (result.success) {
@@ -157,6 +174,8 @@ export async function setupAuthUI() {
             err.textContent = "Registry expansion failed.";
             err.style.opacity = '1';
             err.classList.add('animate-shake');
+        } finally {
+            setAuthLoading(false);
         }
     });
 
@@ -178,6 +197,7 @@ export async function setupAuthUI() {
         const err = document.getElementById('verify-error')!;
         
         err.classList.remove('animate-shake');
+        setAuthLoading(true, "Verifying Identity...");
         try {
             const result = await window.api.verifyEmail(email, code);
             if (result.success) {
@@ -195,6 +215,8 @@ export async function setupAuthUI() {
             err.textContent = "Sync error.";
             err.style.opacity = '1';
             err.classList.add('animate-shake');
+        } finally {
+            setAuthLoading(false);
         }
     }
 

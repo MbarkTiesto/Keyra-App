@@ -21,6 +21,26 @@ export class UIManager {
         }
     }
 
+    public setLoading(show: boolean, title: string = "Processing", subtitle: string = "VAULT SECURITY SYNCHRONIZATION") {
+        const overlay = document.getElementById('loading-overlay');
+        const titleEl = document.getElementById('loading-title');
+        const subtitleEl = document.getElementById('loading-subtitle');
+
+        if (overlay) {
+            if (show) {
+                if (titleEl) titleEl.textContent = title;
+                if (subtitleEl) subtitleEl.textContent = subtitle;
+                overlay.classList.remove('hidden');
+                // Small delay to ensure display: block is processed before opacity starts
+                setTimeout(() => overlay.classList.add('show'), 10);
+            } else {
+                overlay.classList.remove('show');
+                // Match CSS transition duration (assuming 400ms from components.css transition)
+                setTimeout(() => overlay.classList.add('hidden'), 400); 
+            }
+        }
+    }
+
     public userId: string;
 
     constructor(userId: string = 'default') {

@@ -149,6 +149,17 @@
                         to Login</button>
                 </div>
             </div>
+
+            <!-- Auth Loading Overlay (Premium Neuomorphic) -->
+            <div id="auth-loading-overlay" class="auth-loading-overlay hidden">
+                <div class="auth-loader-content">
+                    <div class="auth-spinner-ring">
+                        <div class="auth-spinner-inner"></div>
+                    </div>
+                    <p id="auth-loading-text" class="auth-loader-label">Unlocking Vault...</p>
+                    <p class="auth-loader-sublabel">SECURE CONNECTION</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -910,6 +921,18 @@
                 </div>
                 <h2>Vault Hidden</h2>
                 <p>We've hidden your data to keep it private.</p>
+            </div>
+        </div>
+
+        <!-- Global Loading Overlay (Premium Neuomorphic) -->
+        <div id="loading-overlay" class="modal-overlay hidden" style="z-index: 99999;">
+            <div class="loading-content">
+                <div class="nm-spinner-vessel">
+                    <div class="nm-spinner"></div>
+                    <div class="nm-spinner-inner"></div>
+                </div>
+                <h2 id="loading-title" class="loading-title">Processing</h2>
+                <p id="loading-subtitle" class="loading-subtitle">VAULT SECURITY SYNCHRONIZATION</p>
             </div>
         </div>
 

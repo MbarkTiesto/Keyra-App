@@ -2,40 +2,48 @@ import * as auth from '../core/auth';
 import * as totp from '../core/totp';
 import { parseOTPAuthURI } from '../core/otpauth';
 
-const syncWrapper = async <T>(fn: () => Promise<T>): Promise<T> => {
+const syncWrapper = async <T>(fn: () => Promise<T>, title: string = "Processing", subtitle: string = "VAULT SECURITY SYNCHRONIZATION"): Promise<T> => {
     const ui = (window as any).ui;
-    if (ui) ui.setSyncing(true);
+    if (ui) {
+        ui.setSyncing(true);
+        ui.setLoading(true, title, subtitle);
+    }
     try {
         return await fn();
     } finally {
-        if (ui) setTimeout(() => ui.setSyncing(false), 500); // 500ms min show time to avoid flicker
+        if (ui) {
+            setTimeout(() => {
+                ui.setSyncing(false);
+                ui.setLoading(false);
+            }, 500); // 500ms min show time to avoid flicker
+        }
     }
 };
 
 export const bridge = {
     // Auth System
-    signup: async (user: string, email: string, pass: string) => syncWrapper(() => auth.signup(user, email, pass)),
-    resendCode: async (email: string) => syncWrapper(() => auth.resendCode(email)),
-    verifyEmail: async (email: string, code: string) => syncWrapper(() => auth.verifyEmail(email, code)),
-    login: async (user: string, pass: string) => syncWrapper(() => auth.login(user, pass)),
-    checkSession: async () => syncWrapper(() => auth.checkSession()),
+    signup: async (user: string, email: string, pass: string) => syncWrapper(() => auth.signup(user, email, pass), "Creating Vault", "SECURE VAULT INITIALIZATION"),
+    resendCode: async (email: string) => syncWrapper(() => auth.resendCode(email), "Resending Code", "SECURITY VERIFICATION"),
+    verifyEmail: async (email: string, code: string) => syncWrapper(() => auth.verifyEmail(email, code), "Verifying", "FINALIZING IDENTITY"),
+    login: async (user: string, pass: string) => syncWrapper(() => auth.login(user, pass), "Unlocking Vault", "SECURE CONNECTION"),
+    checkSession: async () => syncWrapper(() => auth.checkSession(), "Syncing", "CHECKING VAULT STATUS"),
     logout: async () => auth.logout(),
     getCurrentUser: async () => auth.getCurrentUser(),
-    updateUserSettings: async (settings: any) => syncWrapper(() => auth.updateUserSettings(settings)),
-    verifyMasterPassword: async (password: string) => syncWrapper(() => auth.verifyMasterPassword(password)),
+    updateUserSettings: async (settings: any) => syncWrapper(() => auth.updateUserSettings(settings), "Saving Changes", "SYNCHRONIZING SECURE DATA"),
+    verifyMasterPassword: async (password: string) => syncWrapper(() => auth.verifyMasterPassword(password), "Verifying", "MASTER KEY VALIDATION"),
 
     // Account Management
-    changeUsername: async (newName: string) => syncWrapper(() => auth.changeUsername(newName)),
-    changePassword: async (newPassword: string) => syncWrapper(() => auth.changePassword(newPassword)),
-    updateProfilePicture: async (base64Image: string) => syncWrapper(() => auth.updateProfilePicture(base64Image)),
-    requestEmailChange: async (newEmail: string) => syncWrapper(() => auth.requestEmailChange(newEmail)),
-    confirmEmailChange: async (code: string) => syncWrapper(() => auth.confirmEmailChange(code)),
-    cancelEmailChange: async () => syncWrapper(() => auth.cancelEmailChange()),
-    resendEmailChangeCode: async () => syncWrapper(() => auth.resendEmailChangeCode()),
+    changeUsername: async (newName: string) => syncWrapper(() => auth.changeUsername(newName), "Updating Profile", "SYNCHRONIZING CHANGES"),
+    changePassword: async (newPassword: string) => syncWrapper(() => auth.changePassword(newPassword), "Re-encrypting Vault", "MASTER KEY ROTATION"),
+    updateProfilePicture: async (base64Image: string) => syncWrapper(() => auth.updateProfilePicture(base64Image), "Updating Photo", "UPLOADING AVATAR"),
+    requestEmailChange: async (newEmail: string) => syncWrapper(() => auth.requestEmailChange(newEmail), "Processing", "INITIATING EMAIL ROTATION"),
+    confirmEmailChange: async (code: string) => syncWrapper(() => auth.confirmEmailChange(code), "Verifying", "FINALIZING EMAIL IDENTITY"),
+    cancelEmailChange: async () => syncWrapper(() => auth.cancelEmailChange(), "Cancelling", "REVERTING CHANGES"),
+    resendEmailChangeCode: async () => syncWrapper(() => auth.resendEmailChangeCode(), "Resending", "SECURITY CODE ROTATION"),
 
     // Operations
     getAccounts: async () => {
-        try { return await syncWrapper(() => auth.getActiveAccounts()); }
+        try { return await syncWrapper(() => auth.getActiveAccounts(), "Loading Vault", "SYNCHRONIZING SECURE DATA"); }
         catch (err) { return []; }
     },
     saveAccount: async (account: any) => {
@@ -50,7 +58,7 @@ export const bridge = {
                 }
                 await auth.saveActiveAccounts(accounts);
                 return accounts;
-            });
+            }, "Syncing Vault", "SECURE CLOUD BACKUP");
         } catch (err) {
             console.error("Save Account Error:", err);
             return [];
@@ -63,7 +71,7 @@ export const bridge = {
                 accounts = accounts.filter((a: any) => a.id !== id);
                 await auth.saveActiveAccounts(accounts);
                 return accounts;
-            });
+            }, "Updating Vault", "CLOUD SYNCHRONIZATION");
         } catch (err) {
             return [];
         }
@@ -116,7 +124,7 @@ export const bridge = {
         });
     },
     performVaultImport: async (salt: string, encryptedVaultData: string, pass: string, autolock?: string, desktopSettings?: any, webSettings?: any) => 
-        syncWrapper(() => auth.importVaultData(salt, encryptedVaultData, pass, autolock, desktopSettings, webSettings)),
+        syncWrapper(() => auth.importVaultData(salt, encryptedVaultData, pass, autolock, desktopSettings, webSettings), "Restoring Vault", "DECRYPTING SECURITY ARCHIVE"),
     
     setContentProtection: async (enabled: boolean) => {
         console.log("Content protection requested:", enabled);
