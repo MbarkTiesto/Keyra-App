@@ -843,6 +843,27 @@ export class UIManager {
             this.updateLastActivity(`Menu Exit ${this.menuExitIntegration ? 'on' : 'off'}`);
         });
 
+        // Private Sync Listeners
+        document.getElementById('btn-open-private-sync')?.addEventListener('click', () => {
+            this.openPrivateSyncModal();
+        });
+
+        document.getElementById('btn-close-private-sync')?.addEventListener('click', () => {
+            const modal = document.getElementById('modal-private-sync');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+        });
+
+        document.getElementById('btn-test-sync-connection')?.addEventListener('click', () => {
+            this.testPrivateSyncConnection();
+        });
+
+        document.getElementById('btn-save-private-sync')?.addEventListener('click', () => {
+            this.savePrivateSyncConfig();
+        });
+
         // Vault View Type Toggle (Vault View Header)
         const countdownSegmented = document.getElementById('countdown-style-segmented');
         countdownSegmented?.querySelectorAll('.segment').forEach(btn => {
@@ -910,6 +931,26 @@ export class UIManager {
 
         // Accent Color
         this.setupAccentColorSelector();
+        
+        // Cloud Sync Toggle (Unified for both online and private sync)
+        document.getElementById('cloud-sync-toggle')?.addEventListener('change', async (e) => {
+            const target = e.target as HTMLInputElement;
+            const user = await (window as any).api.getCurrentUser();
+            
+            if (user?.isLocal) {
+                if (user.privateSync) {
+                    const newConfig = { ...user.privateSync, enabled: target.checked };
+                    await (window as any).api.updatePrivateSyncConfig(newConfig);
+                    this.showToast(target.checked ? "Private Auto-Sync enabled" : "Private Auto-Sync disabled", "info");
+                }
+            } else {
+                // Online sync toggle logic (already persisted via pushSettings and settings object)
+                this.pushSettings();
+                this.showToast(target.checked ? "Cloud Auto-Sync enabled" : "Cloud Auto-Sync disabled", "info");
+            }
+            this.updateLastActivity(`Sync ${target.checked ? 'on' : 'off'}`);
+        });
+
         document.getElementById('btn-sync-now')?.addEventListener('click', () => this.manualSync());
 
         // Vault Maintenance
@@ -1382,19 +1423,142 @@ export class UIManager {
     private handleLocalAccountUI(user: any) {
         const syncCard = document.getElementById('sync-settings-card');
         const syncOverlay = document.getElementById('sync-disabled-overlay');
+        const syncTitle = document.getElementById('sync-settings-title');
+        const syncSubtitle = document.getElementById('sync-settings-subtitle');
+        const syncStatusDesc = document.getElementById('sync-status-desc');
+        const syncToggle = document.getElementById('cloud-sync-toggle') as HTMLInputElement;
 
         if (user.isLocal) {
             document.body.classList.add('local-only');
-            const syncStatusDesc = document.getElementById('sync-status-desc');
-            if (syncStatusDesc) syncStatusDesc.textContent = "Offline Mode Active";
             
-            // Show Disabled Overlay instead of hiding the card (which is handled by CSS partially)
-            if (syncCard) syncCard.classList.add('disabled-card');
-            if (syncOverlay) syncOverlay.classList.remove('hidden');
+            if (user.privateSync && user.privateSync.pat) {
+                // Private Sync is configured
+                if (syncTitle) syncTitle.textContent = "Private Sync";
+                if (syncSubtitle) syncSubtitle.textContent = "GITHUB REPOSITORY STORAGE";
+                if (syncStatusDesc) syncStatusDesc.textContent = user.privateSync.enabled ? "Private GitHub Sync Active" : "Private Sync Paused";
+                
+                // Unlock the card
+                if (syncCard) syncCard.classList.remove('disabled-card');
+                if (syncOverlay) {
+                    syncOverlay.classList.add('hidden');
+                    (syncOverlay as HTMLElement).style.display = 'none';
+                }
+                
+                // Sync toggle state
+                if (syncToggle) syncToggle.checked = !!user.privateSync.enabled;
+            } else {
+                // Not configured
+                const syncStatusDesc = document.getElementById('sync-status-desc');
+                if (syncStatusDesc) syncStatusDesc.textContent = "Offline Mode Active";
+                if (syncCard) syncCard.classList.add('disabled-card');
+                if (syncOverlay) {
+                    syncOverlay.classList.remove('hidden');
+                    (syncOverlay as HTMLElement).style.display = 'flex';
+                }
+            }
         } else {
             document.body.classList.remove('local-only');
+            if (syncTitle) syncTitle.textContent = "Cloud Sync";
+            if (syncSubtitle) syncSubtitle.textContent = "Keep your Vault safe on GitHub";
             if (syncCard) syncCard.classList.remove('disabled-card');
             if (syncOverlay) syncOverlay.classList.add('hidden');
+        }
+
+        // Handle the visibility of Private Sync button specifically
+        const privateSyncBtn = document.getElementById('btn-open-private-sync');
+        if (privateSyncBtn) {
+            if (user.isLocal) {
+                if (user.privateSync?.enabled) {
+                    privateSyncBtn.innerHTML = '<i class="fa-solid fa-gear"></i><span>Configure Private Sync</span>';
+                } else {
+                    privateSyncBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i><span>Enable Private Sync</span>';
+                }
+            }
+        }
+    }
+
+    private async openPrivateSyncModal() {
+        const user = await (window as any).api.getCurrentUser();
+        if (!user) return;
+
+        const patInput = document.getElementById('sync-github-pat') as HTMLInputElement;
+        const ownerInput = document.getElementById('sync-github-owner') as HTMLInputElement;
+        const repoInput = document.getElementById('sync-github-repo') as HTMLInputElement;
+
+        if (user.privateSync) {
+            if (patInput) patInput.value = user.privateSync.pat || '';
+            if (ownerInput) ownerInput.value = user.privateSync.owner || '';
+            if (repoInput) repoInput.value = user.privateSync.repo || '';
+        }
+
+        this.showStaticModal('modal-private-sync');
+    }
+
+    private async testPrivateSyncConnection() {
+        const pat = (document.getElementById('sync-github-pat') as HTMLInputElement)?.value;
+        const owner = (document.getElementById('sync-github-owner') as HTMLInputElement)?.value;
+        const repo = (document.getElementById('sync-github-repo') as HTMLInputElement)?.value;
+
+        if (!pat || !owner || !repo) {
+            this.showToast("Please fill in all fields", "info");
+            return;
+        }
+
+        this.setLoading(true, "Testing Connection", "CONTACTING GITHUB API");
+        try {
+            const result = await (window as any).api.testPrivateSyncConnection({ pat, owner, repo });
+            if (result.success) {
+                this.showToast("Connection successful!", "success");
+            } else {
+                this.showToast(`Connection failed: ${result.message}`, "error");
+            }
+        } catch (e: any) {
+            this.showToast(`Error: ${e.message}`, "error");
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    private async savePrivateSyncConfig() {
+        const pat = (document.getElementById('sync-github-pat') as HTMLInputElement)?.value;
+        const owner = (document.getElementById('sync-github-owner') as HTMLInputElement)?.value;
+        const repo = (document.getElementById('sync-github-repo') as HTMLInputElement)?.value;
+
+        if (!pat || !owner || !repo) {
+            this.showToast("Please fill in all fields", "info");
+            return;
+        }
+
+        this.setLoading(true, "Saving Config", "ENCRYPTING CREDENTIALS");
+        try {
+            const config = { enabled: true, pat, owner, repo };
+            const result = await (window as any).api.updatePrivateSyncConfig(config);
+            if (result.success) {
+                this.showToast("Private Sync enabled successfully!", "success");
+                const modal = document.getElementById('modal-private-sync');
+                if (modal) {
+                    modal.classList.remove('show');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+                }
+                
+                // Update local status desc
+                const syncStatusDesc = document.getElementById('sync-status-desc');
+                if (syncStatusDesc) syncStatusDesc.textContent = "Private GitHub Sync Active";
+
+                // Update the setup button text if it exists
+                const privateSyncBtn = document.getElementById('btn-open-private-sync');
+                if (privateSyncBtn) {
+                    privateSyncBtn.innerHTML = '<i class="fa-solid fa-gear"></i><span>Configure Private Sync</span>';
+                }
+                
+                await this.loadInitialData(); // Refresh UI
+            } else {
+                this.showToast(`Failed to save: ${result.message}`, "error");
+            }
+        } catch (e: any) {
+            this.showToast(`Error: ${e.message}`, "error");
+        } finally {
+            this.setLoading(false);
         }
     }
 

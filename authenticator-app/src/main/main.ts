@@ -1,7 +1,15 @@
 import { app, BrowserWindow, ipcMain, globalShortcut, screen, desktopCapturer, Menu, Tray, nativeImage, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import * as path from 'path';
-import { signup, signupLocal, resendCode, verifyEmail, login, logout, getCurrentUser, getActiveAccounts, saveActiveAccounts, updateUserSettings, checkSession, getBackupData, importVaultData, pollForUpdates, changeUsername, changePassword, requestEmailChange, confirmEmailChange, resendEmailChangeCode, cancelEmailChange, requestPhoneVerification, removePhone, verifyPhoneByWhatsAppMatch, verifyMasterPassword, generatePinResetCode, verifyPinResetCode, clearPinResetCode } from '../core/auth';
+import { 
+    signup, signupLocal, resendCode, verifyEmail, login, logout, 
+    getCurrentUser, getActiveAccounts, saveActiveAccounts, updateUserSettings, 
+    checkSession, getBackupData, importVaultData, pollForUpdates, changeUsername, 
+    changePassword, requestEmailChange, confirmEmailChange, resendEmailChangeCode, 
+    cancelEmailChange, requestPhoneVerification, removePhone, verifyPhoneByWhatsAppMatch, 
+    verifyMasterPassword, generatePinResetCode, verifyPinResetCode, clearPinResetCode,
+    updatePrivateSyncConfig, testPrivateSyncConnection
+} from '../core/auth';
 import { service } from '../core/notifier';
 import { generateTOTP, getRemainingSeconds, getBatchOTPs } from '../core/totp';
 import * as fs from 'fs';
@@ -188,6 +196,23 @@ ipcMain.handle('update-user-settings', async (event, settings) => {
         return { success: true };
     } catch (err) {
         return { success: false };
+    }
+});
+
+ipcMain.handle('update-private-sync-config', async (event, config) => {
+    try {
+        await updatePrivateSyncConfig(config);
+        return { success: true };
+    } catch (err: any) {
+        return { success: false, message: err.message };
+    }
+});
+
+ipcMain.handle('test-private-sync-connection', async (event, config) => {
+    try {
+        return await testPrivateSyncConnection(config);
+    } catch (err: any) {
+        return { success: false, message: err.message };
     }
 });
 

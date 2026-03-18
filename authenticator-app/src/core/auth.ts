@@ -1,4 +1,8 @@
-import { getUsers, saveUsers, UserRecord, getUserData, syncUserData, pollCloudUpdates, renameUserFolder } from './storage';
+import { 
+    getUsers, saveUsers, syncUserData, pollCloudUpdates, 
+    UserRecord, UserSettings, PrivateSyncConfig, testGitHubConnection,
+    getUserData, renameUserFolder
+} from './storage';
 import { hashPassword, verifyPassword, deriveKey, encryptVault, decryptVault, AuthenticatorAccount } from './crypto';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
@@ -41,7 +45,8 @@ export function getCurrentUser() {
         settings: currentUser["Desktop Settings"],
         autolock: currentUser.autolock,
         profilePicture: currentUser.profilePicture,
-        isLocal: !!currentUser.isLocal
+        isLocal: !!currentUser.isLocal,
+        privateSync: currentUser.privateSync
     };
 }
 
@@ -363,6 +368,26 @@ export async function updateUserSettings(settings: any): Promise<void> {
 
     await saveUsers(users);
     await syncUserData(currentUser.username, users[userIndex]);
+}
+
+export async function updatePrivateSyncConfig(config: PrivateSyncConfig): Promise<void> {
+    if (!currentUser) throw new Error("No active user session.");
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    users[userIndex].privateSync = config;
+    currentUser.privateSync = config;
+
+    await saveUsers(users);
+    // Trigger an immediate sync to the new repo if enabled
+    if (config.enabled && config.pat) {
+        await syncUserData(currentUser.username, users[userIndex]);
+    }
+}
+
+export async function testPrivateSyncConnection(config: PrivateSyncConfig): Promise<{ success: boolean, message: string }> {
+    return await testGitHubConnection(config);
 }
 
 export function getBackupData(): { 
@@ -752,7 +777,6 @@ export function clearPinResetCode(): void {
 
 export async function pollForUpdates(): Promise<{ changed: boolean, settings?: any, accounts?: AuthenticatorAccount[] }> {
     if (!currentUser || !currentKey) return { changed: false };
-    if (currentUser.isLocal) return { changed: false }; // BYPASS CLOUD UPDATES FOR LOCAL USERS
 
     const result = await pollCloudUpdates(currentUser.username);
     

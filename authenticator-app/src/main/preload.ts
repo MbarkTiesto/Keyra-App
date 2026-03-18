@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld('api', {
     changeUsername: (newUsername: string) => ipcRenderer.invoke('change-username', newUsername),
     changePassword: (newPassword: string) => ipcRenderer.invoke('change-password', newPassword),
     updateProfilePicture: (base64Image: string) => ipcRenderer.invoke('update-profile-picture', base64Image),
+    updatePrivateSyncConfig: (config: any) => ipcRenderer.invoke('update-private-sync-config', config),
+    testPrivateSyncConnection: (config: any) => ipcRenderer.invoke('test-private-sync-connection', config),
     requestEmailChange: (newEmail: string) => ipcRenderer.invoke('request-email-change', newEmail),
     confirmEmailChange: (code: string) => ipcRenderer.invoke('confirm-email-change', code),
     resendEmailChangeCode: () => ipcRenderer.invoke('resend-email-change-code'),

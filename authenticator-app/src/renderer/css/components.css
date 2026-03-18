@@ -444,6 +444,7 @@ body.dark-theme .dropdown-menu {
     z-index: 5;
     transition: all 0.3s ease;
     user-select: none;
+    pointer-events: auto; /* Allow interaction with children like the Setup button */
 }
 
 body.dark-theme .disabled-card-overlay {
@@ -467,10 +468,45 @@ body.dark-theme.oled-optimized .disabled-card-overlay {
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }
+.btn-nm-setup {
+    margin-top: 14px;
+    height: 38px;
+    padding: 0 24px;
+    border-radius: var(--radius-lg);
+    background: var(--nm-surface);
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--dynamic-accent-primary);
+    font-weight: 850;
+    font-size: 11.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: var(--nm-shadow-out-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-nm-setup:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--nm-shadow-out);
+    color: var(--dynamic-accent-hover);
+}
+
+.btn-nm-setup:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.btn-nm-setup i {
+    font-size: 14px;
+    color: inherit;
+}
 
 .account-card.disabled-card {
-    cursor: default !important;
-    pointer-events: none;
+    cursor: default;
+    pointer-events: none; /* Allow children with auto to still work */
 }
 
 .account-header {
@@ -1044,6 +1080,26 @@ body.dark-theme.oled-optimized .disabled-card-overlay {
     font-size: clamp(13px, 2vw, 14px);
     border-radius: var(--radius-lg);
     font-weight: 800;
+}
+
+/* Enhanced Grid Footer for Complex Modals */
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(10px, 2vw, 14px);
+    width: 100%;
+    margin-top: 20px;
+}
+
+.footer-grid .user-button {
+    width: 100%;
+    height: 48px;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+.footer-grid .btn-full {
+    grid-column: span 2;
 }
 
 .modal-footer .btn-primary {
@@ -1935,7 +1991,7 @@ input:checked+.slider:before {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    z-index: 9998;
+    z-index: 100000; /* Above all modals and overlays */
     align-items: center;
     pointer-events: none;
     width: max-content;
@@ -3766,4 +3822,9 @@ body.light-theme .cloud-sync-pill {
 /* Ensure other spinners use this too if needed */
 .qr-spinner-vessel .qr-spinner {
     animation: nm-spin 1s linear infinite;
+}
+
+/* Global Visibility Utility */
+.hidden {
+    display: none !important;
 }

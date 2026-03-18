@@ -759,8 +759,8 @@
                             <i class="fa-solid fa-cloud" style="color: var(--accent-primary);"></i>
                         </div>
                         <div class="bento-title-vessel">
-                            <h3 class="bento-title">Cloud Sync</h3>
-                            <div class="bento-subtitle">Keep your Vault safe on GitHub</div>
+                            <h3 class="bento-title" id="sync-settings-title">Cloud Sync</h3>
+                            <div class="bento-subtitle" id="sync-settings-subtitle">Keep your Vault safe on GitHub</div>
                         </div>
                     </div>
                     <div class="bento-content">
@@ -793,6 +793,10 @@
                     <div id="sync-disabled-overlay" class="disabled-card-overlay hidden">
                         <i class="fa-solid fa-cloud-slash"></i>
                         <span>Sync Disabled (Local Account)</span>
+                        <button class="btn-nm-setup" id="btn-open-private-sync">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Enable Private Sync</span>
+                        </button>
                     </div>
                 </div>
 
@@ -1134,8 +1138,7 @@
 
 
 
-        <!-- Notification Feed -->
-        <div id="toast-container" style="position: fixed; bottom: clamp(20px, 8vw, 40px); left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 12px; align-items: center; width: 100%; pointer-events: none;"></div>
+        <!-- Notification Feed (Moved to bottom of body) -->
         
         <!-- Premium Syncing Indicator (Floating Pill) -->
         <div id="cloud-sync-indicator" class="cloud-sync-pill hidden">
@@ -1361,5 +1364,58 @@
     <script type="module" src="js/app.js"></script>
     <!-- Dynamic Grain Layer (CSS Optimized) -->
     <div class="grain-overlay"></div>
+    <!-- Private Sync Setup Modal -->
+    <div id="modal-private-sync" class="modal-overlay hidden">
+        <div class="modal animate-fade-in" style="max-width: 480px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon-vessel highlight">
+                        <i class="fa-brands fa-github"></i>
+                    </div>
+                    <div class="modal-title-vessel">
+                        <h2>Private Cloud Sync</h2>
+                        <p>GITHUB REPOSITORY STORAGE</p>
+                    </div>
+                </div>
+                <div class="modal-divider"></div>
+                <div class="modal-body">
+                    <p class="modal-help-text">Synchronize your local vault to your own private GitHub repository. Your data stays 100% yours.</p>
+                    
+                    <div class="settings-form" style="margin-top: 20px;">
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label class="form-label" style="display: block; margin-bottom: 8px;">GitHub Personal Access Token (PAT)</label>
+                            <input type="password" id="sync-github-pat" class="form-input" placeholder="ghp_xxxxxxxxxxxx" style="width: 100%;">
+                            <span class="form-help" style="font-size: 11px; opacity: 0.7; margin-top: 4px; display: block;">Requires 'repo' or 'Contents: Read & Write' scope.</span>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label class="form-label" style="display: block; margin-bottom: 8px;">Repository Owner (Username)</label>
+                            <input type="text" id="sync-github-owner" class="form-input" placeholder="Your GitHub Username" style="width: 100%;">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 16px;">
+                            <label class="form-label" style="display: block; margin-bottom: 8px;">Repository Name</label>
+                            <input type="text" id="sync-github-repo" class="form-input" placeholder="my-keyra-vault" style="width: 100%;">
+                            <span class="form-help" style="font-size: 11px; opacity: 0.7; margin-top: 4px; display: block;">Existing or new repository name.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer footer-grid" style="padding-top: 0;">
+                    <button class="user-button secondary" id="btn-test-sync-connection">
+                        <i class="fa-solid fa-plug"></i>
+                        <span>Test Connection</span>
+                    </button>
+                    <button class="user-button" id="btn-close-private-sync">Cancel</button>
+                    <button class="user-button highlight btn-full" id="btn-save-private-sync">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Enable Private Sync</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Notification Container (Portal) -->
+    <div id="toast-container"></div>
 </body>
 </html>

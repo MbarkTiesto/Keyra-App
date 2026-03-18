@@ -36,6 +36,13 @@ export interface UserSettings {
     vaultPin?: string;
 }
 
+export interface PrivateSyncConfig {
+    enabled: boolean;
+    pat: string;
+    owner: string;
+    repo: string;
+}
+
 export interface UserRecord {
     id: string;
     username: string;
@@ -43,6 +50,7 @@ export interface UserRecord {
     hash: string;
     salt: string;
     isLocal?: boolean;
+    privateSync?: PrivateSyncConfig;
     isActivated: boolean;
     activationCode?: string;
     pendingEmail?: string;
@@ -68,15 +76,19 @@ export interface UserRecord {
  * - [ ] Verify the separation and sync functionality
  */
 
-async function githubRequest(filePath: string, method: string = 'GET', body: any = null) {
-    if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
-        throw new Error("GitHub configuration missing in .env.");
+async function githubRequest(filePath: string, method: string = 'GET', body: any = null, customCreds?: PrivateSyncConfig) {
+    const token = customCreds?.pat || GITHUB_TOKEN;
+    const owner = customCreds?.owner || GITHUB_OWNER;
+    const repo = customCreds?.repo || GITHUB_REPO;
+
+    if (!token || !owner || !repo) {
+        throw new Error("GitHub configuration missing.");
     }
 
-    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
     
     const headers: Record<string, string> = {
-        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Authorization': `token ${token}`,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json',
         'User-Agent': 'Keyra-Electron'
@@ -105,17 +117,17 @@ async function githubRequest(filePath: string, method: string = 'GET', body: any
     return response.json();
 }
 
-async function callSync(action: 'get' | 'put', filePath: string, data?: any) {
+async function callSync(action: 'get' | 'put', filePath: string, data?: any, customCreds?: PrivateSyncConfig) {
     try {
         if (action === 'get') {
-            const fileData: any = await githubRequest(filePath, 'GET');
+            const fileData: any = await githubRequest(filePath, 'GET', null, customCreds);
             if (!fileData) return { success: true, data: null, sha: null };
             const content = Buffer.from(fileData.content, 'base64').toString('utf8');
             return { success: true, data: JSON.parse(content), sha: fileData.sha };
         }
 
         if (action === 'put') {
-            const existingFile: any = await githubRequest(filePath, 'GET');
+            const existingFile: any = await githubRequest(filePath, 'GET', null, customCreds);
             const sha = existingFile ? existingFile.sha : undefined;
             const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
             
@@ -123,7 +135,7 @@ async function callSync(action: 'get' | 'put', filePath: string, data?: any) {
                 message: `Sync ${filePath} from Desktop`,
                 content,
                 sha
-            });
+            }, customCreds);
             return { success: true, sha: result.content.sha };
         }
     } catch (e: any) {
@@ -131,6 +143,38 @@ async function callSync(action: 'get' | 'put', filePath: string, data?: any) {
         return { success: false, message: e.message };
     }
     return { success: false, message: "Invalid action." };
+}
+
+export async function testGitHubConnection(config: PrivateSyncConfig): Promise<{ success: boolean, message: string }> {
+    try {
+        // Try to get repository info to verify token and repo exists
+        const token = config.pat;
+        const owner = config.owner;
+        const repo = config.repo;
+        
+        const url = `https://api.github.com/repos/${owner}/${repo}`;
+        const res = await fetch(url, {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'Keyra-Electron'
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            if (data.private === true) {
+                return { success: true, message: "Connection successful! Private repository verified." };
+            } else {
+                return { success: false, message: "Security Error: Selected repository is PUBLIC. Private Sync requires a PRIVATE repository for your security." };
+            }
+        } else {
+            const err = await res.json();
+            return { success: false, message: err.message || "Failed to connect." };
+        }
+    } catch (e: any) {
+        return { success: false, message: e.message };
+    }
 }
 
 export async function getUsers(): Promise<UserRecord[]> {
@@ -151,20 +195,30 @@ export async function saveUsers(users: UserRecord[]): Promise<void> {
     // 1. Local Save (Immediate feedback)
     fs.writeFileSync(STORE_PATH, JSON.stringify(users, null, 2), 'utf-8');
 
-    // 2. Cloud Save (Only if any non-local user exists, or filter as needed)
-    // For simplicity, we only push users.json if there are non-local accounts
-    // but typically we should push the whole list if we want to sync the registry.
-    // However, we MUST NOT push data.json for local users.
-    const res: any = await callSync('put', 'users.json', users);
-    if (res.success) {
-        lastUsersSHA = res.sha;
-    } else {
-        console.warn("Cloud users storage failed:", res.message);
+    // 2. Cloud Save (Only for online users registry)
+    // We only push to the central repo if we have a global TOKEN
+    if (GITHUB_TOKEN) {
+        const res: any = await callSync('put', 'users.json', users);
+        if (res.success) {
+            lastUsersSHA = res.sha;
+        } else {
+            console.warn("Cloud users storage failed:", res.message);
+        }
     }
 }
 
 export async function syncUserData(username: string, data: Partial<UserRecord>): Promise<void> {
-    if (data.isLocal) return; // BYPASS CLOUD SYNC FOR LOCAL USERS
+    if (data.isLocal) {
+        // Handle Private Sync for local accounts
+        if (data.privateSync?.enabled && data.privateSync.pat) {
+            const filePath = `vault/vault.json`; // Local accounts sync to a flat filename in their own repo
+            const res: any = await callSync('put', filePath, data, data.privateSync);
+            if (res.success) {
+                lastUserDataSHAs[username] = (res as any).sha;
+            }
+        }
+        return;
+    }
     
     const filePath = `users/${username}/data.json`;
     const res: any = await callSync('put', filePath, data);
@@ -190,23 +244,41 @@ export async function pollCloudUpdates(username: string): Promise<{ usersChanged
     let userData: any = null;
 
     try {
-        // Check users.json
-        const userRes: any = await githubRequest('users.json', 'GET');
-        if (userRes && userRes.sha !== lastUsersSHA) {
-            const content = Buffer.from(userRes.content, 'base64').toString('utf8');
-            fs.writeFileSync(STORE_PATH, content);
-            lastUsersSHA = userRes.sha;
-            usersChanged = true;
+        const users = await getUsers();
+        const currentUser = users.find(u => u.username === username);
+
+        // Check global users.json (only for online users)
+        if (GITHUB_TOKEN) {
+            const userRes: any = await githubRequest('users.json', 'GET');
+            if (userRes && userRes.sha !== lastUsersSHA) {
+                const content = Buffer.from(userRes.content, 'base64').toString('utf8');
+                fs.writeFileSync(STORE_PATH, content);
+                lastUsersSHA = userRes.sha;
+                usersChanged = true;
+            }
         }
 
         // Check user-specific data.json
-        const dataPath = `users/${username}/data.json`;
-        const dataRes: any = await githubRequest(dataPath, 'GET');
-        if (dataRes && dataRes.sha !== lastUserDataSHAs[username]) {
-            const content = Buffer.from(dataRes.content, 'base64').toString('utf8');
-            userData = JSON.parse(content);
-            lastUserDataSHAs[username] = dataRes.sha;
-            dataChanged = true;
+        if (currentUser?.isLocal) {
+            if (currentUser.privateSync?.enabled && currentUser.privateSync.pat) {
+                const dataPath = `vault/vault.json`;
+                const dataRes: any = await githubRequest(dataPath, 'GET', null, currentUser.privateSync);
+                if (dataRes && dataRes.sha !== lastUserDataSHAs[username]) {
+                    const content = Buffer.from(dataRes.content, 'base64').toString('utf8');
+                    userData = JSON.parse(content);
+                    lastUserDataSHAs[username] = dataRes.sha;
+                    dataChanged = true;
+                }
+            }
+        } else {
+            const dataPath = `users/${username}/data.json`;
+            const dataRes: any = await githubRequest(dataPath, 'GET');
+            if (dataRes && dataRes.sha !== lastUserDataSHAs[username]) {
+                const content = Buffer.from(dataRes.content, 'base64').toString('utf8');
+                userData = JSON.parse(content);
+                lastUserDataSHAs[username] = dataRes.sha;
+                dataChanged = true;
+            }
         }
     } catch (e) {
         console.error("Live Sync Polling Error:", e);
