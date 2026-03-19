@@ -1784,6 +1784,12 @@ input:checked+.slider:before {
     animation: pulse-success 0.6s ease-in-out;
 }
 
+.pin-dot.blocked {
+    background: var(--text-tertiary);
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 @keyframes shake {
 
     0%,
@@ -1913,6 +1919,15 @@ input:checked+.slider:before {
     caret-color: transparent;
 }
 
+.pin-field:disabled {
+    cursor: not-allowed;
+    opacity: 0;
+}
+
+.pin-field:disabled + .pin-indicators .pin-dot {
+    cursor: not-allowed;
+}
+
 .pin-indicators {
     display: flex;
     gap: 20px;
@@ -1940,6 +1955,68 @@ input:checked+.slider:before {
     background: #ff3c3c;
     box-shadow: 0 0 15px rgba(255, 60, 60, 0.4);
     animation: shake 0.4s ease-in-out;
+}
+
+.pin-dot.success {
+    background: #28a745;
+    box-shadow: 0 0 15px rgba(40, 167, 69, 0.4);
+    animation: pulse-success 0.6s ease-in-out;
+}
+
+.pin-dot.blocked {
+    background: var(--text-tertiary);
+    opacity: 0.3;
+    cursor: not-allowed;
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+/* Blocked Status Message */
+.pin-blocked-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
+    margin: 20px 0 -12px 0;
+    background: var(--nm-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--nm-shadow-in);
+    border: 2px solid rgba(255, 59, 48, 0.15);
+    animation: blockStatusPulse 2s ease-in-out infinite;
+}
+
+.pin-blocked-status i {
+    font-size: 18px;
+    color: #ff3b30;
+    animation: blockIconRotate 3s linear infinite;
+}
+
+.pin-blocked-status span {
+    font-size: 13px;
+    font-weight: 850;
+    color: #ff3b30;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+@keyframes blockStatusPulse {
+    0%, 100% {
+        border-color: rgba(255, 59, 48, 0.15);
+        box-shadow: var(--nm-shadow-in);
+    }
+    50% {
+        border-color: rgba(255, 59, 48, 0.3);
+        box-shadow: var(--nm-shadow-in), 0 0 20px rgba(255, 59, 48, 0.2);
+    }
+}
+
+@keyframes blockIconRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .pin-helper {

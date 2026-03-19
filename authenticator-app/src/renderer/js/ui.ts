@@ -1,4 +1,5 @@
 import { syncVault } from './store.js';
+import { rateLimiter } from '../../core/rateLimiter.js';
 
 export class UIManager {
     private currentTheme: 'light' | 'dark' = 'light';
@@ -354,8 +355,18 @@ export class UIManager {
     }
 
     public async pushSettings(updateLocal: boolean = true) {
+        // Rate limiting check
+        const rateLimitCheck = rateLimiter.isAllowed('sync', this.userId);
+        if (!rateLimitCheck.allowed) {
+            console.warn('Sync rate limited:', rateLimitCheck.message);
+            this.showToast(rateLimitCheck.message || "Too many sync operations. Please wait.", "error");
+            return { success: false, message: 'Rate limited' };
+        }
+
         this.setSyncing(true);
         try {
+            rateLimiter.recordAttempt('sync', this.userId);
+            
             const settings = this.getSettingsObject();
             const res = await (window as any).api.updateUserSettings(settings);
             
@@ -1113,6 +1124,14 @@ export class UIManager {
             forgotPinBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                
+                // Check if user is rate limited
+                const rateLimitCheck = rateLimiter.isAllowed('pin', this.userId);
+                if (!rateLimitCheck.allowed) {
+                    this.showToast(rateLimitCheck.message || "Too many attempts. Please wait.", "error");
+                    return;
+                }
+                
                 console.log("[Auth] Forgot PIN clicked!");
                 this.showForgotPinConfirm();
             });
@@ -2443,13 +2462,80 @@ export class UIManager {
             vessel.classList.add('show');
             document.body.classList.add('vault-is-locked');
             const pinIn = document.getElementById('unlock-pin') as HTMLInputElement;
-            if (pinIn) { 
-                pinIn.value = ''; 
-                setTimeout(() => pinIn.focus(), 100);
-            }
-            // Reset dots
             const dots = vessel.querySelectorAll('.pin-dot');
-            dots.forEach(dot => dot.classList.remove('filled', 'success', 'error'));
+            const forgotPinBtn = document.getElementById('btn-forgot-pin') as HTMLButtonElement;
+            const blockedStatus = document.getElementById('pin-blocked-status');
+            const blockedText = document.getElementById('pin-blocked-text');
+            const pinHelper = vessel.querySelector('.pin-helper') as HTMLElement;
+            
+            // Check if user is currently rate limited
+            const rateLimitCheck = rateLimiter.isAllowed('pin', this.userId);
+            if (!rateLimitCheck.allowed) {
+                // Disable input and show blocked state
+                if (pinIn) {
+                    pinIn.disabled = true;
+                    pinIn.value = '';
+                    pinIn.placeholder = '';
+                }
+                dots.forEach(dot => {
+                    dot.classList.remove('filled', 'success', 'error');
+                    dot.classList.add('blocked');
+                });
+                if (forgotPinBtn) {
+                    forgotPinBtn.disabled = true;
+                    forgotPinBtn.style.opacity = '0.3';
+                    forgotPinBtn.style.cursor = 'not-allowed';
+                }
+                
+                // Show blocked status message
+                if (blockedStatus && blockedText && rateLimitCheck.blockMinutes) {
+                    blockedText.textContent = `Blocked for ${rateLimitCheck.blockMinutes} minute${rateLimitCheck.blockMinutes > 1 ? 's' : ''}`;
+                    blockedStatus.classList.remove('hidden');
+                    if (pinHelper) pinHelper.style.display = 'none';
+                }
+                
+                this.showToast(rateLimitCheck.message || "Too many attempts", "error");
+                
+                // Set a timer to re-enable after block expires
+                if (rateLimitCheck.blockMinutes) {
+                    setTimeout(() => {
+                        if (pinIn) {
+                            pinIn.disabled = false;
+                            pinIn.placeholder = '';
+                            pinIn.focus();
+                        }
+                        dots.forEach(dot => dot.classList.remove('blocked'));
+                        if (forgotPinBtn) {
+                            forgotPinBtn.disabled = false;
+                            forgotPinBtn.style.opacity = '';
+                            forgotPinBtn.style.cursor = '';
+                        }
+                        if (blockedStatus) {
+                            blockedStatus.classList.add('hidden');
+                        }
+                        if (pinHelper) pinHelper.style.display = '';
+                        this.showToast("You can try again now", "info");
+                    }, rateLimitCheck.blockMinutes * 60 * 1000);
+                }
+            } else {
+                // Normal state - enable input
+                if (pinIn) { 
+                    pinIn.disabled = false;
+                    pinIn.value = ''; 
+                    setTimeout(() => pinIn.focus(), 100);
+                }
+                // Reset dots
+                dots.forEach(dot => dot.classList.remove('filled', 'success', 'error', 'blocked'));
+                if (forgotPinBtn) {
+                    forgotPinBtn.disabled = false;
+                    forgotPinBtn.style.opacity = '';
+                    forgotPinBtn.style.cursor = '';
+                }
+                if (blockedStatus) {
+                    blockedStatus.classList.add('hidden');
+                }
+                if (pinHelper) pinHelper.style.display = '';
+            }
         }
     }
 
@@ -2464,6 +2550,67 @@ export class UIManager {
         // Target only the dots inside the lock vessel to avoid conflicts with other modals
         const lockVessel = document.getElementById('lock-vessel');
         const dots = lockVessel?.querySelectorAll('.pin-dot');
+        const pinInput = document.getElementById('unlock-pin') as HTMLInputElement;
+        const forgotPinBtn = document.getElementById('btn-forgot-pin') as HTMLButtonElement;
+        const blockedStatus = document.getElementById('pin-blocked-status');
+        const blockedText = document.getElementById('pin-blocked-text');
+        const pinHelper = lockVessel?.querySelector('.pin-helper') as HTMLElement;
+
+        // Rate limiting check - check before any input processing
+        const rateLimitCheck = rateLimiter.isAllowed('pin', this.userId);
+        if (!rateLimitCheck.allowed) {
+            // Disable input and show blocked state
+            if (pinInput) {
+                pinInput.disabled = true;
+                pinInput.value = '';
+                pinInput.placeholder = '';
+            }
+            if (dots) {
+                dots.forEach(dot => {
+                    dot.classList.remove('filled', 'error', 'success');
+                    dot.classList.add('blocked');
+                });
+            }
+            if (forgotPinBtn) {
+                forgotPinBtn.disabled = true;
+                forgotPinBtn.style.opacity = '0.3';
+                forgotPinBtn.style.cursor = 'not-allowed';
+            }
+            
+            // Show blocked status message
+            if (blockedStatus && blockedText && rateLimitCheck.blockMinutes) {
+                blockedText.textContent = `Blocked for ${rateLimitCheck.blockMinutes} minute${rateLimitCheck.blockMinutes > 1 ? 's' : ''}`;
+                blockedStatus.classList.remove('hidden');
+                if (pinHelper) pinHelper.style.display = 'none';
+            }
+            
+            this.showToast(rateLimitCheck.message || "Too many attempts", "error");
+            
+            // Set a timer to re-enable after block expires
+            if (rateLimitCheck.blockMinutes) {
+                setTimeout(() => {
+                    if (pinInput) {
+                        pinInput.disabled = false;
+                        pinInput.placeholder = '';
+                        pinInput.focus();
+                    }
+                    if (dots) {
+                        dots.forEach(dot => dot.classList.remove('blocked'));
+                    }
+                    if (forgotPinBtn) {
+                        forgotPinBtn.disabled = false;
+                        forgotPinBtn.style.opacity = '';
+                        forgotPinBtn.style.cursor = '';
+                    }
+                    if (blockedStatus) {
+                        blockedStatus.classList.add('hidden');
+                    }
+                    if (pinHelper) pinHelper.style.display = '';
+                    this.showToast("You can try again now", "info");
+                }, rateLimitCheck.blockMinutes * 60 * 1000);
+            }
+            return;
+        }
 
         if (dots) {
             dots.forEach((dot, i) => dot.classList.toggle('filled', i < pinValue.length));
@@ -2489,22 +2636,39 @@ export class UIManager {
             }
 
             if (isCorrect) {
+                // Reset rate limit on successful unlock
+                rateLimiter.reset('pin', this.userId);
+                
                 if (dots) dots.forEach(dot => dot.classList.add('success'));
                 setTimeout(() => {
                     document.getElementById('lock-vessel')?.classList.remove('show');
                     document.body.classList.remove('vault-is-locked');
-                    (document.getElementById('unlock-pin') as HTMLInputElement).value = '';
+                    if (pinInput) pinInput.value = '';
                     if (dots) dots.forEach(dot => dot.classList.remove('filled', 'success'));
                 }, 500);
                 this.showToast("Vault unlocked!", "success");
                 this.updateLastActivity('Vault unlocked');
             } else {
+                // Record failed attempt
+                rateLimiter.recordAttempt('pin', this.userId);
+                const remaining = rateLimiter.getRemainingAttempts('pin', this.userId);
+                
                 if (dots) dots.forEach(dot => dot.classList.add('error'));
                 setTimeout(() => {
-                    (document.getElementById('unlock-pin') as HTMLInputElement).value = '';
+                    if (pinInput) pinInput.value = '';
                     if (dots) dots.forEach(dot => dot.classList.remove('filled', 'error'));
                 }, 800);
-                this.showToast("Incorrect PIN", "error");
+                
+                let errorMsg = "Incorrect PIN";
+                if (remaining > 0 && remaining <= 3) {
+                    errorMsg += ` (${remaining} attempt${remaining > 1 ? 's' : ''} remaining)`;
+                } else if (remaining === 0) {
+                    errorMsg = "Too many attempts. Blocked for 10 minutes.";
+                    // Trigger the block state
+                    setTimeout(() => this.validateAndAutoUnlock(''), 100);
+                }
+                
+                this.showToast(errorMsg, "error");
             }
         }
     }
