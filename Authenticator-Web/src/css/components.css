@@ -3278,6 +3278,11 @@ body.vault-is-locked .main-app-content,
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Light mode loading overlay */
+body.light-theme #loading-overlay {
+    background: hsla(var(--h), 20%, 95%, 0.85);
+}
+
 #loading-overlay.show {
     opacity: 1;
     visibility: visible;
