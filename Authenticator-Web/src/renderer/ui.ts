@@ -2638,15 +2638,16 @@ export class UIManager {
             : '';
         
         const content = `
-            <div style="padding: clamp(var(--space-md), 8vw, var(--space-xl));">
-                <div style="display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg);">
-                    <div class="account-icon nm-icon-large" style="width: 64px; height: 64px;">
-                        <i class="fa-solid fa-upload"></i>
+            <div style="padding: clamp(24px, 5vw, 40px); max-width: 600px; margin: 0 auto;">
+                <!-- Header -->
+                <div style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 28px;">
+                    <div class="account-icon nm-icon-large" style="width: 72px; height: 72px; flex-shrink: 0;">
+                        <i class="fa-solid fa-upload" style="font-size: 32px;"></i>
                     </div>
-                    <div style="flex: 1;">
-                        <h2 style="font-weight: 900; font-size: 24px; color: var(--text-primary); margin-bottom: 8px;">Restore Vault</h2>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div class="modal-help-text" style="text-transform: uppercase; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">VERIFY MASTER KEY TO IMPORT</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <h2 style="font-weight: 900; font-size: clamp(22px, 4vw, 28px); color: var(--text-primary); margin: 0 0 12px 0; line-height: 1.2;">Restore Vault</h2>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; color: var(--text-secondary); text-transform: uppercase;">Verify Master Key</div>
                             ${encryptionBadge}
                         </div>
                     </div>
@@ -2654,47 +2655,60 @@ export class UIManager {
                 
                 ${warningSection}
                 
-                <div style="background: var(--bg-primary); border-radius: var(--radius-md); padding: var(--space-md); box-shadow: var(--nm-shadow-in-sm); margin-bottom: var(--space-lg);">
-                    <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 12px; text-transform: uppercase;">Backup Details</div>
+                <!-- Backup Details Card -->
+                <div style="background: var(--bg-primary); border-radius: 16px; padding: 20px; box-shadow: var(--nm-shadow-in-sm); margin-bottom: 24px;">
+                    <div style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase; opacity: 0.7;">Backup Information</div>
                     
-                    <div style="display: grid; gap: 12px;">
-                        <div class="setting-row" style="padding: 0; margin: 0;">
-                            <div class="setting-info">
-                                <div class="setting-name" style="font-size: 13px;">Version</div>
-                                <div class="setting-desc" style="font-size: 12px;">${verification.version || 'Unknown'}</div>
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 13px; font-weight: 700;">
-                                <i class="fa-solid fa-code-branch"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="setting-row" style="padding: 0; margin: 0;">
-                            <div class="setting-info">
-                                <div class="setting-name" style="font-size: 13px;">Created</div>
-                                <div class="setting-desc" style="font-size: 12px;">${dateStr}</div>
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 13px; font-weight: 700;">
-                                <i class="fa-solid fa-clock"></i>
+                    <div style="display: grid; gap: 16px;">
+                        <!-- Version -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; transition: all 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
+                                <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-primary); box-shadow: var(--nm-shadow-in-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fa-solid fa-code-branch" style="font-size: 16px; color: var(--accent-primary);"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Version</div>
+                                    <div style="font-size: 15px; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">${verification.version || 'Unknown'}</div>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="setting-row" style="padding: 0; margin: 0;">
-                            <div class="setting-info">
-                                <div class="setting-name" style="font-size: 13px;">Accounts</div>
-                                <div class="setting-desc" style="font-size: 12px;">${verification.accountCount !== undefined ? verification.accountCount + ' accounts' : 'Unknown'}</div>
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 13px; font-weight: 700;">
-                                <i class="fa-solid fa-key"></i>
+                        <!-- Created Date -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; transition: all 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
+                                <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-primary); box-shadow: var(--nm-shadow-in-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fa-solid fa-clock" style="font-size: 16px; color: var(--accent-primary);"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Created</div>
+                                    <div style="font-size: 14px; font-weight: 700; color: var(--text-primary);">${dateStr}</div>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="setting-row" style="padding: 0; margin: 0;">
-                            <div class="setting-info">
-                                <div class="setting-name" style="font-size: 13px;">Encryption</div>
-                                <div class="setting-desc" style="font-size: 12px;">${verification.encrypted ? 'AES-256-GCM' : 'Partial (Legacy)'}</div>
+                        <!-- Accounts Count -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; transition: all 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
+                                <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-primary); box-shadow: var(--nm-shadow-in-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fa-solid fa-key" style="font-size: 16px; color: var(--accent-primary);"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Accounts</div>
+                                    <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">${verification.accountCount !== undefined ? verification.accountCount : 'Unknown'}</div>
+                                </div>
                             </div>
-                            <div style="color: ${verification.encrypted ? 'var(--success)' : '#ff9500'}; font-size: 13px; font-weight: 700;">
-                                <i class="fa-solid fa-${verification.encrypted ? 'shield-halved' : 'shield'}"></i>
+                        </div>
+                        
+                        <!-- Encryption -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; transition: all 0.2s ease;">
+                            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
+                                <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-primary); box-shadow: var(--nm-shadow-in-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fa-solid fa-${verification.encrypted ? 'shield-halved' : 'shield'}" style="font-size: 16px; color: ${verification.encrypted ? 'var(--success)' : '#ff9500'};"></i>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Encryption</div>
+                                    <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">${verification.encrypted ? 'AES-256-GCM' : 'Partial (Legacy)'}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2702,18 +2716,20 @@ export class UIManager {
                     ${checksumStatus}
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Backup Master Password</label>
-                    <input type="password" id="import-pass" class="form-input" placeholder="••••••••" ${!verification.valid ? 'disabled' : ''}>
-                    <p class="modal-help-text" style="margin-top: 8px;">Enter the master password that was used when this backup was created.</p>
+                <!-- Password Input -->
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; letter-spacing: 0.3px;">Backup Master Password</label>
+                    <input type="password" id="import-pass" class="form-input" placeholder="Enter your master password" ${!verification.valid ? 'disabled' : ''} style="width: 100%; height: 52px; font-size: 15px;">
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px; font-weight: 600; line-height: 1.5;">Enter the master password used when this backup was created.</p>
                 </div>
                 
-                <div style="display: flex; gap: var(--space-md); margin-top: var(--space-xl);">
-                    <button class="btn-primary" id="confirm-import" style="flex: 2; height: var(--btn-h-lg);" ${!verification.valid ? 'disabled' : ''}>
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-primary" id="confirm-import" style="flex: 2; height: 56px; font-size: 15px; font-weight: 800; border-radius: 14px;" ${!verification.valid ? 'disabled' : ''}>
                         <i class="fa-solid fa-shield-halved"></i>
-                        Restore Vault
+                        <span>Restore Vault</span>
                     </button>
-                    <button class="user-button" id="cancel-import" style="flex: 1; justify-content: center; height: var(--btn-h-lg); font-weight: 800;">Cancel</button>
+                    <button class="user-button" id="cancel-import" style="flex: 1; justify-content: center; height: 56px; font-weight: 800; border-radius: 14px;">Cancel</button>
                 </div>
             </div>
         `;
