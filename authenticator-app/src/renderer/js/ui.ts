@@ -4,12 +4,14 @@ import { ThemeManager } from './managers/ThemeManager.js';
 import { SyncManager } from './managers/SyncManager.js';
 import { AccountManager } from './managers/AccountManager.js';
 import { AuthManager } from './managers/AuthManager.js';
+import { ConnectivityManager } from './managers/ConnectivityManager.js';
 
 export class UIManager {
     public theme: ThemeManager;
     public sync: SyncManager;
     public accounts: AccountManager;
     public auth: AuthManager;
+    public connectivity: ConnectivityManager;
     private currentTab: 'vault' | 'settings' | 'account' = 'vault';
     private timerInterval: any = null;
     private privacyMode: boolean = false;
@@ -69,6 +71,9 @@ export class UIManager {
             setSyncVisible: (visible) => { this.sync.syncVisible = visible; },
             formatSyncTime: (date) => this.formatSyncTime(date),
         });
+        this.connectivity = new ConnectivityManager({
+            showToast: (msg, type) => this.showToast(msg, type),
+        });
         this.theme.init();
         this.initPrivacyMode();
         this.initScreenGuardian();
@@ -86,7 +91,7 @@ export class UIManager {
         this.sync.startLastSyncTimer();
         // Listen for private sync config saved event
         document.addEventListener('sync:configSaved', () => this.loadInitialData());
-        this.initConnectivityStatus();
+        this.connectivity.init();
         this.updatePinStatus();
         this.initUpdateSystem();
         this.initSystemIntegration();
@@ -187,40 +192,11 @@ export class UIManager {
     }
 
     private initConnectivityStatus() {
-        this.updateConnectivityStatus();
-        window.addEventListener('online', () => this.updateConnectivityStatus());
-        window.addEventListener('offline', () => this.updateConnectivityStatus());
-
-        // Interactive Expansion
-        const statusEl = document.getElementById('connectivity-status');
-        if (statusEl) {
-            statusEl.addEventListener('click', () => {
-                statusEl.classList.toggle('expanded');
-                
-                // Auto-collapse after 5 seconds if expanded
-                if (statusEl.classList.contains('expanded')) {
-                    setTimeout(() => {
-                        statusEl.classList.remove('expanded');
-                    }, 5000);
-                }
-            });
-        }
+        this.connectivity.init();
     }
 
     private updateConnectivityStatus() {
-        const isOnline = navigator.onLine;
-        const statusEl = document.getElementById('connectivity-status');
-        const textEl = document.getElementById('status-text');
-
-        if (statusEl && textEl) {
-            statusEl.classList.toggle('online', isOnline);
-            statusEl.classList.toggle('offline', !isOnline);
-            textEl.textContent = isOnline ? 'Online' : 'Offline';
-        }
-        
-        if (!isOnline) {
-            this.showToast("You're offline", "info");
-        }
+        this.connectivity.updateStatus();
     }
 
     private initSystemIntegration() {
