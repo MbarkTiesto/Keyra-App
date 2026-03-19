@@ -64,7 +64,11 @@ function createWindow() {
 
     // Configure AutoUpdater
     autoUpdater.autoDownload = false; // We want to control the download via UI
-    autoUpdater.forceDevUpdateConfig = true; // Allow testing updates in development
+    
+    // Only force dev update config in development
+    if (process.env.NODE_ENV === 'development' || !app.isPackaged) {
+        autoUpdater.forceDevUpdateConfig = true;
+    }
     
     autoUpdater.on('checking-for-update', () => {
         mainWindow?.webContents.send('update-checking');
