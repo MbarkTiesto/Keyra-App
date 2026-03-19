@@ -5,6 +5,7 @@ import { SyncManager } from './managers/SyncManager.js';
 import { AccountManager } from './managers/AccountManager.js';
 import { AuthManager } from './managers/AuthManager.js';
 import { ConnectivityManager } from './managers/ConnectivityManager.js';
+import { NavigationManager, TabName } from './managers/NavigationManager.js';
 
 export class UIManager {
     public theme: ThemeManager;
@@ -12,7 +13,7 @@ export class UIManager {
     public accounts: AccountManager;
     public auth: AuthManager;
     public connectivity: ConnectivityManager;
-    private currentTab: 'vault' | 'settings' | 'account' = 'vault';
+    public nav: NavigationManager;
     private timerInterval: any = null;
     private privacyMode: boolean = false;
     private screenGuardian: boolean = false;
@@ -74,6 +75,13 @@ export class UIManager {
         this.connectivity = new ConnectivityManager({
             showToast: (msg, type) => this.showToast(msg, type),
         });
+        this.nav = new NavigationManager({
+            onTabSwitch: (tab) => {
+                if (tab === 'account') this.loadAccountInfo();
+                else if (tab === 'settings') this.updateLastActivityDisplay();
+            },
+            updateLastActivity: (action) => this.updateLastActivity(action),
+        });
         this.theme.init();
         this.initPrivacyMode();
         this.initScreenGuardian();
@@ -83,6 +91,7 @@ export class UIManager {
         this.initVaultViewStyle();
         this.initSegmentedStates();
         this.setupEventListeners();
+        this.nav.init();
         this.updateLockVaultVisibility();
         this.accounts.startTimer();
         this.loadInitialData();
@@ -590,34 +599,9 @@ export class UIManager {
     }
 
     private setupEventListeners() {
-        // Tab Navigation
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const target = e.currentTarget as HTMLElement;
-                const tabName = target.getAttribute('data-tab') as 'vault' | 'settings' | 'account';
-                this.switchTab(tabName);
-                this.updateLastActivity(`Viewed ${tabName}`);
-            });
-        });
-
-        // Account navigation from dropdown
-        document.getElementById('account-settings-btn')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('user-dropdown')?.classList.remove('show');
-            this.switchTab('account');
-            this.updateLastActivity('Opened Account Settings');
-        });
-
-
-        // User Dropdown Logic
-        const dropdownBtn = document.getElementById('user-dropdown-btn');
-        const dropdownMenu = document.getElementById('user-dropdown');
-        dropdownBtn?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            dropdownMenu?.classList.toggle('show');
-        });
+        // User Dropdown close on outside click (card dropdowns also handled here)
         document.addEventListener('click', () => {
-            dropdownMenu?.classList.remove('show');
+            document.getElementById('user-dropdown')?.classList.remove('show');
             document.querySelectorAll('.card-dropdown.show').forEach(d => {
                 d.classList.remove('show');
                 d.previousElementSibling?.classList.remove('active');
@@ -985,28 +969,8 @@ export class UIManager {
         return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + `, ${timeStr}`;
     }
 
-    public switchTab(tab: 'vault' | 'settings' | 'account') {
-        this.currentTab = tab;
-
-        // Update Nav Tabs UI
-        document.querySelectorAll('.nav-tab').forEach(t => {
-            t.classList.toggle('active', t.getAttribute('data-tab') === tab);
-        });
-
-        // Toggle View Sections
-        ['vault-view', 'settings-view', 'account-view'].forEach(viewId => {
-            const el = document.getElementById(viewId);
-            if (el) {
-                const shouldShow = viewId === `${tab}-view`;
-                el.classList.toggle('hidden', !shouldShow);
-            }
-        });
-
-        if (tab === 'account') {
-            this.loadAccountInfo();
-        } else if (tab === 'settings') {
-            this.updateLastActivityDisplay();
-        }
+    public switchTab(tab: TabName) {
+        this.nav.switchTab(tab);
     }
 
 
