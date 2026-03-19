@@ -6,6 +6,7 @@ import { AccountManager } from './managers/AccountManager.js';
 import { AuthManager } from './managers/AuthManager.js';
 import { ConnectivityManager } from './managers/ConnectivityManager.js';
 import { NavigationManager, TabName } from './managers/NavigationManager.js';
+import { PrivacyManager } from './managers/PrivacyManager.js';
 
 export class UIManager {
     public theme: ThemeManager;
@@ -14,11 +15,9 @@ export class UIManager {
     public auth: AuthManager;
     public connectivity: ConnectivityManager;
     public nav: NavigationManager;
+    public privacy: PrivacyManager;
     private timerInterval: any = null;
-    private privacyMode: boolean = false;
-    private screenGuardian: boolean = false;
     private menuExitIntegration: boolean = false;
-    private privacyBlur: boolean = false;
     private windowResizable: boolean = false;
     private wallpaperPreset: string = 'nebula';
     private searchQuery: string = '';
@@ -41,7 +40,7 @@ export class UIManager {
             setLoading: (show, title, subtitle) => this.setLoading(show, title, subtitle),
         });
         this.accounts = new AccountManager({
-            getPrivacyMode: () => this.privacyMode,
+            getPrivacyMode: () => this.privacy.privacyMode,
             getVaultViewStyle: () => this.vaultViewStyle,
             getUserId: () => this.userId,
             showToast: (msg, type) => this.showToast(msg, type),
@@ -82,11 +81,14 @@ export class UIManager {
             },
             updateLastActivity: (action) => this.updateLastActivity(action),
         });
+        this.privacy = new PrivacyManager({
+            getStorageKey: (key) => this.getStorageKey(key),
+        });
         this.theme.init();
-        this.initPrivacyMode();
-        this.initScreenGuardian();
+        this.privacy.initPrivacyMode();
+        this.privacy.initScreenGuardian();
         this.initMenuExitIntegration();
-        this.initInteractivePrivacy();
+        this.privacy.initInteractivePrivacy();
         this.initWindowResizable();
         this.initVaultViewStyle();
         this.initSegmentedStates();
@@ -303,13 +305,13 @@ export class UIManager {
                 theme: localStorage.getItem(this.getStorageKey('theme')) || 'auto',
                 accentColor: localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple',
                 wallpaperPreset: this.wallpaperPreset,
-                privacyMode: this.privacyMode,
-                screenGuardian: this.screenGuardian,
+                privacyMode: this.privacy.privacyMode,
+                screenGuardian: this.privacy.screenGuardian,
                 autolock: localStorage.getItem(this.getStorageKey('autolock')) || '0',
                 oledMode: this.theme.oledMode,
                 performanceMode: this.theme.performanceMode,
                 menuExitIntegration: this.menuExitIntegration,
-                privacyBlur: this.privacyBlur,
+                privacyBlur: this.privacy.privacyBlur,
                 windowResizable: this.windowResizable,
                 launchOnStartup: this.launchOnStartup,
                 minimizeToTray: this.minimizeToTray,
@@ -331,14 +333,8 @@ export class UIManager {
         if (settings.theme) this.setTheme(settings.theme, true);
         if (settings.accentColor) this.setAccentColor(settings.accentColor, true);
 
-        this.privacyMode = !!settings.privacyMode;
-        const privacyToggle = document.getElementById('privacy-mode-toggle') as HTMLInputElement;
-        if (privacyToggle) privacyToggle.checked = this.privacyMode;
-
-        this.screenGuardian = !!settings.screenGuardian;
-        const guardianToggle = document.getElementById('screen-guardian-toggle') as HTMLInputElement;
-        if (guardianToggle) guardianToggle.checked = this.screenGuardian;
-        (window as any).api.setContentProtection(this.screenGuardian);
+        this.privacy.applyPrivacyMode(!!settings.privacyMode, false);
+        this.privacy.applyScreenGuardian(!!settings.screenGuardian, false);
 
         if (settings.autolock !== undefined) {
             this.updateSegmentedUI('autolock-segmented', String(settings.autolock));
@@ -398,9 +394,7 @@ export class UIManager {
         }
 
         if (settings.privacyBlur !== undefined) {
-            this.privacyBlur = !!settings.privacyBlur;
-            const blurToggle = document.getElementById('privacy-blur-toggle') as HTMLInputElement;
-            if (blurToggle) blurToggle.checked = this.privacyBlur;
+            this.privacy.applyPrivacyBlur(!!settings.privacyBlur, false);
         }
 
         if (settings.autoCheckUpdates !== undefined) {
@@ -420,13 +414,13 @@ export class UIManager {
             if (settings.theme) localStorage.setItem(this.getStorageKey('theme'), settings.theme);
             if (settings.accentColor) localStorage.setItem(this.getStorageKey('accent_color'), settings.accentColor);
             if (settings.wallpaperPreset) localStorage.setItem(this.getStorageKey('wallpaperPreset'), settings.wallpaperPreset);
-            localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacyMode));
-            localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
+            localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacy.privacyMode));
+            localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.privacy.screenGuardian));
             if (settings.autolock !== undefined) localStorage.setItem(this.getStorageKey('autolock'), String(settings.autolock));
             localStorage.setItem(this.getStorageKey('oled_mode'), String(this.theme.oledMode));
             localStorage.setItem(this.getStorageKey('performance_mode'), String(this.theme.performanceMode));
             localStorage.setItem(this.getStorageKey('menu_exit_integration'), String(this.menuExitIntegration));
-            localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacyBlur));
+            localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacy.privacyBlur));
             localStorage.setItem(this.getStorageKey('window_resizable'), String(this.windowResizable));
             localStorage.setItem(this.getStorageKey('auto_check_updates'), String(this.autoCheckUpdates));
             localStorage.setItem(this.getStorageKey('vault_view_style'), this.vaultViewStyle);
@@ -451,16 +445,11 @@ export class UIManager {
     }
 
     private initPrivacyMode() {
-        this.privacyMode = localStorage.getItem(this.getStorageKey('privacyMode')) === 'true';
-        const toggle = document.getElementById('privacy-mode-toggle') as HTMLInputElement;
-        if (toggle) toggle.checked = this.privacyMode;
+        this.privacy.initPrivacyMode();
     }
 
     private initScreenGuardian() {
-        this.screenGuardian = localStorage.getItem(this.getStorageKey('screenGuardian')) === 'true';
-        const toggle = document.getElementById('screen-guardian-toggle') as HTMLInputElement;
-        if (toggle) toggle.checked = this.screenGuardian;
-        (window as any).api.setContentProtection(this.screenGuardian);
+        this.privacy.initScreenGuardian();
     }
 
     private initPerformanceMode() {
@@ -498,29 +487,7 @@ export class UIManager {
     }
 
     private initInteractivePrivacy() {
-        this.privacyBlur = localStorage.getItem(this.getStorageKey('privacy_blur')) === 'true';
-        const toggle = document.getElementById('privacy-blur-toggle') as HTMLInputElement;
-        if (toggle) toggle.checked = this.privacyBlur;
-
-        // Mouse Sensors for Privacy (Document level is often more stable for viewport exit)
-        document.documentElement.addEventListener('mouseleave', (e) => {
-            if (!e.relatedTarget) {
-                if (this.privacyBlur) this.showPrivacyOverlay();
-            }
-        });
-
-        document.documentElement.addEventListener('mouseenter', () => {
-            if (this.privacyBlur) this.hidePrivacyOverlay();
-        });
-
-        // Unified Focus logic
-        window.addEventListener('blur', () => {
-            if (this.privacyBlur || this.screenGuardian) this.showPrivacyOverlay();
-        });
-
-        window.addEventListener('focus', () => {
-            if (this.privacyBlur || this.screenGuardian) this.hidePrivacyOverlay();
-        });
+        this.privacy.initInteractivePrivacy();
     }
 
     private async migratePin() {
@@ -547,24 +514,11 @@ export class UIManager {
     }
 
     private showPrivacyOverlay() {
-        // Don't show if we are on the auth screen
-        const authVessel = document.getElementById('auth-vessel');
-        const isAuthActive = authVessel && (authVessel.classList.contains('show'));
-        
-        if (!isAuthActive) {
-            const overlay = document.getElementById('privacy-blur-overlay');
-            if (overlay) {
-                overlay.classList.add('show');
-            } else {
-                console.error("[Privacy] Overlay element NOT FOUND");
-            }
-        } else {
-        }
+        this.privacy.showOverlay();
     }
 
     private hidePrivacyOverlay() {
-        const overlay = document.getElementById('privacy-blur-overlay');
-        overlay?.classList.remove('show');
+        this.privacy.hideOverlay();
     }
 
     private initSegmentedStates() {
@@ -738,33 +692,29 @@ export class UIManager {
         // Privacy Mode Toggle
         document.getElementById('privacy-mode-toggle')?.addEventListener('change', (e) => {
             const target = e.target as HTMLInputElement;
-            this.privacyMode = target.checked;
-            localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacyMode));
+            this.privacy.applyPrivacyMode(target.checked, true);
             this.pushSettings();
             this.renderAccounts();
-            this.showToast(this.privacyMode ? "Codes are now hidden" : "Codes are now visible", "info");
-            this.updateLastActivity(`Hide Codes ${this.privacyMode ? 'on' : 'off'}`);
+            this.showToast(this.privacy.privacyMode ? "Codes are now hidden" : "Codes are now visible", "info");
+            this.updateLastActivity(`Hide Codes ${this.privacy.privacyMode ? 'on' : 'off'}`);
         });
 
         // Screen Guardian Toggle
         document.getElementById('screen-guardian-toggle')?.addEventListener('change', (e) => {
             const target = e.target as HTMLInputElement;
-            this.screenGuardian = target.checked;
-            localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.screenGuardian));
-            (window as any).api.setContentProtection(this.screenGuardian);
+            this.privacy.applyScreenGuardian(target.checked, true);
             this.pushSettings();
-            this.showToast(this.screenGuardian ? "Screenshot protection is on" : "Screenshot protection is off", "info");
-            this.updateLastActivity(`Anti-Peek ${this.screenGuardian ? 'on' : 'off'}`);
+            this.showToast(this.privacy.screenGuardian ? "Screenshot protection is on" : "Screenshot protection is off", "info");
+            this.updateLastActivity(`Anti-Peek ${this.privacy.screenGuardian ? 'on' : 'off'}`);
         });
 
         // Interactive Privacy Toggle
         document.getElementById('privacy-blur-toggle')?.addEventListener('change', (e) => {
             const target = e.target as HTMLInputElement;
-            this.privacyBlur = target.checked;
-            localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacyBlur));
+            this.privacy.applyPrivacyBlur(target.checked, true);
             this.pushSettings();
-            this.showToast(this.privacyBlur ? "Auto-blur is on" : "Auto-blur is off", "info");
-            this.updateLastActivity(`Auto-blur ${this.privacyBlur ? 'on' : 'off'}`);
+            this.showToast(this.privacy.privacyBlur ? "Auto-blur is on" : "Auto-blur is off", "info");
+            this.updateLastActivity(`Auto-blur ${this.privacy.privacyBlur ? 'on' : 'off'}`);
         });
 
         // Window Resizable Toggle

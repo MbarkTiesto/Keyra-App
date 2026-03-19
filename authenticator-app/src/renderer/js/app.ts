@@ -55,20 +55,6 @@ async function init() {
 
         // 5. Initialize Security Logic
         initAutoLock();
-
-        // 6. Privacy & Focus Shield
-        const privacyOverlay = document.getElementById('privacy-blur-overlay');
-        window.addEventListener('blur', () => {
-            const ui = (window as any).ui;
-            const authVessel = document.getElementById('auth-vessel');
-            // Only blur if we are not on the auth screen AND screenGuardian is enabled
-            if (ui && ui.screenGuardian && authVessel && authVessel.classList.contains('hidden')) {
-                privacyOverlay?.classList.remove('hidden');
-            }
-        });
-        window.addEventListener('focus', () => {
-            privacyOverlay?.classList.add('hidden');
-        });
     });
 }
 
