@@ -69,7 +69,7 @@ export class UIManager {
         const nmLoader = document.getElementById('nm-update-loader');
 
         if (versionText) {
-            versionText.textContent = `Version 1.0.0`;
+            versionText.textContent = `Version 1.2.0`;
         }
 
         checkBtn?.addEventListener('click', () => {
