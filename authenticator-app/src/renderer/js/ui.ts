@@ -1,4 +1,3 @@
-import { syncVault } from './store.js';
 import { rateLimiter } from '../../core/rateLimiter.js';
 import { ThemeManager } from './managers/ThemeManager.js';
 import { SyncManager } from './managers/SyncManager.js';
@@ -130,24 +129,8 @@ export class UIManager {
         this.updatePinStatus();
         this.updates.init();
         this.system.initSystemIntegration();
-        this.initPhoneSecurity();
+        this.auth.initPhoneSecurity();
         this.migratePin();
-    }
-
-    private initUpdateSystem() {
-        this.updates.init();
-    }
-
-    private initConnectivityStatus() {
-        this.connectivity.init();
-    }
-
-    private updateConnectivityStatus() {
-        this.connectivity.updateStatus();
-    }
-
-    private initSystemIntegration() {
-        this.system.initSystemIntegration();
     }
 
     private getStorageKey(key: string): string {
@@ -160,14 +143,6 @@ export class UIManager {
 
     public updateSyncIndicator(state: 'synced' | 'syncing' | 'error' | 'warning', message?: string) {
         this.sync.updateSyncIndicator(state, message);
-    }
-
-    private startLastSyncTimer() {
-        this.sync.startLastSyncTimer();
-    }
-
-    private updateLastSyncDisplay() {
-        this.sync.updateLastSyncDisplay();
     }
 
     public setLoading(show: boolean, title: string = "One moment...", subtitle: string = "GETTING THINGS READY") {
@@ -314,35 +289,12 @@ export class UIManager {
         this.renderAccounts();
     }
 
-    private initTheme() {
-        // Delegated to ThemeManager — kept for compatibility
-        this.theme.init();
-    }
-
     public setTheme(theme: string, silent: boolean = false) {
         this.theme.setTheme(theme, silent);
     }
 
     public setAccentColor(accentColor: string, silent: boolean = false) {
         this.theme.setAccentColor(accentColor, silent);
-    }
-
-    private initPrivacyMode() {
-        this.privacy.initPrivacyMode();
-    }
-
-    private initScreenGuardian() {
-        this.privacy.initScreenGuardian();
-    }
-
-    private initPerformanceMode() {
-        // Delegated to ThemeManager
-        this.theme.applyPerformanceMode(this.theme.performanceMode);
-    }
-
-    private initOledMode() {
-        // Delegated to ThemeManager
-        this.theme.applyOledMode(this.theme.oledMode);
     }
 
     private initMenuExitIntegration() {
@@ -369,24 +321,8 @@ export class UIManager {
         (window as any).api.setResizable(this.windowResizable);
     }
 
-    private initInteractivePrivacy() {
-        this.privacy.initInteractivePrivacy();
-    }
-
     private async migratePin() {
         return this.auth.migratePin();
-    }
-
-    private initVaultViewStyle() {
-        this.vault.initVaultViewStyle();
-    }
-
-    private showPrivacyOverlay() {
-        this.privacy.showOverlay();
-    }
-
-    private hidePrivacyOverlay() {
-        this.privacy.hideOverlay();
     }
 
     private initSegmentedStates() {
@@ -463,10 +399,10 @@ export class UIManager {
 
         // Main Add Account
         document.getElementById('add-account-btn')?.addEventListener('click', () => {
-            this.showAddModal();
+            this.accounts.showAddModal();
             this.updateLastActivity('Opened add account');
         });
-        document.getElementById('empty-add-btn')?.addEventListener('click', () => this.showAddModal());
+        document.getElementById('empty-add-btn')?.addEventListener('click', () => this.accounts.showAddModal());
 
         // Segmented Theme Toggle (Light/Dark/Auto)
         document.querySelectorAll('#theme-segmented .segment').forEach(seg => {
@@ -539,7 +475,7 @@ export class UIManager {
         this.vault.setupEventListeners();
 
         // Settings PIN
-        document.getElementById('setup-pin-btn')?.addEventListener('click', () => this.showPinSetup());
+        document.getElementById('setup-pin-btn')?.addEventListener('click', () => this.auth.showPinSetup());
 
         // Privacy Mode Toggle
         document.getElementById('privacy-mode-toggle')?.addEventListener('change', (e) => {
@@ -582,6 +518,8 @@ export class UIManager {
 
         // Accent Color
         this.setupAccentColorSelector();
+        const savedAccent = localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple';
+        this.setAccentColor(savedAccent, true);
 
         // Unlock
         document.getElementById('form-unlock')?.addEventListener('submit', (e) => {
@@ -606,11 +544,6 @@ export class UIManager {
             else if (e.key === 'Enter') { e.preventDefault(); this.handleUnlock(); }
         });
 
-        // Accent Color
-        this.setupAccentColorSelector();
-        const savedAccent = localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple';
-        this.setAccentColor(savedAccent, true);
-
         // About Modal
         const brandBtn = document.getElementById('navbar-brand');
         const aboutModal = document.getElementById('about-modal');
@@ -627,7 +560,7 @@ export class UIManager {
 
         // Remove PIN Logic
         document.getElementById('remove-pin-btn')?.addEventListener('click', () => {
-            this.showRemovePinConfirm();
+            this.auth.showRemovePinConfirm();
         });
 
         // Forgot PIN Logic
@@ -659,18 +592,6 @@ export class UIManager {
         this.auth.setupAccountEvents();
     }
 
-    private async handleEmailVerification() {
-        return this.auth.handleEmailVerification();
-    }
-
-    private startEmailResendTimer() {
-        this.auth.startEmailResendTimer();
-    }
-
-    private updateResendBtnUI() {
-        this.auth.updateResendBtnUI();
-    }
-
     private async loadAccountInfo() {
         return this.auth.loadAccountInfo();
     }
@@ -678,19 +599,6 @@ export class UIManager {
     private handleLocalAccountUI(user: any) {
         this.auth.handleLocalAccountUI(user);
     }
-
-    private async openPrivateSyncModal() {
-        this.sync.openPrivateSyncModal();
-    }
-
-    private async testPrivateSyncConnection() {
-        this.sync.testPrivateSyncConnection();
-    }
-
-    private async savePrivateSyncConfig() {
-        this.sync.savePrivateSyncConfig(() => this.loadInitialData());
-    }
-
 
     private showAboutModal() {
         const modal = document.getElementById('about-modal');
@@ -717,10 +625,6 @@ export class UIManager {
             this.showToast("Color updated!", "success");
             this.updateLastActivity(`Changed color to ${accent}`);
         });
-    }
-
-    private async manualSync() {
-        this.sync.manualSync();
     }
 
     private updateLastActivity(action: string) {
@@ -756,64 +660,8 @@ export class UIManager {
         return this.accounts.refreshAccounts();
     }
     
-    private showSkeletonLoaders(count: number = 6) {
-        this.accounts.showSkeletonLoaders(count);
-    }
-    
-    private createSkeletonCard(index: number): HTMLElement {
-        // Delegated — kept for internal compatibility
-        const card = document.createElement('div');
-        card.className = 'skeleton-card';
-        card.style.animationDelay = `${index * 0.06}s`;
-        card.innerHTML = `
-            <div class="skeleton-header">
-                <div class="skeleton-icon skeleton-shimmer"></div>
-                <div class="skeleton-text-group">
-                    <div class="skeleton-text title skeleton-shimmer"></div>
-                    <div class="skeleton-text subtitle skeleton-shimmer"></div>
-                </div>
-            </div>
-            <div class="skeleton-otp skeleton-shimmer"></div>
-            <div class="skeleton-button skeleton-shimmer"></div>
-        `;
-        return card;
-    }
-
     private renderAccounts() {
         this.accounts.renderAccounts();
-    }
-
-    private createAccountCard(account: any, index: number): HTMLElement {
-        return this.accounts.createAccountCard(account, index);
-    }
-
-    private async handleScannedData(data: string) {
-        return this.accounts.handleScannedData(data);
-    }
-
-    private async updateCardOTP(card: HTMLElement, otp: string, remaining: number) {
-        return this.accounts.updateCardOTP(card, otp, remaining);
-    }
-
-    private updateOtpModal(otp: string, remaining: number) {
-        this.accounts.updateOtpModal(otp, remaining);
-    }
-
-    private async showOtpModal(account: any) {
-        return this.accounts.showOtpModal(account);
-    }
-
-    private startTimer() {
-        // Delegated to AccountManager
-        this.accounts.startTimer();
-    }
-
-    private showSyncConflictModal(action: string, data: any) {
-        this.accounts.showSyncConflictModal(action, data);
-    }
-
-    private getIcon(issuer: string): string {
-        return this.accounts.getIcon(issuer);
     }
 
     private showModal(content: string) {
@@ -937,43 +785,6 @@ export class UIManager {
         }
     }
 
-    private async verifyCurrentPin(onSuccess: () => void) {
-        return this.auth.verifyCurrentPin(onSuccess);
-    }
-
-    private showRemovePinConfirm() {
-        this.auth.showRemovePinConfirm();
-    }
-    private showPinSetup() {
-        this.auth.showPinSetup();
-    }
-
-    private showAddModal() {
-        this.accounts.showAddModal();
-    }
-
-    private showEditModal(account: any) {
-        this.accounts.showEditModal(account);
-    }
-
-    private showDeleteConfirm(account: any) {
-        this.accounts.showDeleteConfirm(account);
-    }
-
-    private async showImportPasswordModal(data: any) {
-        return this.vault.showImportPasswordModal(data);
-    }
-
-    private startLiveSync() {
-        // Delegated to SyncManager
-        this.sync.startLiveSync();
-    }
-
-    private async checkForUpdates() {
-        // Delegated to SyncManager
-    }
-
-
     private async loadInitialData() {
         try {
             const user = await (window as any).api.getCurrentUser();
@@ -1012,22 +823,6 @@ export class UIManager {
         }
     }
 
-
-    private showPhoneQrModal() {
-        this.auth.showPhoneQrModal();
-    }
-
-    private hidePhoneQrModal() {
-        this.auth.hidePhoneQrModal();
-    }
-
-    private initPhoneSecurity() {
-        this.auth.initPhoneSecurity();
-    }
-
-    private initWhatsAppLinking() {
-        this.auth.initWhatsAppLinking();
-    }
 
     private async updateAccountView() {
         return this.auth.updateAccountView();
@@ -1364,12 +1159,5 @@ export class UIManager {
         });
     }
     
-    private showExportOptionsModal() {
-        this.accounts.showExportOptionsModal();
-    }
-    
-    private async performExport(format: string, accountsList: any[]) {
-        return this.accounts.performExport(format, accountsList);
-    }
 }
 
