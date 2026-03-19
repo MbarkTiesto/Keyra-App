@@ -8,6 +8,7 @@ import { ConnectivityManager } from './managers/ConnectivityManager.js';
 import { NavigationManager, TabName } from './managers/NavigationManager.js';
 import { PrivacyManager } from './managers/PrivacyManager.js';
 import { SystemManager } from './managers/SystemManager.js';
+import { UpdateManager } from './managers/UpdateManager.js';
 
 export class UIManager {
     public theme: ThemeManager;
@@ -18,6 +19,7 @@ export class UIManager {
     public nav: NavigationManager;
     public privacy: PrivacyManager;
     public system: SystemManager;
+    public updates: UpdateManager;
     private timerInterval: any = null;
     private menuExitIntegration: boolean = false;
     private windowResizable: boolean = false;
@@ -85,6 +87,9 @@ export class UIManager {
         this.system = new SystemManager({
             getStorageKey: (key) => this.getStorageKey(key),
             pushSettings: () => this.pushSettings(),
+        });
+        this.updates = new UpdateManager({
+            pushSettings: () => this.pushSettings(),
             showToast: (msg, type) => this.showToast(msg, type),
             setLoading: (show, title, subtitle) => this.setLoading(show, title, subtitle),
         });
@@ -108,14 +113,14 @@ export class UIManager {
         document.addEventListener('sync:configSaved', () => this.loadInitialData());
         this.connectivity.init();
         this.updatePinStatus();
-        this.system.initUpdateSystem();
+        this.updates.init();
         this.system.initSystemIntegration();
         this.initPhoneSecurity();
         this.migratePin();
     }
 
     private initUpdateSystem() {
-        this.system.initUpdateSystem();
+        this.updates.init();
     }
 
     private initConnectivityStatus() {
@@ -195,7 +200,7 @@ export class UIManager {
                 launchOnStartup: this.system.launchOnStartup,
                 minimizeToTray: this.system.minimizeToTray,
                 globalHotkey: this.system.globalHotkey,
-                autoCheckUpdates: this.system.autoCheckUpdates,
+                autoCheckUpdates: this.updates.autoCheckUpdates,
                 vaultViewStyle: this.vaultViewStyle,
                 vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
             }
@@ -268,9 +273,9 @@ export class UIManager {
         }
 
         if (settings.autoCheckUpdates !== undefined) {
-            this.system.autoCheckUpdates = !!settings.autoCheckUpdates;
+            this.updates.autoCheckUpdates = !!settings.autoCheckUpdates;
             const autoToggle = document.getElementById('auto-update-toggle') as HTMLInputElement;
-            if (autoToggle) autoToggle.checked = this.system.autoCheckUpdates;
+            if (autoToggle) autoToggle.checked = this.updates.autoCheckUpdates;
         }
         
         if (settings.windowResizable !== undefined) {
@@ -292,7 +297,7 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('menu_exit_integration'), String(this.menuExitIntegration));
             localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacy.privacyBlur));
             localStorage.setItem(this.getStorageKey('window_resizable'), String(this.windowResizable));
-            localStorage.setItem(this.getStorageKey('auto_check_updates'), String(this.system.autoCheckUpdates));
+            localStorage.setItem(this.getStorageKey('auto_check_updates'), String(this.updates.autoCheckUpdates));
             localStorage.setItem(this.getStorageKey('vault_view_style'), this.vaultViewStyle);
             if (settings.vaultPin !== undefined) localStorage.setItem(this.getStorageKey('vault_pin'), settings.vaultPin);
         }
