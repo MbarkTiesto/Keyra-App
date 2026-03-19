@@ -21,7 +21,7 @@ export class AccountManager {
     public cardCache: HTMLElement[] = [];
     public activeOtpAccount: any = null;
     private timerInterval: any = null;
-    private searchQuery: string = '';
+    public searchQuery: string = '';
     private pendingConflictAction: string | null = null;
     private pendingConflictData: any = null;
 

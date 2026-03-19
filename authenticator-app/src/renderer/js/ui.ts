@@ -9,6 +9,7 @@ import { NavigationManager, TabName } from './managers/NavigationManager.js';
 import { PrivacyManager } from './managers/PrivacyManager.js';
 import { SystemManager } from './managers/SystemManager.js';
 import { UpdateManager } from './managers/UpdateManager.js';
+import { VaultManager } from './managers/VaultManager.js';
 
 export class UIManager {
     public theme: ThemeManager;
@@ -20,12 +21,11 @@ export class UIManager {
     public privacy: PrivacyManager;
     public system: SystemManager;
     public updates: UpdateManager;
+    public vault: VaultManager;
     private timerInterval: any = null;
     private menuExitIntegration: boolean = false;
     private windowResizable: boolean = false;
     private wallpaperPreset: string = 'nebula';
-    private searchQuery: string = '';
-    private vaultViewStyle: 'unified' | 'compact' | 'secure' = 'compact';
 
 
     constructor(public userId: string = 'default') {
@@ -41,7 +41,7 @@ export class UIManager {
         });
         this.accounts = new AccountManager({
             getPrivacyMode: () => this.privacy.privacyMode,
-            getVaultViewStyle: () => this.vaultViewStyle,
+            getVaultViewStyle: () => this.vault.vaultViewStyle,
             getUserId: () => this.userId,
             showToast: (msg, type) => this.showToast(msg, type),
             setLoading: (show, title, subtitle) => this.setLoading(show, title, subtitle),
@@ -93,13 +93,28 @@ export class UIManager {
             showToast: (msg, type) => this.showToast(msg, type),
             setLoading: (show, title, subtitle) => this.setLoading(show, title, subtitle),
         });
+        this.vault = new VaultManager({
+            getStorageKey: (key) => this.getStorageKey(key),
+            pushSettings: () => this.pushSettings(),
+            showToast: (msg, type) => this.showToast(msg, type),
+            setLoading: (show, title, subtitle) => this.setLoading(show, title, subtitle),
+            showModal: (content) => this.showModal(content),
+            hideModal: () => this.hideModal(),
+            refreshAccounts: () => this.refreshAccounts(),
+            renderAccounts: () => this.renderAccounts(),
+            updateSegmentedUI: (id, val) => this.updateSegmentedUI(id, val),
+            updateLastActivity: (action) => this.updateLastActivity(action),
+            showExportOptionsModal: () => this.accounts.showExportOptionsModal(),
+            performExport: (format, list) => this.accounts.performExport(format, list),
+            setSearchQuery: (query) => { this.accounts.searchQuery = query; },
+        });
         this.theme.init();
         this.privacy.initPrivacyMode();
         this.privacy.initScreenGuardian();
         this.initMenuExitIntegration();
         this.privacy.initInteractivePrivacy();
         this.initWindowResizable();
-        this.initVaultViewStyle();
+        this.vault.initVaultViewStyle();
         this.initSegmentedStates();
         this.setupEventListeners();
         this.nav.init();
@@ -201,7 +216,7 @@ export class UIManager {
                 minimizeToTray: this.system.minimizeToTray,
                 globalHotkey: this.system.globalHotkey,
                 autoCheckUpdates: this.updates.autoCheckUpdates,
-                vaultViewStyle: this.vaultViewStyle,
+                vaultViewStyle: this.vault.vaultViewStyle,
                 vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
             }
         };
@@ -237,14 +252,7 @@ export class UIManager {
         }
 
         if (settings.vaultViewStyle !== undefined) {
-            this.vaultViewStyle = settings.vaultViewStyle;
-            this.updateSegmentedUI('countdown-style-segmented', this.vaultViewStyle);
-            
-            // Immediately toggle global bar visibility
-            const globalVessel = document.getElementById('global-timer-vessel');
-            if (globalVessel) globalVessel.classList.toggle('hidden', this.vaultViewStyle !== 'unified');
-            
-            this.renderAccounts();
+            this.vault.applyVaultViewStyle(settings.vaultViewStyle);
         }
 
         if (settings.oledMode !== undefined) {
@@ -298,7 +306,7 @@ export class UIManager {
             localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacy.privacyBlur));
             localStorage.setItem(this.getStorageKey('window_resizable'), String(this.windowResizable));
             localStorage.setItem(this.getStorageKey('auto_check_updates'), String(this.updates.autoCheckUpdates));
-            localStorage.setItem(this.getStorageKey('vault_view_style'), this.vaultViewStyle);
+            localStorage.setItem(this.getStorageKey('vault_view_style'), this.vault.vaultViewStyle);
             if (settings.vaultPin !== undefined) localStorage.setItem(this.getStorageKey('vault_pin'), settings.vaultPin);
         }
 
@@ -370,22 +378,7 @@ export class UIManager {
     }
 
     private initVaultViewStyle() {
-        const saved = localStorage.getItem(this.getStorageKey('vault_view_style')) as any;
-        if (saved && ['unified', 'compact', 'secure'].includes(saved)) {
-            this.vaultViewStyle = saved;
-        } else {
-            // Check legacy key if any or default
-            const legacy = localStorage.getItem(this.getStorageKey('vaultViewStyle')) as any;
-            if (legacy && ['unified', 'compact', 'secure'].includes(legacy)) {
-                this.vaultViewStyle = legacy;
-                localStorage.setItem(this.getStorageKey('vault_view_style'), legacy);
-                localStorage.removeItem(this.getStorageKey('vaultViewStyle'));
-            }
-        }
-        
-        // Apply initial visibility
-        const globalVessel = document.getElementById('global-timer-vessel');
-        if (globalVessel) globalVessel.classList.toggle('hidden', this.vaultViewStyle !== 'unified');
+        this.vault.initVaultViewStyle();
     }
 
     private showPrivacyOverlay() {
@@ -403,7 +396,7 @@ export class UIManager {
         const autolock = localStorage.getItem(this.getStorageKey('autolock')) || '0';
         this.updateSegmentedUI('autolock-segmented', autolock);
 
-        this.updateSegmentedUI('countdown-style-segmented', this.vaultViewStyle);
+        this.updateSegmentedUI('countdown-style-segmented', this.vault.vaultViewStyle);
     }
 
     private updateSegmentedUI(containerId: string, value: string) {
@@ -542,24 +535,8 @@ export class UIManager {
         // Private Sync Listeners — delegated to SyncManager
         this.sync.setupEventListeners();
 
-        // Vault View Type Toggle (Vault View Header)
-        const countdownSegmented = document.getElementById('countdown-style-segmented');
-        countdownSegmented?.querySelectorAll('.segment').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const val = btn.getAttribute('data-val') as any;
-                this.vaultViewStyle = val || 'unified';
-                localStorage.setItem(this.getStorageKey('vault_view_style'), this.vaultViewStyle);
-                this.updateSegmentedUI('countdown-style-segmented', this.vaultViewStyle);
-                
-                const globalVessel = document.getElementById('global-timer-vessel');
-                if (globalVessel) globalVessel.classList.toggle('hidden', this.vaultViewStyle !== 'unified');
-                
-                this.renderAccounts();
-                this.pushSettings();
-                this.showToast(`View style: ${this.vaultViewStyle.charAt(0).toUpperCase() + this.vaultViewStyle.slice(1)}`, "info");
-                this.updateLastActivity(`Changed view to ${this.vaultViewStyle}`);
-            });
-        });
+        // Vault view, import/export, search — delegated to VaultManager
+        this.vault.setupEventListeners();
 
         // Settings PIN
         document.getElementById('setup-pin-btn')?.addEventListener('click', () => this.showPinSetup());
@@ -605,30 +582,6 @@ export class UIManager {
 
         // Accent Color
         this.setupAccentColorSelector();
-
-        // Vault Maintenance
-        document.getElementById('btn-export-vault')?.addEventListener('click', async () => {
-            this.showExportOptionsModal();
-        });
-        document.getElementById('btn-import-vault')?.addEventListener('click', async () => {
-            this.setLoading(true, "Opening Explorer", "SELECTING BACKUP FILE");
-            try {
-                const res = await (window as any).api.importVault();
-                if (res.success && res.data) {
-                    await this.showImportPasswordModal(res.data);
-                }
-            } finally {
-                this.setLoading(false);
-            }
-        });
-
-        // Search
-        const searchInput = document.getElementById('vault-search') as HTMLInputElement;
-        searchInput?.addEventListener('input', (e) => {
-            const target = e.target as HTMLInputElement;
-            this.searchQuery = target.value.toLowerCase().trim();
-            this.renderAccounts();
-        });
 
         // Unlock
         document.getElementById('form-unlock')?.addEventListener('submit', (e) => {
@@ -1008,206 +961,7 @@ export class UIManager {
     }
 
     private async showImportPasswordModal(data: any) {
-        console.log('showImportPasswordModal called with data:', {
-            hasSalt: !!data?.salt,
-            hasEncryptedVaultData: !!data?.encryptedVaultData,
-            hasEncryptedSettings: !!data?.encryptedSettings,
-            hasChecksum: !!data?.checksum,
-            version: data?.version,
-            timestamp: data?.timestamp,
-            accountCount: data?.accountCount,
-            keys: Object.keys(data || {})
-        });
-        
-        // Verify backup file first
-        const verification = await (window as any).api.verifyBackupFile(data);
-        console.log('Verification result:', verification);
-        
-        // Support both new encrypted format and legacy plaintext format
-        const { 
-            salt, 
-            encryptedVaultData, 
-            encryptedSettings,
-            autolock, 
-            "Desktop Settings": desktopSettings, 
-            "Web Settings": webSettings 
-        } = data;
-        
-        // Format timestamp if available
-        let dateStr = "Unknown";
-        if (verification.timestamp) {
-            const date = new Date(verification.timestamp);
-            dateStr = date.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-        
-        // Encryption status badge
-        const encryptionBadge = verification.encrypted 
-            ? '<div class="badge" style="background: var(--success); color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800;"><i class="fa-solid fa-lock"></i> FULLY ENCRYPTED</div>'
-            : '<div class="badge" style="background: #ff9500; color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 800;"><i class="fa-solid fa-triangle-exclamation"></i> LEGACY FORMAT</div>';
-        
-        // Checksum status
-        let checksumStatus = '';
-        if (verification.hasChecksum) {
-            if (verification.checksumValid) {
-                checksumStatus = '<div style="display: flex; align-items: center; gap: 8px; color: var(--success); font-size: 13px; font-weight: 700; margin-top: 12px;"><i class="fa-solid fa-circle-check"></i><span>Integrity Verified</span></div>';
-            } else {
-                checksumStatus = '<div style="display: flex; align-items: center; gap: 8px; color: #ff3b30; font-size: 13px; font-weight: 700; margin-top: 12px;"><i class="fa-solid fa-triangle-exclamation"></i><span>Checksum Mismatch - File may be corrupted</span></div>';
-            }
-        }
-        
-        // Warning if backup is invalid
-        const warningSection = !verification.valid 
-            ? `<div style="background: rgba(255, 59, 48, 0.1); border: 2px solid #ff3b30; border-radius: var(--radius-md); padding: var(--space-md); margin-bottom: var(--space-md);">
-                <div style="display: flex; align-items: center; gap: 12px; color: #ff3b30;">
-                    <i class="fa-solid fa-circle-exclamation" style="font-size: 24px;"></i>
-                    <div>
-                        <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">Invalid Backup File</div>
-                        <div style="font-size: 12px; opacity: 0.9;">${verification.error || 'This file cannot be restored'}</div>
-                    </div>
-                </div>
-            </div>`
-            : '';
-        
-        const content = `
-            <div class="modal-content" style="max-width: 600px; padding: clamp(24px, 5vw, 40px);">
-                <!-- Header -->
-                <div style="display: flex; align-items: flex-start; gap: 20px; margin-bottom: 28px;">
-                    <div class="modal-icon-vessel" style="width: 72px; height: 72px; flex-shrink: 0;">
-                        <i class="fa-solid fa-upload" style="font-size: 32px;"></i>
-                    </div>
-                    <div style="flex: 1; min-width: 0;">
-                        <h2 style="font-weight: 900; font-size: clamp(22px, 4vw, 28px); color: var(--text-primary); margin: 0 0 12px 0; line-height: 1.2;">Restore Vault</h2>
-                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <div style="font-size: 11px; font-weight: 800; letter-spacing: 0.8px; color: var(--text-secondary); text-transform: uppercase;">Verify Master Key</div>
-                            ${encryptionBadge}
-                        </div>
-                    </div>
-                </div>
-                
-                ${warningSection}
-                
-                <!-- Backup Details Card -->
-                <div style="background: var(--bg-primary); border-radius: 16px; padding: 20px; box-shadow: var(--nm-shadow-in-sm); margin-bottom: 24px;">
-                    <div style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 16px; text-transform: uppercase; opacity: 0.7;">Backup Information</div>
-                    
-                    <div style="display: grid; gap: 16px;">
-                        <!-- Version -->
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; transition: all 0.2s ease;">
-                            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
-                                <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-primary); box-shadow: var(--nm-shadow-in-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <i class="fa-solid fa-code-branch" style="font-size: 16px; color: var(--accent-primary);"></i>
-                                </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Version</div>
-                                    <div style="font-size: 15px; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">${verification.version || 'Unknown'}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Created Date -->
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; transition: all 0.2s ease;">
-                            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
-                                <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-primary); box-shadow: var(--nm-shadow-in-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <i class="fa-solid fa-clock" style="font-size: 16px; color: var(--accent-primary);"></i>
-                                </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Created</div>
-                                    <div style="font-size: 14px; font-weight: 700; color: var(--text-primary);">${dateStr}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Accounts Count -->
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; transition: all 0.2s ease;">
-                            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
-                                <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-primary); box-shadow: var(--nm-shadow-in-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <i class="fa-solid fa-key" style="font-size: 16px; color: var(--accent-primary);"></i>
-                                </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Accounts</div>
-                                    <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">${verification.accountCount !== undefined ? verification.accountCount : 'Unknown'}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Encryption -->
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-secondary); border-radius: 12px; transition: all 0.2s ease;">
-                            <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0;">
-                                <div style="width: 40px; height: 40px; border-radius: 10px; background: var(--bg-primary); box-shadow: var(--nm-shadow-in-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <i class="fa-solid fa-${verification.encrypted ? 'shield-halved' : 'shield'}" style="font-size: 16px; color: ${verification.encrypted ? 'var(--success)' : '#ff9500'};"></i>
-                                </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px;">Encryption</div>
-                                    <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">${verification.encrypted ? 'AES-256-GCM' : 'Partial (Legacy)'}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${checksumStatus}
-                </div>
-                
-                <!-- Password Input -->
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; letter-spacing: 0.3px;">Backup Master Password</label>
-                    <input type="password" id="import-pass" class="form-input" placeholder="Enter your master password" autocomplete="current-password" ${!verification.valid ? 'disabled' : ''} style="width: 100%; height: 52px; font-size: 15px;">
-                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px; font-weight: 600; line-height: 1.5;">Enter the master password used when this backup was created.</p>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-primary" id="confirm-import" style="flex: 2; height: 56px; font-size: 15px; font-weight: 800; border-radius: 14px;" ${!verification.valid ? 'disabled' : ''}>
-                        <i class="fa-solid fa-shield-halved"></i>
-                        <span>Restore Vault</span>
-                    </button>
-                    <button class="user-button" id="cancel-import" style="flex: 1; justify-content: center; height: 56px; font-weight: 800; border-radius: 14px;">Cancel</button>
-                </div>
-            </div>
-        `;
-        this.showModal(content);
-        
-        if (verification.valid) {
-            document.getElementById('confirm-import')?.addEventListener('click', async () => {
-                const pass = (document.getElementById('import-pass') as HTMLInputElement).value;
-                
-                // Show warning if checksum is invalid
-                if (verification.hasChecksum && !verification.checksumValid) {
-                    const confirmed = confirm("Warning: Backup file integrity check failed. The file may be corrupted or tampered with. Continue anyway?");
-                    if (!confirmed) return;
-                }
-                
-                this.setLoading(true, "Restoring Vault", "DECRYPTING BACKUP ARCHIVE");
-                try {
-                    const res = await (window as any).api.performVaultImport(
-                        salt, 
-                        encryptedVaultData, 
-                        pass, 
-                        encryptedSettings,
-                        autolock, 
-                        desktopSettings, 
-                        webSettings
-                    );
-                    if (res.success) {
-                        this.hideModal();
-                        this.showToast("Vault restored!", "success");
-                        await this.refreshAccounts();
-                    } else this.showToast(res.message, "error");
-                } finally {
-                    this.setLoading(false);
-                }
-            });
-            document.getElementById('import-pass')?.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') document.getElementById('confirm-import')?.click();
-            });
-        }
-        
-        document.getElementById('cancel-import')?.addEventListener('click', () => this.hideModal());
+        return this.vault.showImportPasswordModal(data);
     }
 
     private startLiveSync() {
