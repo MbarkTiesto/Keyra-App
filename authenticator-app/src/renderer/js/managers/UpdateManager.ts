@@ -21,7 +21,7 @@ export class UpdateManager {
         const versionText = document.getElementById('current-version-text');
         const nmLoader = document.getElementById('nm-update-loader');
 
-        if (versionText) versionText.textContent = `Version 1.3.0`;
+        if (versionText) versionText.textContent = `Version 1.4.0`;
 
         checkBtn?.addEventListener('click', () => {
             this.cb.setLoading(true, "Checking Updates", "CONTACTING KEYRA SERVERS");
