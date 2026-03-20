@@ -26,21 +26,41 @@ export class AccountRenderer {
 
     public startTimer(getAccounts: () => any[]) {
         if (this.timerInterval) clearInterval(this.timerInterval);
-        this.timerInterval = setInterval(async () => {
-            const accounts = getAccounts();
-            if (accounts.length === 0 || this.cardCache.length === 0) return;
-            const secrets = accounts.map((acc: any) => acc.secret);
-            const { otps, remaining } = await (window as any).api.getBatchOTPs(secrets);
-            this.cardCache.forEach((card, i) => {
-                if (otps[i]) this.updateCardOTP(card, otps[i], remaining);
-            });
-            if (this.activeOtpAccount) {
-                const activeIndex = accounts.findIndex((a: any) => a.id === this.activeOtpAccount.id);
-                if (activeIndex !== -1 && otps[activeIndex]) {
-                    this.updateOtpModal(otps[activeIndex], remaining);
+
+        // Use requestAnimationFrame-based loop instead of setInterval for smoother updates
+        let lastSecond = -1;
+        const tick = async () => {
+            const now = Math.floor(Date.now() / 1000);
+            if (now !== lastSecond) {
+                lastSecond = now;
+                const accounts = getAccounts();
+                if (accounts.length > 0 && this.cardCache.length > 0) {
+                    const secrets = accounts.map((acc: any) => acc.secret);
+                    const { otps, remaining } = await (window as any).api.getBatchOTPs(secrets);
+                    // Batch all DOM writes in one rAF to avoid layout thrashing
+                    requestAnimationFrame(() => {
+                        this.cardCache.forEach((card, i) => {
+                            if (otps[i]) this.updateCardOTP(card, otps[i], remaining);
+                        });
+                        if (this.activeOtpAccount) {
+                            const activeIndex = accounts.findIndex((a: any) => a.id === this.activeOtpAccount.id);
+                            if (activeIndex !== -1 && otps[activeIndex]) {
+                                this.updateOtpModal(otps[activeIndex], remaining);
+                            }
+                        }
+                    });
                 }
             }
-        }, 1000);
+            this.timerInterval = requestAnimationFrame(tick);
+        };
+        this.timerInterval = requestAnimationFrame(tick);
+    }
+
+    public stopTimer() {
+        if (this.timerInterval) {
+            cancelAnimationFrame(this.timerInterval);
+            this.timerInterval = null;
+        }
     }
 
     // ─── Skeleton ─────────────────────────────────────────────────────────────
@@ -94,26 +114,49 @@ export class AccountRenderer {
             grid.classList.add('hidden');
             emptyState.classList.remove('hidden');
             searchEmptyState.classList.add('hidden');
-        } else if (filtered.length === 0) {
+            return;
+        }
+
+        if (filtered.length === 0) {
             grid.classList.add('hidden');
             emptyState.classList.add('hidden');
             searchEmptyState.classList.remove('hidden');
-        } else {
-            grid.classList.remove('hidden');
-            emptyState.classList.add('hidden');
-            searchEmptyState.classList.add('hidden');
-            grid.innerHTML = '';
+            return;
+        }
+
+        grid.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+        searchEmptyState.classList.add('hidden');
+
+        // Diff-based update: only skip rebuild if account IDs AND view style are unchanged
+        const currentIds = this.cardCache.map(c => c.dataset.id);
+        const newIds = filtered.map(acc => acc.id);
+        const currentStyle = grid.dataset.viewStyle || '';
+        const newStyle = this.cb.getVaultViewStyle();
+        const isSameSet = currentIds.length === newIds.length
+            && newIds.every((id, i) => id === currentIds[i])
+            && currentStyle === newStyle;
+
+        if (!isSameSet) {
+            // Use DocumentFragment to batch DOM insertions
+            const fragment = document.createDocumentFragment();
             this.cardCache = [];
             filtered.forEach((acc, index) => {
                 const card = this.createAccountCard(acc, index);
-                grid.appendChild(card);
+                card.dataset.id = acc.id;
+                fragment.appendChild(card);
                 this.cardCache.push(card);
             });
+            grid.innerHTML = '';
+            grid.dataset.viewStyle = newStyle;
+            grid.appendChild(fragment);
 
             const secrets = filtered.map(acc => acc.secret);
             (window as any).api.getBatchOTPs(secrets).then((res: { otps: string[], remaining: number }) => {
-                this.cardCache.forEach((card, i) => {
-                    if (res.otps[i]) this.updateCardOTP(card, res.otps[i], res.remaining);
+                requestAnimationFrame(() => {
+                    this.cardCache.forEach((card, i) => {
+                        if (res.otps[i]) this.updateCardOTP(card, res.otps[i], res.remaining);
+                    });
                 });
             });
         }
@@ -126,8 +169,9 @@ export class AccountRenderer {
         const vaultViewStyle = this.cb.getVaultViewStyle();
 
         const card = document.createElement('div');
-        card.className = 'account-card animate-fade-in';
-        card.style.animationDelay = `${index * 0.05}s`;
+        card.className = 'account-card';
+        // Cap stagger at 150ms max so large vaults don't feel sluggish
+        card.style.animationDelay = `${Math.min(index * 0.04, 0.15)}s`;
 
         card.innerHTML = `
             <div class="account-header">

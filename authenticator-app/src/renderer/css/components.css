@@ -618,15 +618,19 @@ body.dark-theme .dropdown-menu {
     border: var(--glass-border);
     border-radius: var(--radius-lg);
     padding: 20px;
-    transition: all var(--transition-medium);
+    /* Only transition the properties we actually animate — never use 'all' */
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     position: relative;
     overflow: visible;
     display: flex;
     flex-direction: column;
     gap: 12px;
     box-shadow: var(--nm-shadow-out);
-    animation: cardEntrance 0.6s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+    animation: cardEntrance 0.5s cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
     opacity: 0;
+    /* Isolate each card's paint/layout from its siblings */
+    contain: layout paint;
+    will-change: transform;
 }
 
 .account-card:hover {

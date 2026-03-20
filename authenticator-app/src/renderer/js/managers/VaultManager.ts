@@ -80,12 +80,16 @@ export class VaultManager {
             }
         });
 
-        // Search
+        // Search — debounced to avoid re-rendering on every keystroke
         const searchInput = document.getElementById('vault-search') as HTMLInputElement;
+        let searchDebounce: any = null;
         searchInput?.addEventListener('input', (e) => {
-            this.searchQuery = (e.target as HTMLInputElement).value.toLowerCase().trim();
-            this.cb.setSearchQuery(this.searchQuery);
-            this.cb.renderAccounts();
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                this.searchQuery = (e.target as HTMLInputElement).value.toLowerCase().trim();
+                this.cb.setSearchQuery(this.searchQuery);
+                this.cb.renderAccounts();
+            }, 200);
         });
     }
 

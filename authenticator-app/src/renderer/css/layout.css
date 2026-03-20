@@ -137,9 +137,11 @@ body.local-only #about-sync-row {
     max-width: 1280px;
     margin: 0 auto;
     width: 100%;
-    /* Modern Scrollbar Tracking */
     scrollbar-gutter: stable;
     scroll-behavior: smooth;
+    /* Promote scroll container to its own compositor layer */
+    will-change: scroll-position;
+    -webkit-overflow-scrolling: touch;
 }
 
 .main-content::-webkit-scrollbar {
