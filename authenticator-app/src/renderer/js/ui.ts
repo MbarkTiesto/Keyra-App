@@ -330,25 +330,11 @@ export class UIManager {
         this.theme.setAccentColor(accentColor, silent);
     }
 
-    private initMenuExitIntegration() {
-        this.settings.initMenuExitIntegration();
-    }
-
-    private updateCloseButtonVisibility() {
-        this.settings.updateCloseButtonVisibility();
-    }
-
-    private initWindowResizable() {
-        this.settings.initWindowResizable();
-    }
-
-    private initSegmentedStates() {
-        this.settings.initSegmentedStates();
-    }
-
-    private updateSegmentedUI(containerId: string, value: string) {
-        this.settings.updateSegmentedUI(containerId, value);
-    }
+    private initMenuExitIntegration() { this.settings.initMenuExitIntegration(); }
+    private updateCloseButtonVisibility() { this.settings.updateCloseButtonVisibility(); }
+    private initWindowResizable() { this.settings.initWindowResizable(); }
+    private initSegmentedStates() { this.settings.initSegmentedStates(); }
+    private updateSegmentedUI(containerId: string, value: string) { this.settings.updateSegmentedUI(containerId, value); }
 
     private setupEventListeners() {
         // User Dropdown close on outside click (card dropdowns also handled here)
