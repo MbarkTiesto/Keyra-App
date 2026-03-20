@@ -297,10 +297,14 @@ export class AccountRenderer {
         this.activeOtpAccount = account;
         const initialOtp = await (window as any).api.generateTOTP(account.secret);
         const { remaining } = await (window as any).api.getBatchOTPs([account.secret]);
+        const iconClass = this.getIcon(account.issuer);
 
         const content = `
             <div class="otp-modal-container">
                 <div class="otp-modal-header">
+                    <div class="otp-modal-icon-vessel">
+                        <i class="${iconClass}"></i>
+                    </div>
                     <div class="otp-modal-name">${account.issuer}</div>
                     <div class="otp-modal-account">${account.account}</div>
                 </div>
@@ -314,6 +318,7 @@ export class AccountRenderer {
                 <div class="otp-modal-code-vessel" id="otp-modal-copy">
                     ${initialOtp.substring(0, 3)} ${initialOtp.substring(3)}
                 </div>
+                <p class="otp-modal-hint">Tap code to copy</p>
                 <div class="otp-modal-footer">
                     <button class="btn-primary" id="btn-otp-modal-copy" style="flex: 1;">
                         <i class="fa-solid fa-copy"></i>
@@ -327,16 +332,16 @@ export class AccountRenderer {
         this.cb.showModal(content);
         this.updateOtpModal(initialOtp, remaining);
 
-        document.getElementById('btn-otp-modal-copy')?.addEventListener('click', () => {
-            navigator.clipboard.writeText(initialOtp);
+        const copyAction = async () => {
+            const freshOtp = await (window as any).api.generateTOTP(account.secret);
+            await navigator.clipboard.writeText(freshOtp);
             this.cb.showToast("Code copied!", "success");
-            this.cb.showCopyFeedback(document.getElementById('otp-modal-copy')!);
-        });
-        document.getElementById('otp-modal-copy')?.addEventListener('click', () => {
-            navigator.clipboard.writeText(initialOtp);
-            this.cb.showToast("OTP Copied", "success");
-            this.cb.showCopyFeedback(document.getElementById('otp-modal-copy')!);
-        });
+            const codeVessel = document.getElementById('otp-modal-copy');
+            if (codeVessel) this.cb.showCopyFeedback(codeVessel);
+        };
+
+        document.getElementById('btn-otp-modal-copy')?.addEventListener('click', copyAction);
+        document.getElementById('otp-modal-copy')?.addEventListener('click', copyAction);
         document.getElementById('btn-otp-modal-close')?.addEventListener('click', () => {
             this.activeOtpAccount = null;
             this.cb.hideModal();

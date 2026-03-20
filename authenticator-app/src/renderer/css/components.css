@@ -956,19 +956,53 @@ body.dark-theme.oled-optimized .disabled-card-overlay {
 }
 
 .otp-modal-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
     margin-bottom: var(--space-md);
+}
+
+/* Service icon vessel */
+.otp-modal-icon-vessel {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-primary);
+    margin-bottom: 4px;
+    flex-shrink: 0;
+}
+
+.otp-modal-icon-vessel i {
+    font-size: 26px;
 }
 
 .otp-modal-name {
     font-size: 20px;
     font-weight: 900;
     color: var(--text-primary);
+    letter-spacing: -0.4px;
 }
 
 .otp-modal-account {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.otp-modal-hint {
+    font-size: 10px;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-tertiary);
+    margin-top: -8px;
+    margin-bottom: 4px;
 }
 
 .otp-modal-code-vessel {
@@ -976,7 +1010,7 @@ body.dark-theme.oled-optimized .disabled-card-overlay {
     padding: var(--space-lg);
     border-radius: var(--radius-lg);
     box-shadow: var(--nm-shadow-in);
-    margin: var(--space-lg) 0;
+    margin: var(--space-md) 0 var(--space-xs);
     font-size: 38px;
     font-weight: 950;
     letter-spacing: 4px;
@@ -993,7 +1027,7 @@ body.dark-theme.oled-optimized .disabled-card-overlay {
 .otp-modal-footer {
     display: flex;
     gap: 12px;
-    margin-top: var(--space-lg);
+    margin-top: var(--space-md);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
