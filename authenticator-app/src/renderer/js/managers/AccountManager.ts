@@ -146,38 +146,54 @@ export class AccountManager {
         const modal = document.getElementById('modal-sync-conflict');
         if (!modal) return;
 
-        modal.classList.remove('hidden');
-        setTimeout(() => modal.classList.add('show'), 10);
-
+        // Reset state: clone nodes to wipe all previous event listeners
         const forcePushOption = document.getElementById('option-force-push');
         const pullRemoteOption = document.getElementById('option-pull-remote');
         const resolveBtn = document.getElementById('btn-resolve-sync-conflict') as HTMLButtonElement;
         const closeBtn = document.getElementById('btn-close-sync-conflict');
 
+        const freshForce = forcePushOption?.cloneNode(true) as HTMLElement;
+        const freshPull  = pullRemoteOption?.cloneNode(true) as HTMLElement;
+        const freshClose = closeBtn?.cloneNode(true) as HTMLElement;
+        const freshResolve = resolveBtn?.cloneNode(true) as HTMLButtonElement;
+
+        forcePushOption?.replaceWith(freshForce);
+        pullRemoteOption?.replaceWith(freshPull);
+        closeBtn?.replaceWith(freshClose);
+        resolveBtn?.replaceWith(freshResolve);
+
+        // Reset selection UI
+        freshForce.classList.remove('selected');
+        freshPull.classList.remove('selected');
+        freshResolve.classList.add('disabled');
+        freshResolve.disabled = true;
+
         let selectedResolution: 'force' | 'pull' | null = null;
 
         const updateSelection = (res: 'force' | 'pull') => {
             selectedResolution = res;
-            forcePushOption?.classList.toggle('selected', res === 'force');
-            pullRemoteOption?.classList.toggle('selected', res === 'pull');
-            if (resolveBtn) {
-                resolveBtn.classList.remove('disabled');
-                resolveBtn.disabled = false;
-            }
+            freshForce.classList.toggle('selected', res === 'force');
+            freshPull.classList.toggle('selected', res === 'pull');
+            freshResolve.classList.remove('disabled');
+            freshResolve.disabled = false;
         };
 
-        forcePushOption?.addEventListener('click', () => updateSelection('force'));
-        pullRemoteOption?.addEventListener('click', () => updateSelection('pull'));
+        freshForce.addEventListener('click', () => updateSelection('force'));
+        freshPull.addEventListener('click', () => updateSelection('pull'));
 
-        closeBtn?.addEventListener('click', () => {
+        freshClose.addEventListener('click', () => {
             modal.classList.remove('show');
             setTimeout(() => modal.classList.add('hidden'), 300);
             this.pendingConflictAction = null;
             this.pendingConflictData = null;
         });
 
-        resolveBtn.addEventListener('click', async () => {
-            if (!selectedResolution) return;
+        freshResolve.addEventListener('click', async () => {
+            if (!selectedResolution || freshResolve.disabled) return;
+            // Prevent double-click
+            freshResolve.disabled = true;
+            freshClose.setAttribute('disabled', 'true');
+
             this.cb.setLoading(true, "Resolving Conflict", "SYNCHRONIZING SECURE DATA");
             try {
                 if (selectedResolution === 'force') {
@@ -189,37 +205,49 @@ export class AccountManager {
                     } else if (this.pendingConflictAction === 'update-user-settings') {
                         res = await (window as any).api.updateUserSettings(this.pendingConflictData, true);
                     }
-                    if (res && res.success) {
-                        this.cb.showToast("Conflict resolved: local data pushed", "success");
+                    if (res?.success) {
+                        this.cb.showToast("Conflict resolved — local version pushed", "success");
                         if (res.accounts) {
                             this.accounts = res.accounts;
                             this.renderAccounts();
                         }
-                        modal.classList.remove('show');
-                        setTimeout(() => modal.classList.add('hidden'), 300);
-                        this.cb.hideModal();
+                        this.closeConflictModal(modal);
                     } else {
                         this.cb.showToast(res?.message || "Resolution failed", "error");
+                        freshResolve.disabled = false;
+                        freshClose.removeAttribute('disabled');
                     }
                 } else {
                     await this.refreshAccounts();
                     const user = await (window as any).api.getCurrentUser();
                     if (user) {
                         this.cb.handleLocalAccountUI(user);
-                        this.cb.applySettings(user.settings || {}, true);
+                        const settings = user['Desktop Settings'] || user.settings || {};
+                        this.cb.applySettings(settings, true);
                     }
-                    this.cb.showToast("Conflict resolved: remote data pulled", "success");
-                    modal.classList.remove('show');
-                    setTimeout(() => modal.classList.add('hidden'), 300);
-                    this.cb.hideModal();
+                    this.cb.showToast("Conflict resolved — remote version pulled", "success");
+                    this.closeConflictModal(modal);
                 }
             } catch (err) {
                 console.error("Resolution Error:", err);
                 this.cb.showToast("An error occurred during resolution", "error");
+                freshResolve.disabled = false;
+                freshClose.removeAttribute('disabled');
             } finally {
                 this.cb.setLoading(false);
             }
         });
+
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.add('show'), 10);
+    }
+
+    private closeConflictModal(modal: HTMLElement) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+        this.pendingConflictAction = null;
+        this.pendingConflictData = null;
+        this.cb.hideModal();
     }
 
     // ─── Add / Edit / Delete Modals ───────────────────────────────────────────

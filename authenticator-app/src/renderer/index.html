@@ -1612,50 +1612,62 @@
     <div class="grain-overlay"></div>
     <!-- Sync Conflict Resolution Modal -->
     <div id="modal-sync-conflict" class="modal-overlay hidden">
-        <div class="modal animate-fade-in">
+        <div class="modal animate-fade-in" style="max-width: 480px;">
             <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-icon-vessel danger">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <div class="modal-title-vessel">
-                        <h2 class="danger-text">Sync Conflict</h2>
-                        <p>DATA VERSION MISMATCH DETECTED</p>
-                    </div>
-                </div>
-                <div class="modal-divider"></div>
-                <div class="modal-body">
-                    <p class="modal-help-text">Another device has updated your vault on GitHub. Overwriting it might lead to data loss on that device.</p>
-                    
-                    <div class="conflict-options" style="margin-top: 24px; display: grid; gap: 16px;">
-                        <div class="conflict-option-card" id="option-force-push">
-                            <div class="option-icon-box">
-                                <i class="fa-solid fa-cloud-arrow-up"></i>
-                            </div>
-                            <div class="option-details">
-                                <div class="option-title">Force Push (Overwrite)</div>
-                                <div class="option-desc">Keep your <strong>local</strong> changes and overwrite the version on GitHub.</div>
-                            </div>
-                        </div>
 
-                        <div class="conflict-option-card" id="option-pull-remote">
-                            <div class="option-icon-box accent">
-                                <i class="fa-solid fa-cloud-arrow-down"></i>
-                            </div>
-                            <div class="option-details">
-                                <div class="option-title">Pull Remote (Overwrite Local)</div>
-                                <div class="option-desc">Discard <strong>local</strong> changes and download the latest version from GitHub.</div>
-                            </div>
-                        </div>
+                <!-- Header -->
+                <div class="conflict-modal-header">
+                    <div class="conflict-modal-icon">
+                        <i class="fa-solid fa-code-branch"></i>
+                    </div>
+                    <div>
+                        <h2 class="conflict-modal-title">Sync Conflict</h2>
+                        <p class="conflict-modal-subtitle">VERSION MISMATCH DETECTED</p>
                     </div>
                 </div>
-                <div class="modal-footer footer-grid" style="padding-top: 0;">
-                    <button class="user-button secondary" id="btn-close-sync-conflict">Review Later</button>
-                    <button class="user-button highlight btn-full disabled" id="btn-resolve-sync-conflict" disabled>
+
+                <!-- Info banner -->
+                <div class="conflict-info-banner">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Another device has modified your vault on GitHub since your last sync. Choose how to resolve this.</span>
+                </div>
+
+                <!-- Options -->
+                <div class="conflict-options">
+
+                    <div class="conflict-option-card" id="option-force-push">
+                        <div class="conflict-option-icon push">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div class="conflict-option-body">
+                            <div class="conflict-option-title">Keep Local</div>
+                            <div class="conflict-option-desc">Push your current changes to GitHub, overwriting the remote version.</div>
+                        </div>
+                        <div class="conflict-option-check"><i class="fa-solid fa-check"></i></div>
+                    </div>
+
+                    <div class="conflict-option-card" id="option-pull-remote">
+                        <div class="conflict-option-icon pull">
+                            <i class="fa-solid fa-cloud-arrow-down"></i>
+                        </div>
+                        <div class="conflict-option-body">
+                            <div class="conflict-option-title">Use Remote</div>
+                            <div class="conflict-option-desc">Discard local changes and download the latest version from GitHub.</div>
+                        </div>
+                        <div class="conflict-option-check"><i class="fa-solid fa-check"></i></div>
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="conflict-modal-footer">
+                    <button class="btn-nm-secondary" id="btn-close-sync-conflict">Later</button>
+                    <button class="btn-nm-primary disabled" id="btn-resolve-sync-conflict" disabled>
                         <i class="fa-solid fa-check"></i>
-                        <span>Resolve Conflict</span>
+                        <span>Resolve</span>
                     </button>
                 </div>
+
             </div>
         </div>
     </div>
