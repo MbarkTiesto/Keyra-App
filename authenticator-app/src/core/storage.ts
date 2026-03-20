@@ -43,6 +43,14 @@ export interface PrivateSyncConfig {
     repo: string;
 }
 
+export interface DeviceRecord {
+    id: string;           // unique per device (stored in localStorage)
+    name: string;         // OS + hostname
+    platform: string;     // win32 / darwin / linux
+    firstSeen: string;    // ISO timestamp
+    lastSeen: string;     // ISO timestamp — updated on every login
+}
+
 export interface UserRecord {
     id: string;
     username: string;
@@ -65,6 +73,8 @@ export interface UserRecord {
     "Web Settings"?: any;
     autolock: string;
     profilePicture?: string;
+    devices?: DeviceRecord[];
+    revokedDevices?: string[];
 }
 
 /*

@@ -1,10 +1,11 @@
 import { 
     getUsers, saveUsers, syncUserData, pollCloudUpdates, 
-    UserRecord, UserSettings, PrivateSyncConfig, testGitHubConnection,
+    UserRecord, UserSettings, PrivateSyncConfig, DeviceRecord, testGitHubConnection,
     getUserData, renameUserFolder
 } from './storage';
 import { hashPassword, verifyPassword, deriveKey, encryptVault, decryptVault, AuthenticatorAccount } from './crypto';
 import * as crypto from 'crypto';
+import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 import { app, safeStorage } from 'electron';
@@ -52,8 +53,99 @@ export function getCurrentUser() {
         autolock: currentUser.autolock,
         profilePicture: currentUser.profilePicture,
         isLocal: !!currentUser.isLocal,
-        privateSync: currentUser.privateSync
+        privateSync: currentUser.privateSync,
+        devices: currentUser.devices || []
     };
+}
+// ─── Device Management ──────────────────────────────────────────────
+
+function buildDeviceInfo(): { id: string; name: string; platform: string } {
+    // Stable device ID: stored in a local file so it survives app restarts
+    const idPath = path.join(app.getPath('userData'), 'device.id');
+    let deviceId: string;
+    try {
+        deviceId = fs.existsSync(idPath)
+            ? fs.readFileSync(idPath, 'utf-8').trim()
+            : (() => {
+                const id = crypto.randomUUID();
+                fs.writeFileSync(idPath, id, 'utf-8');
+                return id;
+            })();
+    } catch {
+        deviceId = crypto.randomUUID();
+    }
+
+    const platform = process.platform; // win32 | darwin | linux
+    const hostname = os.hostname();
+    const platformLabel = platform === 'win32' ? 'Windows' : platform === 'darwin' ? 'macOS' : 'Linux';
+    const name = `${platformLabel} — ${hostname}`;
+
+    return { id: deviceId, name, platform };
+}
+
+export async function registerCurrentDevice(): Promise<void> {
+    if (!currentUser) return;
+
+    const { id, name, platform } = buildDeviceInfo();
+    const now = new Date().toISOString();
+
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) return;
+
+    const devices: DeviceRecord[] = users[userIndex].devices || [];
+    const existing = devices.findIndex(d => d.id === id);
+
+    if (existing >= 0) {
+        devices[existing].lastSeen = now;
+        devices[existing].name = name; // update in case hostname changed
+    } else {
+        devices.push({ id, name, platform, firstSeen: now, lastSeen: now });
+    }
+
+    users[userIndex].devices = devices;
+    currentUser.devices = devices;
+
+    // Write locally only (avoid touching global users registry on GitHub)
+    const storePath = path.join(app.getPath('userData'), 'users.json');
+    try { fs.writeFileSync(storePath, JSON.stringify(users, null, 2), 'utf-8'); } catch {}
+    // Sync user-specific data file (fire-and-forget)
+    syncUserData(currentUser.username, users[userIndex]).catch(() => {});
+}
+
+export async function revokeDevice(deviceId: string): Promise<SyncResult> {
+    if (!currentUser) throw new Error("No active user session.");
+
+    const users = await getUsers();
+    const userIndex = users.findIndex(u => u.id === currentUser!.id);
+    if (userIndex === -1) throw new Error("User missing from storage.");
+
+    const before = (users[userIndex].devices || []).length;
+    users[userIndex].devices = (users[userIndex].devices || []).filter(d => d.id !== deviceId);
+
+    if (users[userIndex].devices.length === before) {
+        return { success: false, message: "Device not found." };
+    }
+
+    // Add to revoked list so the device gets logged out on next session check
+    const revoked = users[userIndex].revokedDevices || [];
+    if (!revoked.includes(deviceId)) revoked.push(deviceId);
+    users[userIndex].revokedDevices = revoked;
+
+    currentUser.devices = users[userIndex].devices;
+    currentUser.revokedDevices = revoked;
+
+    await saveUsers(users);
+    return await syncUserData(currentUser.username, users[userIndex]);
+}
+
+export function getCurrentDeviceId(): string | null {
+    try {
+        const idPath = path.join(app.getPath('userData'), 'device.id');
+        return fs.existsSync(idPath) ? fs.readFileSync(idPath, 'utf-8').trim() : null;
+    } catch {
+        return null;
+    }
 }
 
 export async function cancelEmailChange(): Promise<SyncResult> {
@@ -300,6 +392,23 @@ export async function login(username: string, password: string): Promise<{ succe
         const key = deriveKey(password, user.salt);
         const decryptedJson = decryptVault(user.encryptedVaultData, key);
         JSON.parse(decryptedJson);
+
+        // Check if this device has been remotely revoked
+        const { id: thisDeviceId } = buildDeviceInfo();
+        if ((user.revokedDevices || []).includes(thisDeviceId)) {
+            // Remove own device from revoked list (self-cleanup) and clear session
+            user.revokedDevices = (user.revokedDevices || []).filter(id => id !== thisDeviceId);
+            const allUsers = await getUsers();
+            const idx = allUsers.findIndex(u => u.id === user!.id);
+            if (idx !== -1) {
+                allUsers[idx].revokedDevices = user.revokedDevices;
+                await saveUsers(allUsers);
+                syncUserData(user.username, allUsers[idx]).catch(() => {});
+            }
+            // Delete local session so auto-login won't loop
+            try { if (fs.existsSync(getSessionPath())) fs.unlinkSync(getSessionPath()); } catch {}
+            return { success: false, message: "This device has been logged out remotely. Please sign in again." };
+        }
 
         currentUser = user;
         currentKey = key;
@@ -1048,6 +1157,14 @@ export async function pollForUpdates(): Promise<{ changed: boolean, settings?: a
         }
 
         if (result.userData.autolock !== undefined) currentUser.autolock = result.userData.autolock;
+
+        // Sync devices list from cloud (another device may have registered or been revoked)
+        if (result.userData.devices !== undefined) {
+            currentUser.devices = result.userData.devices;
+        }
+        if (result.userData.revokedDevices !== undefined) {
+            currentUser.revokedDevices = result.userData.revokedDevices;
+        }
 
         // If vault data changed, decrypt it
         let accounts: AuthenticatorAccount[] | undefined = undefined;

@@ -8,7 +8,8 @@ import {
     changePassword, requestEmailChange, confirmEmailChange, resendEmailChangeCode, 
     cancelEmailChange, requestPhoneVerification, removePhone, verifyPhoneByWhatsAppMatch, 
     verifyMasterPassword, generatePinResetCode, verifyPinResetCode, clearPinResetCode,
-    updatePrivateSyncConfig, testPrivateSyncConnection
+    updatePrivateSyncConfig, testPrivateSyncConnection,
+    registerCurrentDevice, revokeDevice, getCurrentDeviceId
 } from '../core/auth';
 import { service } from '../core/notifier';
 import { generateTOTP, getRemainingSeconds, getBatchOTPs } from '../core/totp';
@@ -120,12 +121,20 @@ ipcMain.handle('signup', (event, user, email, pass) => signup(user, email, pass)
 ipcMain.handle('signup-local', (event, user, pass) => signupLocal(user, pass));
 ipcMain.handle('resend-code', (event, email) => resendCode(email));
 ipcMain.handle('verify-email', (event, email, code) => verifyEmail(email, code));
-ipcMain.handle('login', (event, user, pass) => login(user, pass));
+ipcMain.handle('login', async (event, user, pass) => {
+    const result = await login(user, pass);
+    if (result.success) registerCurrentDevice().catch(() => {});
+    return result;
+});
 ipcMain.handle('resume-from-github', (event, pat, owner, repo) => {
     const { resumeFromGitHub } = require('../core/auth');
     return resumeFromGitHub(pat, owner, repo);
 });
-ipcMain.handle('check-session', () => checkSession());
+ipcMain.handle('check-session', async () => {
+    const result = await checkSession();
+    if (result.success) registerCurrentDevice().catch(() => {});
+    return result;
+});
 ipcMain.handle('logout', () => logout());
 ipcMain.handle('get-current-user', () => getCurrentUser());
 ipcMain.handle('poll-for-updates', () => pollForUpdates());
@@ -143,6 +152,11 @@ ipcMain.handle('resend-email-change-code', () => resendEmailChangeCode());
 ipcMain.handle('cancel-email-change', () => cancelEmailChange());
 ipcMain.handle('request-phone-verification', (event, phone) => requestPhoneVerification(phone));
 ipcMain.handle('remove-phone', () => removePhone()),
+ipcMain.handle('revoke-device', async (event, deviceId) => {
+    try { return await revokeDevice(deviceId); }
+    catch (err: any) { return { success: false, message: err.message }; }
+}),
+ipcMain.handle('get-current-device-id', () => getCurrentDeviceId()),
 ipcMain.handle('verify-phone-wa-match', (_event, waNumber) => verifyPhoneByWhatsAppMatch(waNumber)),
 ipcMain.handle('verify-master-password', (_event, password) => verifyMasterPassword(password)),
 ipcMain.handle('generate-pin-reset-code', () => generatePinResetCode()),

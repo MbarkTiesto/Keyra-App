@@ -1185,6 +1185,29 @@
 
                         </div>
                     </div>
+
+                    <!-- Connected Devices -->
+                    <div class="account-card bento-card online-only" id="devices-card">
+                        <div class="bento-header">
+                            <div class="bento-icon">
+                                <i class="fa-solid fa-laptop" style="color: var(--accent-primary);"></i>
+                            </div>
+                            <div class="bento-title-vessel">
+                                <h3 class="bento-title">Connected Devices</h3>
+                                <div class="bento-subtitle">ACTIVE SESSIONS</div>
+                            </div>
+                            <button id="btn-refresh-devices" class="btn-icon-nm" title="Refresh devices" style="margin-left:auto;">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </button>
+                        </div>
+                        <div id="devices-list" style="margin-top: 16px; display: flex; flex-direction: column; gap: 10px;">
+                            <div class="device-skeleton">
+                                <div class="sk-line" style="width:60%;height:13px;"></div>
+                                <div class="sk-line" style="width:40%;height:10px;margin-top:6px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </section>
         </main>

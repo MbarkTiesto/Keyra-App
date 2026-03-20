@@ -74,6 +74,7 @@ export class AuthManager {
         if (dispEmail) dispEmail.textContent = user.isLocal ? "Local-Only Account" : user.email;
 
         this.handleLocalAccountUI(user);
+        this.loadDevices();
 
         if (avatarImgEl && initialsEl) {
             if (user.profilePicture) {
@@ -563,5 +564,124 @@ export class AuthManager {
                 } else { this.cb.showToast(res.message, "error"); }
             } finally { this.cb.setLoading(false); }
         });
+
+        document.getElementById('btn-refresh-devices')?.addEventListener('click', async () => {
+            const btn = document.getElementById('btn-refresh-devices');
+            if (btn) btn.classList.add('spinning');
+            await this.loadDevices();
+            if (btn) btn.classList.remove('spinning');
+        });
+    }
+
+    async loadDevices() {
+        const list = document.getElementById('devices-list');
+        if (!list) return;
+
+        const user = await (window as any).api.getCurrentUser();
+        if (!user || user.isLocal) return;
+
+        const currentDeviceId: string | null = await (window as any).api.getCurrentDeviceId();
+        const devices: any[] = user.devices || [];
+
+        if (devices.length === 0) {
+            list.innerHTML = `<p style="font-size:12px;opacity:0.5;font-weight:600;text-align:center;padding:12px 0;">No devices recorded yet.</p>`;
+            return;
+        }
+
+        // Sort: current device first, then by lastSeen desc
+        const sorted = [...devices].sort((a, b) => {
+            if (a.id === currentDeviceId) return -1;
+            if (b.id === currentDeviceId) return 1;
+            return new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime();
+        });
+
+        list.innerHTML = sorted.map(device => {
+            const isCurrent = device.id === currentDeviceId;
+            const platformIcon = device.platform === 'darwin' ? 'fa-apple' :
+                                 device.platform === 'linux'  ? 'fa-linux' : 'fa-windows';
+            const lastSeen = this.formatRelativeTime(new Date(device.lastSeen));
+            const firstSeen = new Date(device.firstSeen).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
+            return `
+            <div class="device-row" data-device-id="${device.id}">
+                <div class="device-icon-vessel">
+                    <i class="fa-brands ${platformIcon}"></i>
+                </div>
+                <div class="device-info">
+                    <div class="device-name">
+                        ${device.name}
+                        ${isCurrent ? '<span class="device-current-badge">This Device</span>' : ''}
+                    </div>
+                    <div class="device-meta">
+                        <span>First seen ${firstSeen}</span>
+                        <span class="device-meta-dot">·</span>
+                        <span>Active ${lastSeen}</span>
+                    </div>
+                </div>
+                ${!isCurrent ? `
+                <button class="device-revoke-btn" data-device-id="${device.id}" title="Revoke access">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>` : ''}
+            </div>
+            ${!isCurrent ? `
+            <div class="device-revoke-confirm hidden" data-confirm-id="${device.id}">
+                <span class="device-revoke-confirm-text">Log out &amp; remove this device?</span>
+                <div class="device-revoke-confirm-actions">
+                    <button class="device-confirm-cancel" data-confirm-id="${device.id}">Cancel</button>
+                    <button class="device-confirm-ok" data-confirm-id="${device.id}">Remove</button>
+                </div>
+            </div>` : ''}`;
+        }).join('');
+
+        // Revoke button — show inline confirm
+        list.querySelectorAll('.device-revoke-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const deviceId = (btn as HTMLElement).dataset.deviceId!;
+                const confirm = list.querySelector(`.device-revoke-confirm[data-confirm-id="${deviceId}"]`);
+                confirm?.classList.remove('hidden');
+            });
+        });
+
+        // Cancel confirm
+        list.querySelectorAll('.device-confirm-cancel').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const deviceId = (btn as HTMLElement).dataset.confirmId!;
+                const confirm = list.querySelector(`.device-revoke-confirm[data-confirm-id="${deviceId}"]`);
+                confirm?.classList.add('hidden');
+            });
+        });
+
+        // Confirm revoke
+        list.querySelectorAll('.device-confirm-ok').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const deviceId = (btn as HTMLElement).dataset.confirmId!;
+                this.cb.setLoading(true, "Revoking Device", "UPDATING SECURITY");
+                try {
+                    const res = await (window as any).api.revokeDevice(deviceId);
+                    if (res.success) {
+                        this.cb.showToast("Device removed and logged out remotely", "success");
+                        await this.loadDevices();
+                    } else {
+                        this.cb.showToast(res.message || "Failed to remove device", "error");
+                    }
+                } finally {
+                    this.cb.setLoading(false);
+                }
+            });
+        });
+    }
+
+    private formatRelativeTime(date: Date): string {
+        const diffMs = Date.now() - date.getTime();
+        const diffMin = Math.floor(diffMs / 60000);
+        if (diffMin < 1) return 'just now';
+        if (diffMin < 60) return `${diffMin}m ago`;
+        const diffHrs = Math.floor(diffMin / 60);
+        if (diffHrs < 24) return `${diffHrs}h ago`;
+        const diffDays = Math.floor(diffHrs / 24);
+        return diffDays === 1 ? 'yesterday' : `${diffDays}d ago`;
     }
 }

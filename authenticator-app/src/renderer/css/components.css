@@ -4779,3 +4779,228 @@ body.light-theme .cloud-sync-pill {
 .export-option-card.selected .export-option-icon {
     box-shadow: var(--nm-shadow-out);
 }
+
+/* ── Connected Devices ── */
+.device-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+    transition: box-shadow var(--transition-fast);
+}
+
+.device-icon-vessel {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-in-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--accent-primary);
+    flex-shrink: 0;
+}
+
+.device-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.device-name {
+    font-size: 13px;
+    font-weight: 750;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.device-current-badge {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-in-sm);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+.device-meta {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    opacity: 0.65;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.device-meta-dot {
+    opacity: 0.4;
+}
+
+.device-revoke-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+    opacity: 0.5;
+}
+
+.device-row:hover .device-revoke-btn {
+    opacity: 1;
+}
+
+.device-revoke-btn:hover {
+    box-shadow: var(--nm-shadow-out);
+    color: #ff3b30;
+}
+
+.device-revoke-btn:active {
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.device-skeleton {
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+}
+
+.device-skeleton .sk-line {
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-in-sm);
+    border-radius: 4px;
+    display: block;
+    animation: skPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes skPulse {
+    0%, 100% { opacity: 0.6; }
+    50%       { opacity: 1; }
+}
+
+/* Inline revoke confirmation strip */
+.device-revoke-confirm {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-in-sm);
+    margin-top: -4px;
+}
+
+.device-revoke-confirm.hidden {
+    display: none;
+}
+
+.device-revoke-confirm-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    flex: 1;
+}
+
+.device-revoke-confirm-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.device-confirm-cancel,
+.device-confirm-ok {
+    height: 28px;
+    padding: 0 14px;
+    border-radius: var(--radius-full);
+    border: none;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.device-confirm-cancel {
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+    color: var(--text-secondary);
+}
+
+.device-confirm-cancel:hover {
+    box-shadow: var(--nm-shadow-out);
+    color: var(--text-primary);
+}
+
+.device-confirm-cancel:active {
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.device-confirm-ok {
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+    color: #ff3b30;
+}
+
+.device-confirm-ok:hover {
+    box-shadow: var(--nm-shadow-out);
+}
+
+.device-confirm-ok:active {
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+/* Refresh button for devices card */
+.btn-icon-nm {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--nm-surface);
+    box-shadow: var(--nm-shadow-out-sm);
+    border: none;
+    color: var(--text-tertiary);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.btn-icon-nm:hover {
+    box-shadow: var(--nm-shadow-out);
+    color: var(--accent-primary);
+}
+
+.btn-icon-nm:active,
+.btn-icon-nm.spinning {
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.btn-icon-nm.spinning i {
+    animation: nmRingSpin 0.7s linear infinite;
+}
