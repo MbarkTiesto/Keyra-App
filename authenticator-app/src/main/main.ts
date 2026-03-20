@@ -1,6 +1,13 @@
 import { app, BrowserWindow, ipcMain, globalShortcut, screen, desktopCapturer, Menu, Tray, nativeImage, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
+
+// Load .env — works both in dev and packaged
+const envPath = app.isPackaged
+    ? path.join(process.resourcesPath, '.env')
+    : path.join(process.cwd(), '.env');
+dotenv.config({ path: envPath });
 import { 
     signup, signupLocal, resendCode, verifyEmail, login, logout, 
     getCurrentUser, getActiveAccounts, saveActiveAccounts, updateUserSettings, 
@@ -64,13 +71,15 @@ function createWindow() {
     setupGlobalShortcut();
 
     // Configure AutoUpdater
-    autoUpdater.autoDownload = false; // We want to control the download via UI
-    
-    // Only force dev update config in development
-    if (process.env.NODE_ENV === 'development' || !app.isPackaged) {
-        autoUpdater.forceDevUpdateConfig = true;
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = true;
+
+    // Set GitHub token for authenticated requests (avoids rate limiting on download)
+    const ghToken = process.env.GH_TOKEN || process.env.GITHUB_TOKEN;
+    if (ghToken) {
+        autoUpdater.requestHeaders = { 'Authorization': `token ${ghToken}` };
     }
-    
+
     autoUpdater.on('checking-for-update', () => {
         mainWindow?.webContents.send('update-checking');
     });
@@ -84,6 +93,7 @@ function createWindow() {
     });
 
     autoUpdater.on('error', (err) => {
+        console.error('[AutoUpdater] Error:', err.message);
         mainWindow?.webContents.send('update-error', err.message);
     });
 
@@ -528,12 +538,21 @@ ipcMain.on('set-resizable', (event, enabled) => {
 });
 
 // -- Update System IPC --
-ipcMain.handle('check-for-updates', () => {
-    return autoUpdater.checkForUpdates();
+ipcMain.handle('check-for-updates', async () => {
+    try {
+        return await autoUpdater.checkForUpdates();
+    } catch (err: any) {
+        mainWindow?.webContents.send('update-error', err.message);
+    }
 });
 
-ipcMain.handle('start-download', () => {
-    return autoUpdater.downloadUpdate();
+ipcMain.handle('start-download', async () => {
+    try {
+        return await autoUpdater.downloadUpdate();
+    } catch (err: any) {
+        console.error('[AutoUpdater] Download failed:', err.message);
+        mainWindow?.webContents.send('update-error', err.message);
+    }
 });
 
 ipcMain.handle('install-update', () => {

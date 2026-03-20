@@ -31,9 +31,10 @@ export class UpdateManager {
         });
 
         downloadBtn?.addEventListener('click', () => {
-            (window as any).api.startDownload();
+            if (message) message.textContent = 'Starting download...';
             downloadBtn.classList.add('hidden');
             progressContainer?.classList.remove('hidden');
+            (window as any).api.startDownload();
         });
 
         installBtn?.addEventListener('click', () => {
@@ -66,9 +67,12 @@ export class UpdateManager {
         (window as any).api.onUpdateError((err: string) => {
             this.cb.setLoading(false);
             nmLoader?.classList.add('hidden');
-            if (message) message.textContent = `Update check failed.`;
+            progressContainer?.classList.add('hidden');
+            if (message) message.textContent = `Update failed. Please try again.`;
             console.error("Update Error:", err);
             checkBtn?.classList.remove('hidden');
+            downloadBtn?.classList.add('hidden');
+            installBtn?.classList.add('hidden');
         });
 
         (window as any).api.onDownloadProgress((percent: number) => {
