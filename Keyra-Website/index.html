@@ -191,32 +191,40 @@
                 <!-- Mock Navbar -->
                 <header class="mock-navbar">
                     <div class="mock-navbar-wrapper">
+                        <!-- Left: Brand -->
                         <div class="mock-navbar-left">
                             <div class="mock-navbar-brand">
-                                <div class="mock-brand-icon"><img src="icon.png" alt="Keyra Logo"
-                                        class="brand-logo small nm-convex"></div>
-                                <span class="mock-brand-text">Keyra</span>
+                                <div class="mock-brand-icon nm-flat">
+                                    <img src="icon.png" alt="Keyra Logo" class="mock-app-logo">
+                                </div>
+                                <div class="mock-brand-text-group">
+                                    <span class="mock-brand-name">Keyr<span class="text-gradient">a</span></span>
+                                    <span class="mock-brand-sub">Authenticator</span>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- Center: Nav Tabs -->
                         <div class="mock-navbar-center">
                             <nav class="mock-nav-tabs nm-inset">
-                                <button class="mock-nav-tab active nm-convex">
-                                    <i class="fa-solid fa-vault"></i>
+                                <button class="mock-nav-tab active nm-flat" id="mock-tab-vault">
+                                    <i class="fa-solid fa-box-archive"></i>
                                     <span>My Vault</span>
                                 </button>
-                                <button class="mock-nav-tab">
+                                <button class="mock-nav-tab" id="mock-tab-settings">
                                     <i class="fa-solid fa-gear"></i>
                                     <span>Settings</span>
                                 </button>
                             </nav>
                         </div>
 
+                        <!-- Right: Status + User -->
                         <div class="mock-navbar-right">
-                            <div class="mock-connectivity-indicator online nm-convex">
+                            <div class="mock-status-pill nm-flat online" title="Online - Synced">
+                                <i class="fa-solid fa-cloud-arrow-up mock-status-icon"></i>
                                 <span class="mock-status-dot"></span>
                             </div>
-                            <button class="mock-user-button nm-convex">
+                            <button class="mock-user-button nm-flat" id="mock-user-btn">
                                 <div class="mock-user-avatar">M</div>
                                 <span class="mock-user-name">MBVRK</span>
                                 <i class="fa-solid fa-chevron-down"></i>
@@ -226,7 +234,8 @@
                 </header>
 
                 <!-- Mock Main Content -->
-                <main class="mock-main-content" id="mock-main-view">
+                <main class="mock-main-content">
+
                     <!-- Vault View -->
                     <div id="mock-vault-view">
                         <div class="mock-section-header">
@@ -235,145 +244,145 @@
                                 <p class="mock-section-subtitle">YOUR SAVED ACCOUNTS</p>
                             </div>
                             <div class="mock-search-add">
+                                <div class="mock-segmented nm-inset" id="mock-view-toggle">
+                                    <button class="mock-segment active nm-flat" data-mode="compact" title="Individual Bars">
+                                        <i class="fa-solid fa-grip"></i>
+                                    </button>
+                                    <button class="mock-segment" data-mode="unified" title="Unified Bar">
+                                        <i class="fa-solid fa-grip-lines"></i>
+                                    </button>
+                                    <button class="mock-segment" data-mode="secure" title="Secure Mode">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                    </button>
+                                </div>
                                 <div class="mock-search-vessel nm-inset">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                     <span>Search your accounts...</span>
                                 </div>
-                                <button class="mock-btn-primary nm-convex" id="mock-add-account-btn">
-                                    <i class="fa-solid fa-plus"></i> Add Account
+                                <button class="mock-btn-add nm-flat" id="mock-add-account-btn">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>Add Account</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div class="mock-accounts-grid">
-                            <!-- Card 1 -->
-                            <div class="mock-account-card nm-flat">
-                                <div class="mock-account-header">
-                                    <div class="mock-account-icon nm-inset">
-                                        <i class="fa-brands fa-aws text-gradient"></i>
-                                    </div>
-                                    <div class="mock-account-info">
-                                        <div class="mock-service-name">Amazon Web Services</div>
-                                        <div class="mock-account-identity">admin@keyra.app</div>
-                                    </div>
-                                </div>
-                                <div class="mock-otp-hero nm-concave">
-                                    <div class="mock-otp-code">419 283</div>
-                                    <div class="mock-timer-linear-vessel nm-inset">
-                                        <div class="mock-timer-linear-progress nm-convex" style="width: 65%;"></div>
-                                    </div>
-                                </div>
+                        <!-- Unified Global Timer Bar -->
+                        <div class="mock-global-timer nm-flat" id="mock-global-timer" style="display:none;">
+                            <div class="mock-global-timer-label">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <span>Security Sync</span>
                             </div>
-
-                            <!-- Card 2 -->
-                            <div class="mock-account-card nm-flat">
-                                <div class="mock-account-header">
-                                    <div class="mock-account-icon nm-inset">
-                                        <i class="fa-brands fa-discord text-gradient"></i>
-                                    </div>
-                                    <div class="mock-account-info">
-                                        <div class="mock-service-name">Discord</div>
-                                        <div class="mock-account-identity">MBVRK#1234</div>
-                                    </div>
-                                </div>
-                                <div class="mock-otp-hero nm-concave">
-                                    <div class="mock-otp-code">752 891</div>
-                                    <div class="mock-timer-linear-vessel nm-inset">
-                                        <div class="mock-timer-linear-progress nm-convex" style="width: 30%;"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Card 3 -->
-                            <div class="mock-account-card nm-flat">
-                                <div class="mock-account-header">
-                                    <div class="mock-account-icon nm-inset">
-                                        <i class="fa-brands fa-github text-gradient"></i>
-                                    </div>
-                                    <div class="mock-account-info">
-                                        <div class="mock-service-name">GitHub</div>
-                                        <div class="mock-account-identity">mbvrk-dev</div>
-                                    </div>
-                                </div>
-                                <div class="mock-otp-hero nm-concave">
-                                    <div class="mock-otp-code">942 184</div>
-                                    <div class="mock-timer-linear-vessel nm-inset">
-                                        <div class="mock-timer-linear-progress nm-convex" style="width: 85%;"></div>
-                                    </div>
-                                </div>
+                            <div class="mock-timer-track nm-inset">
+                                <div class="mock-timer-fill" id="mock-global-fill"></div>
                             </div>
                         </div>
+
+                        <!-- Accounts Grid -->
+                        <div class="mock-accounts-grid" id="mock-accounts-grid"></div>
                     </div>
 
-                    <!-- Settings View (Hidden by default) -->
-                    <div id="mock-settings-view" style="display: none; height: 100%;">
+                    <!-- Settings View -->
+                    <div id="mock-settings-view" style="display:none;">
                         <div class="mock-section-header">
                             <div class="mock-header-main">
                                 <h1 class="mock-section-title">Settings</h1>
                                 <p class="mock-section-subtitle">CUSTOMIZE YOUR EXPERIENCE</p>
                             </div>
                         </div>
-
                         <div class="mock-settings-grid">
-                            <div class="mock-settings-card nm-flat">
-                                <h3>Appearance</h3>
-                                <div class="mock-setting-row">
-                                    <span>Dark Mode</span>
-                                    <div class="mock-switch active nm-inset">
-                                        <div class="mock-switch-thumb nm-convex"></div>
+                            <div class="mock-bento nm-flat">
+                                <div class="mock-bento-header">
+                                    <div class="mock-bento-icon nm-inset"><i class="fa-solid fa-palette text-gradient"></i></div>
+                                    <div>
+                                        <div class="mock-bento-title">Appearance</div>
+                                        <div class="mock-bento-sub">THEME &amp; DISPLAY</div>
                                     </div>
                                 </div>
-                                <div class="mock-setting-row">
-                                    <span>Cloud Sync</span>
-                                    <div class="mock-switch active nm-inset">
-                                        <div class="mock-switch-thumb nm-convex"></div>
+                                <div class="mock-setting-row"><span>Dark Mode</span><div class="mock-toggle active nm-inset"><div class="mock-toggle-thumb nm-flat"></div></div></div>
+                                <div class="mock-setting-row"><span>OLED Optimization</span><div class="mock-toggle nm-inset"><div class="mock-toggle-thumb nm-flat"></div></div></div>
+                            </div>
+                            <div class="mock-bento nm-flat">
+                                <div class="mock-bento-header">
+                                    <div class="mock-bento-icon nm-inset"><i class="fa-solid fa-shield-halved text-gradient"></i></div>
+                                    <div>
+                                        <div class="mock-bento-title">Security</div>
+                                        <div class="mock-bento-sub">VAULT PROTECTION</div>
                                     </div>
                                 </div>
+                                <div class="mock-setting-row"><span>Auto-Lock Vault</span><div class="mock-toggle active nm-inset"><div class="mock-toggle-thumb nm-flat"></div></div></div>
+                                <div class="mock-setting-row"><span>Privacy Screen</span><div class="mock-toggle nm-inset"><div class="mock-toggle-thumb nm-flat"></div></div></div>
+                            </div>
+                            <div class="mock-bento nm-flat">
+                                <div class="mock-bento-header">
+                                    <div class="mock-bento-icon nm-inset"><i class="fa-solid fa-cloud-arrow-up text-gradient"></i></div>
+                                    <div>
+                                        <div class="mock-bento-title">Cloud Sync</div>
+                                        <div class="mock-bento-sub">BACKUP &amp; RESTORE</div>
+                                    </div>
+                                </div>
+                                <div class="mock-setting-row"><span>Auto Sync</span><div class="mock-toggle active nm-inset"><div class="mock-toggle-thumb nm-flat"></div></div></div>
+                                <div class="mock-setting-row"><span>Sync on Launch</span><div class="mock-toggle active nm-inset"><div class="mock-toggle-thumb nm-flat"></div></div></div>
                             </div>
                         </div>
                     </div>
                 </main>
 
-                <!-- Mock Modal Overlay -->
+                <!-- Add Account Modal -->
                 <div class="mock-modal-overlay" id="mock-modal">
                     <div class="mock-modal nm-flat">
                         <div class="mock-modal-header">
+                            <div class="mock-modal-icon nm-flat"><i class="fa-solid fa-key text-gradient"></i></div>
                             <h2>Add Account</h2>
-                            <p>Scan QR or Enter details</p>
+                            <p>Scan a QR code or enter details manually</p>
                         </div>
                         <div class="mock-modal-body">
-                            <div class="mock-form-group nm-inset">
-                                <i class="fa-solid fa-building"></i>
-                                <span>Service Name</span>
-                            </div>
-                            <div class="mock-form-group nm-inset">
-                                <i class="fa-solid fa-key"></i>
-                                <span>Secret Key</span>
-                            </div>
+                            <div class="mock-form-field nm-inset"><i class="fa-solid fa-building"></i><span>Service Name</span></div>
+                            <div class="mock-form-field nm-inset"><i class="fa-solid fa-user"></i><span>Account / Email</span></div>
+                            <div class="mock-form-field nm-inset"><i class="fa-solid fa-key"></i><span>Secret Key</span></div>
                         </div>
                         <div class="mock-modal-footer">
-                            <button class="mock-btn-secondary nm-convex" id="mock-modal-cancel">Cancel</button>
-                            <button class="mock-btn-primary nm-convex">Save Account</button>
+                            <button class="mock-btn-cancel nm-flat" id="mock-modal-cancel">Cancel</button>
+                            <button class="mock-btn-add nm-flat"><i class="fa-solid fa-check"></i><span>Save Account</span></button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Mock Dropdown -->
+                <!-- User Dropdown -->
                 <div class="mock-dropdown nm-flat" id="mock-user-dropdown">
                     <div class="mock-dropdown-header">
                         <div class="mock-dropdown-name">MBVRK</div>
                         <div class="mock-dropdown-email">admin@keyra.app</div>
                     </div>
-                    <div class="mock-dropdown-item nm-pressed">
-                        <i class="fa-solid fa-shield"></i> Security
-                    </div>
-                    <div class="mock-dropdown-item danger nm-pressed">
-                        <i class="fa-solid fa-right-from-bracket"></i> Sign out
+                    <div class="mock-dropdown-item"><i class="fa-solid fa-user"></i> Account</div>
+                    <div class="mock-dropdown-item"><i class="fa-solid fa-lock"></i> Lock Vault</div>
+                    <div class="mock-dropdown-item"><i class="fa-solid fa-moon"></i> Dark Mode</div>
+                    <div class="mock-dropdown-divider"></div>
+                    <div class="mock-dropdown-item danger"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</div>
+                </div>
+
+                <!-- Secure OTP Modal -->
+                <div class="mock-modal-overlay" id="mock-secure-modal">
+                    <div class="mock-modal nm-flat" style="text-align:center;">
+                        <div class="mock-modal-header">
+                            <div class="mock-modal-icon nm-flat" id="mock-secure-icon"><i class="fa-brands fa-github text-gradient"></i></div>
+                            <h2 id="mock-secure-name">GitHub</h2>
+                            <p id="mock-secure-account">mbvrk-dev</p>
+                        </div>
+                        <div class="mock-circular-timer">
+                            <svg class="mock-circular-svg" viewBox="0 0 80 80">
+                                <circle class="mock-circle-bg" cx="40" cy="40" r="34"/>
+                                <circle class="mock-circle-progress" id="mock-circle-progress" cx="40" cy="40" r="34"/>
+                            </svg>
+                            <span class="mock-circular-count" id="mock-circular-count">30</span>
+                        </div>
+                        <div class="mock-secure-code nm-inset" id="mock-secure-code">000 000</div>
+                        <div class="mock-modal-footer" style="margin-top:16px;">
+                            <button class="mock-btn-cancel nm-flat" id="mock-secure-close">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
-
         <!-- Download Section -->
         <section class="download" id="download">
             <div class="download-container nm-flat">

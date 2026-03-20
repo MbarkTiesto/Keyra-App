@@ -76,164 +76,260 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 
-    // --- Mock UI Interactivity ---
-    
-    // Elements
-    const mockVaultTab = document.querySelectorAll('.mock-nav-tab')[0];
-    const mockSettingsTab = document.querySelectorAll('.mock-nav-tab')[1];
-    const mockVaultView = document.getElementById('mock-vault-view');
-    const mockSettingsView = document.getElementById('mock-settings-view');
-    const mockAddAccountBtn = document.getElementById('mock-add-account-btn');
-    const mockModal = document.getElementById('mock-modal');
-    const mockModalCancel = document.getElementById('mock-modal-cancel');
-    const mockUserBtn = document.querySelector('.mock-user-button');
-    const mockUserDropdown = document.getElementById('mock-user-dropdown');
-    const mockSwitches = document.querySelectorAll('.mock-switch');
+    // ─── Desktop App Simulation ───────────────────────────────────────────────
 
-    // 1. Tab Switching
-    if (mockVaultTab && mockSettingsTab && mockVaultView && mockSettingsView) {
-        mockVaultTab.addEventListener('click', () => {
-            mockVaultTab.classList.add('active', 'nm-convex');
-            mockSettingsTab.classList.remove('active', 'nm-convex');
-            mockVaultView.style.display = 'block';
-            mockSettingsView.style.display = 'none';
+    const MOCK_ACCOUNTS = [
+        { icon: 'fa-brands fa-aws',      service: 'Amazon Web Services', identity: 'admin@keyra.app',   offset: 0   },
+        { icon: 'fa-brands fa-discord',  service: 'Discord',             identity: 'MBVRK#1234',        offset: 7   },
+        { icon: 'fa-brands fa-github',   service: 'GitHub',              identity: 'mbvrk-dev',         offset: 14  },
+        { icon: 'fa-brands fa-google',   service: 'Google',              identity: 'mbvrk@gmail.com',   offset: 21  },
+        { icon: 'fa-brands fa-twitter',  service: 'X / Twitter',         identity: '@mbarkt3sto',       offset: 3   },
+        { icon: 'fa-solid fa-cloud',     service: 'Cloudflare',          identity: 'admin@keyra.app',   offset: 18  },
+    ];
+
+    const PERIOD = 30; // seconds
+    let viewMode = 'compact'; // compact | unified | secure
+    let secureTarget = null;
+
+    const fmtOTP = (n) => {
+        const s = String(n).padStart(6, '0');
+        return s.slice(0, 3) + ' ' + s.slice(3);
+    };
+
+    const genOTP = (offset) => {
+        // Deterministic fake OTP based on time + offset so it refreshes every 30s
+        const slot = Math.floor((Date.now() / 1000 + offset) / PERIOD);
+        const seed = (slot * 1234567 + offset * 9871) % 1000000;
+        return fmtOTP(Math.abs(seed));
+    };
+
+    const getProgress = (offset) => {
+        const elapsed = (Date.now() / 1000 + offset) % PERIOD;
+        return ((PERIOD - elapsed) / PERIOD) * 100;
+    };
+
+    const timerColor = (pct) => pct < 20 ? '#ff3b30' : 'var(--accent-primary)';
+
+    // Build cards
+    const grid = document.getElementById('mock-accounts-grid');
+
+    const buildCards = () => {
+        grid.innerHTML = '';
+        MOCK_ACCOUNTS.forEach((acc, i) => {
+            const pct = getProgress(acc.offset);
+            const code = genOTP(acc.offset);
+            const card = document.createElement('div');
+            card.className = 'mock-account-card nm-flat';
+            card.dataset.index = i;
+            card.innerHTML = `
+                <div class="mock-account-header">
+                    <div class="mock-account-icon nm-inset">
+                        <i class="${acc.icon} text-gradient"></i>
+                    </div>
+                    <div class="mock-account-info">
+                        <div class="mock-service-name">${acc.service}</div>
+                        <div class="mock-account-identity">${acc.identity}</div>
+                    </div>
+                </div>
+                <div class="mock-otp-hero">
+                    <div class="mock-otp-code" data-idx="${i}">${code}</div>
+                    <div class="mock-card-timer-track">
+                        <div class="mock-card-timer-fill" data-idx="${i}" style="width:${pct}%;background:${timerColor(pct)};"></div>
+                    </div>
+                    <div class="mock-secure-hint">Tap to reveal</div>
+                </div>
+                <button class="mock-card-more nm-flat"><i class="fa-solid fa-ellipsis"></i></button>
+            `;
+            // Secure mode: tap to open secure modal
+            card.addEventListener('click', () => {
+                if (viewMode === 'secure') openSecureModal(i);
+            });
+            grid.appendChild(card);
         });
+    };
 
-        mockSettingsTab.addEventListener('click', () => {
-            mockSettingsTab.classList.add('active', 'nm-convex');
-            mockVaultTab.classList.remove('active', 'nm-convex');
-            mockVaultView.style.display = 'none';
-            mockSettingsView.style.display = 'block';
-        });
-    }
+    buildCards();
 
-    // 2. Modal Toggling
-    if (mockAddAccountBtn && mockModal && mockModalCancel) {
-        mockAddAccountBtn.addEventListener('click', () => {
-            mockModal.classList.add('show');
-        });
+    // Live timer tick
+    const tickTimers = () => {
+        MOCK_ACCOUNTS.forEach((acc, i) => {
+            const pct = getProgress(acc.offset);
+            const newCode = genOTP(acc.offset);
 
-        mockModalCancel.addEventListener('click', () => {
-            mockModal.classList.remove('show');
-        });
+            const fillEl = grid.querySelector(`.mock-card-timer-fill[data-idx="${i}"]`);
+            const codeEl = grid.querySelector(`.mock-otp-code[data-idx="${i}"]`);
 
-        // Close modal on click outside
-        mockModal.addEventListener('click', (e) => {
-            if (e.target === mockModal) {
-                mockModal.classList.remove('show');
+            if (fillEl) {
+                fillEl.style.width = pct + '%';
+                fillEl.style.background = timerColor(pct);
+            }
+
+            if (codeEl && codeEl.textContent !== newCode) {
+                codeEl.classList.add('refreshing');
+                setTimeout(() => {
+                    codeEl.textContent = newCode;
+                    codeEl.classList.remove('refreshing');
+                }, 300);
             }
         });
-    }
 
-    // 3. Dropdown Toggling
-    if (mockUserBtn && mockUserDropdown) {
-        mockUserBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            mockUserDropdown.classList.toggle('show');
-        });
+        // Global bar
+        const globalFill = document.getElementById('mock-global-fill');
+        if (globalFill) {
+            const pct = getProgress(0);
+            globalFill.style.width = pct + '%';
+            globalFill.style.background = timerColor(pct);
+        }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (mockUserDropdown.classList.contains('show') && !mockUserBtn.contains(e.target) && !mockUserDropdown.contains(e.target)) {
-                mockUserDropdown.classList.remove('show');
+        // Secure modal circular timer
+        if (secureTarget !== null) {
+            const acc = MOCK_ACCOUNTS[secureTarget];
+            const pct = getProgress(acc.offset);
+            const remaining = Math.ceil((pct / 100) * PERIOD);
+            const circumference = 2 * Math.PI * 34;
+            const offset = circumference * (1 - pct / 100);
+
+            const circle = document.getElementById('mock-circle-progress');
+            const count  = document.getElementById('mock-circular-count');
+            const secCode = document.getElementById('mock-secure-code');
+
+            if (circle) {
+                circle.style.strokeDasharray = circumference;
+                circle.style.strokeDashoffset = offset;
+                circle.style.stroke = timerColor(pct);
             }
-        });
-    }
-
-    // 4. Switch Toggling
-    mockSwitches.forEach(sw => {
-        sw.addEventListener('click', () => {
-            sw.classList.toggle('active');
-        });
-    });
-
-    // --- Mobile Menu Logic ---
-    const menuToggle = document.getElementById('menuToggle');
-    const closeMenu = document.getElementById('closeMenu');
-    const mobileNav = document.getElementById('mobileNav');
-    
-    // Create overlay if it doesn't exist
-    let mobileOverlay = document.querySelector('.mobile-overlay');
-    if (!mobileOverlay) {
-        mobileOverlay = document.createElement('div');
-        mobileOverlay.className = 'mobile-overlay';
-        document.body.appendChild(mobileOverlay);
-    }
-
-    const toggleMobileMenu = (show) => {
-        if (show) {
-            mobileNav.classList.add('show');
-            mobileOverlay.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        } else {
-            mobileNav.classList.remove('show');
-            mobileOverlay.classList.remove('show');
-            document.body.style.overflow = '';
+            if (count) count.textContent = remaining;
+            if (secCode) secCode.textContent = genOTP(acc.offset);
         }
     };
 
-    if (menuToggle && closeMenu && mobileNav) {
-        menuToggle.addEventListener('click', () => toggleMobileMenu(true));
-        closeMenu.addEventListener('click', () => toggleMobileMenu(false));
-        mobileOverlay.addEventListener('click', () => toggleMobileMenu(false));
-        
-        // Close menu on link click
-        mobileNav.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => toggleMobileMenu(false));
-        });
-    }
+    setInterval(tickTimers, 500);
 
-    // --- Live Demo Simulation ---
-    const mockCards = document.querySelectorAll('.mock-account-card');
-    
-    const generateOTP = () => {
-        return Math.floor(100000 + Math.random() * 900000).toString().replace(/(\d{3})(\d{3})/, '$1 $2');
-    };
+    // ── View Mode Toggle ──
+    const viewToggle = document.getElementById('mock-view-toggle');
+    const globalTimer = document.getElementById('mock-global-timer');
 
-    const updateMockTimers = () => {
-        mockCards.forEach(card => {
-            const progress = card.querySelector('.mock-timer-linear-progress');
-            const codeDisplay = card.querySelector('.mock-otp-code');
-            
-            if (progress && codeDisplay) {
-                // Get current width as percentage
-                let currentWidth = parseFloat(progress.style.width) || 100;
-                
-                // Decrease width
-                currentWidth -= 0.5; // Decrement speed
-                
-                if (currentWidth <= 0) {
-                    currentWidth = 100;
-                    // Refresh code with animation
-                    codeDisplay.style.opacity = '0';
-                    setTimeout(() => {
-                        codeDisplay.textContent = generateOTP();
-                        codeDisplay.style.opacity = '1';
-                    }, 300);
-                }
-                
-                progress.style.width = `${currentWidth}%`;
-                
-                // Color change warning
-                if (currentWidth < 20) {
-                    progress.style.background = '#ff4757';
+    if (viewToggle) {
+        viewToggle.querySelectorAll('.mock-segment').forEach(btn => {
+            btn.addEventListener('click', () => {
+                viewToggle.querySelectorAll('.mock-segment').forEach(b => {
+                    b.classList.remove('active', 'nm-flat');
+                });
+                btn.classList.add('active', 'nm-flat');
+                viewMode = btn.dataset.mode;
+
+                // Apply mode to grid
+                grid.classList.remove('unified-mode');
+                grid.querySelectorAll('.mock-account-card').forEach(c => c.classList.remove('secure-mode'));
+
+                if (viewMode === 'unified') {
+                    grid.classList.add('unified-mode');
+                    globalTimer.style.display = 'flex';
                 } else {
-                    progress.style.background = 'var(--accent-primary)';
+                    globalTimer.style.display = 'none';
                 }
-            }
+
+                if (viewMode === 'secure') {
+                    grid.querySelectorAll('.mock-account-card').forEach(c => c.classList.add('secure-mode'));
+                }
+            });
         });
+    }
+
+    // ── Tab Switching ──
+    const tabVault    = document.getElementById('mock-tab-vault');
+    const tabSettings = document.getElementById('mock-tab-settings');
+    const vaultView   = document.getElementById('mock-vault-view');
+    const settingsView = document.getElementById('mock-settings-view');
+
+    const switchTab = (active, inactive, show, hide) => {
+        active.classList.add('active', 'nm-flat');
+        inactive.classList.remove('active', 'nm-flat');
+        show.style.display = 'block';
+        hide.style.display = 'none';
     };
 
-    // Initialize timers with random offsets
-    mockCards.forEach(card => {
-        const progress = card.querySelector('.mock-timer-linear-progress');
-        if (progress) {
-            progress.style.width = `${Math.random() * 100}%`;
-        }
+    if (tabVault && tabSettings) {
+        tabVault.addEventListener('click', () => switchTab(tabVault, tabSettings, vaultView, settingsView));
+        tabSettings.addEventListener('click', () => switchTab(tabSettings, tabVault, settingsView, vaultView));
+    }
+
+    // ── Add Account Modal ──
+    const addBtn    = document.getElementById('mock-add-account-btn');
+    const modal     = document.getElementById('mock-modal');
+    const cancelBtn = document.getElementById('mock-modal-cancel');
+
+    if (addBtn && modal) {
+        addBtn.addEventListener('click', () => modal.classList.add('show'));
+        cancelBtn.addEventListener('click', () => modal.classList.remove('show'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+    }
+
+    // ── User Dropdown ──
+    const userBtn      = document.getElementById('mock-user-btn');
+    const userDropdown = document.getElementById('mock-user-dropdown');
+
+    if (userBtn && userDropdown) {
+        userBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+        document.addEventListener('click', (e) => {
+            if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('show');
+            }
+        });
+    }
+
+    // ── Settings Toggles ──
+    document.querySelectorAll('.mock-toggle').forEach(toggle => {
+        toggle.addEventListener('click', () => toggle.classList.toggle('active'));
     });
 
-    setInterval(updateMockTimers, 150);
+    // ── Secure Modal ──
+    const secureModal   = document.getElementById('mock-secure-modal');
+    const secureClose   = document.getElementById('mock-secure-close');
+    const secureIconEl  = document.getElementById('mock-secure-icon');
+    const secureNameEl  = document.getElementById('mock-secure-name');
+    const secureAccEl   = document.getElementById('mock-secure-account');
+    const secureCodeEl  = document.getElementById('mock-secure-code');
+    const circleEl      = document.getElementById('mock-circle-progress');
+    const circumference = 2 * Math.PI * 34;
 
+    const openSecureModal = (idx) => {
+        const acc = MOCK_ACCOUNTS[idx];
+        secureTarget = idx;
+        secureIconEl.innerHTML = `<i class="${acc.icon} text-gradient"></i>`;
+        secureNameEl.textContent = acc.service;
+        secureAccEl.textContent  = acc.identity;
+        secureCodeEl.textContent = genOTP(acc.offset);
+        if (circleEl) {
+            circleEl.style.strokeDasharray = circumference;
+            circleEl.style.strokeDashoffset = 0;
+        }
+        secureModal.classList.add('show');
+    };
+
+    if (secureClose) {
+        secureClose.addEventListener('click', () => {
+            secureModal.classList.remove('show');
+            secureTarget = null;
+        });
+        secureModal.addEventListener('click', (e) => {
+            if (e.target === secureModal) {
+                secureModal.classList.remove('show');
+                secureTarget = null;
+            }
+        });
+    }
+
+    // Copy code on click in secure modal
+    if (secureCodeEl) {
+        secureCodeEl.addEventListener('click', () => {
+            secureCodeEl.style.transform = 'scale(0.97)';
+            setTimeout(() => secureCodeEl.style.transform = '', 150);
+        });
+    }
     // --- Download Dropdowns Logic ---
     const dropdownTriggers = document.querySelectorAll('.dropdown-trigger');
     const submenus = document.querySelectorAll('.download-submenu');
@@ -269,34 +365,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Dynamic GitHub Stats ---
     const fetchGitHubStats = async () => {
-        const starsEl = document.getElementById('github-stars');
-        const forksEl = document.getElementById('github-forks');
+        const starsEl    = document.getElementById('github-stars');
+        const forksEl    = document.getElementById('github-forks');
         const watchersEl = document.getElementById('github-watchers');
 
-        const formatNumber = (num) => {
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'k';
-            }
-            return num.toString();
+        const fmt = (n) => n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+
+        const applyStats = (data) => {
+            if (starsEl)    starsEl.textContent    = fmt(data.stargazers_count  || 0);
+            if (forksEl)    forksEl.textContent    = fmt(data.forks_count       || 0);
+            if (watchersEl) watchersEl.textContent = fmt(data.subscribers_count || 0);
         };
 
         try {
-            const response = await fetch('https://api.github.com/repos/MbarkT3STO/Keyra-App');
-            if (!response.ok) throw new Error('Failed to fetch stats');
-            
-            const data = await response.json();
-            
-            if (starsEl) starsEl.textContent = formatNumber(data.stargazers_count);
-            if (forksEl) forksEl.textContent = formatNumber(data.forks_count);
-            if (watchersEl) watchersEl.textContent = formatNumber(data.subscribers_count);
-        } catch (error) {
-            console.error('GitHub Stats Error:', error);
-            // Fallback to placeholders if API fails
-            if (starsEl) starsEl.textContent = '1.2k';
-            if (forksEl) forksEl.textContent = '156';
-            if (watchersEl) watchersEl.textContent = '89';
+            const res = await fetch('https://api.github.com/repos/MbarkT3STO/Keyra-App', {
+                headers: { 'Accept': 'application/vnd.github.v3+json' }
+            });
+            if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+            applyStats(await res.json());
+        } catch (err) {
+            console.warn('GitHub Stats:', err.message);
+            if (starsEl)    starsEl.textContent    = '1';
+            if (forksEl)    forksEl.textContent    = '0';
+            if (watchersEl) watchersEl.textContent = '1';
         }
     };
+
+    fetchGitHubStats();
 
     // --- OS Detection & Recommended Badge ---
     const detectOSAndHighlight = () => {
