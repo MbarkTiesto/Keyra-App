@@ -272,17 +272,17 @@
 <!-- Premium Neumorphic About Modal -->
 <div id="about-modal" class="modal-overlay hidden">
     <div class="modal about-modal-card animate-fade-in">
-        <div class="about-header-hero">
+        <div class="nm-modal-header" style="margin-bottom: 4px;">
             <div class="about-hero-vessel">
                 <img src="assets/logo.png" alt="Keyra Logo" class="app-logo-medium">
             </div>
-            <div class="about-title-group">
-                <h1 class="about-app-name">Keyra Authenticator</h1>
-                <p class="about-mission-tag">Professional Security Made Simple</p>
+            <div class="nm-modal-titles">
+                <h2 class="nm-modal-title">Keyra Authenticator</h2>
+                <p class="nm-modal-subtitle">PROFESSIONAL SECURITY MADE SIMPLE</p>
             </div>
         </div>
 
-        <div class="modal-divider"></div>
+        <div class="nm-modal-divider"></div>
 
         <div class="about-info-sections">
             <div class="about-info-row">
@@ -329,7 +329,7 @@
             </div>
         </div>
 
-        <div class="modal-divider"></div>
+        <div class="nm-modal-divider"></div>
 
         <div class="about-footer-actions">
             <p class="footer-label">Connect with us</p>
@@ -1030,258 +1030,339 @@
 
         </main>
 
-        <!-- Modals -->
-<div id="modal-overlay" class="modal-overlay">
-    <!-- Content injected by JS -->
-</div>
+        <!-- ═══════════════════════════════════════════════════════════════
+     MODALS — Pure Neumorphic UI System
+     ═══════════════════════════════════════════════════════════════ -->
 
-<!-- Logout Confirm -->
+<!-- Dynamic Modal Overlay (JS-injected content) -->
+<div id="modal-overlay" class="modal-overlay"></div>
+
+<!-- ── Sign Out Confirmation ── -->
 <div id="modal-logout" class="modal-overlay">
-    <div class="modal animate-fade-in">
+    <div class="modal nm-modal animate-fade-in">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon-vessel danger">
+
+            <!-- Header -->
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon danger">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </div>
-                <div class="modal-title-vessel">
-                    <h2 class="danger">Sign Out?</h2>
-                    <p>YOUR VAULT WILL BE LOCKED</p>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title danger">Sign Out?</h2>
+                    <p class="nm-modal-subtitle">YOUR VAULT WILL BE LOCKED</p>
                 </div>
             </div>
-            <div class="modal-divider"></div>
+
+            <!-- Divider -->
+            <div class="nm-modal-divider"></div>
+
+            <!-- Body -->
             <div class="modal-body">
-                <div class="modal-entity-badge">
-                    <div class="entity-icon">
+                <div class="nm-entity-card">
+                    <div class="nm-entity-icon">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <div class="entity-info">
-                        <span class="entity-name">Your Keyra Vault</span>
-                        <span class="entity-label">Active Session</span>
+                    <div class="nm-entity-info">
+                        <span class="nm-entity-name">Your Keyra Vault</span>
+                        <span class="nm-entity-meta">Active Session</span>
+                    </div>
+                    <div class="nm-entity-status online">
+                        <i class="fa-solid fa-circle"></i>
                     </div>
                 </div>
-                <p class="modal-help-text">Signing out will lock your vault. You'll need your password to get back in.</p>
+                <p class="nm-modal-help">Signing out will lock your vault. You'll need your master password to get back in.</p>
             </div>
+
+            <!-- Footer -->
             <div class="modal-footer">
                 <button class="btn-danger" id="btn-confirm-logout">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     Sign Out
                 </button>
-                <button class="user-button" id="btn-cancel-logout" style="justify-content: center;">Stay Signed In</button>
+                <button class="user-button" id="btn-cancel-logout" style="justify-content: center;">
+                    Stay Signed In
+                </button>
             </div>
+
         </div>
     </div>
 </div>
 
-<!-- Email Verification Modal -->
+<!-- ── Email Verification ── -->
 <div id="modal-email-verify" class="modal-overlay hidden">
-    <div class="modal animate-fade-in" style="max-width: 400px;">
+    <div class="modal nm-modal animate-fade-in" style="max-width: 420px;">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon-vessel">
+
+            <!-- Header -->
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon accent">
                     <i class="fa-solid fa-envelope-circle-check"></i>
                 </div>
-                <div class="modal-title-vessel">
-                    <h2>Check your Email</h2>
-                    <p>Enter the 6-digit code we just sent you</p>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title">Check your Email</h2>
+                    <p class="nm-modal-subtitle">ENTER THE 6-DIGIT CODE WE SENT YOU</p>
                 </div>
             </div>
+
+            <!-- Body -->
             <div class="modal-body">
-                <div class="verify-inputs" style="justify-content: center; margin: 20px 0;">
-                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
-                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
-                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
-                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
-                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
-                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
+                <!-- OTP digit inputs -->
+                <div class="nm-otp-row">
+                    <input type="text" inputmode="numeric" maxlength="1" class="email-verify-digit nm-otp-digit" autocomplete="one-time-code">
+                    <input type="text" inputmode="numeric" maxlength="1" class="email-verify-digit nm-otp-digit">
+                    <input type="text" inputmode="numeric" maxlength="1" class="email-verify-digit nm-otp-digit">
+                    <div class="nm-otp-sep"></div>
+                    <input type="text" inputmode="numeric" maxlength="1" class="email-verify-digit nm-otp-digit">
+                    <input type="text" inputmode="numeric" maxlength="1" class="email-verify-digit nm-otp-digit">
+                    <input type="text" inputmode="numeric" maxlength="1" class="email-verify-digit nm-otp-digit">
                 </div>
+
+                <!-- Error -->
                 <div id="email-verify-error" class="auth-error opacity-0"></div>
-                <div style="text-align: center; font-size: 13px; margin-top: 16px;">
-                    <span>Didn't get the code?</span>
-                    <button id="btn-resend-email-code" class="auth-resend-btn">Send again <span id="email-resend-timer"></span></button>
+
+                <!-- Resend -->
+                <div class="nm-resend-row">
+                    <span class="nm-resend-label">Didn't get the code?</span>
+                    <button id="btn-resend-email-code" class="nm-resend-btn">
+                        Resend <span id="email-resend-timer"></span>
+                    </button>
                 </div>
             </div>
-            <div class="modal-footer" style="padding-top: 0;">
-                <button class="btn-primary" id="btn-confirm-email-change" style="width: 100%;">Verify & Update</button>
-                <button class="user-button" id="btn-cancel-email-modal" style="width: 100%; justify-content: center; margin-top: 8px;">Cancel</button>
+
+            <!-- Footer -->
+            <div class="modal-footer" style="flex-direction: column; gap: 10px;">
+                <button class="btn-primary" id="btn-confirm-email-change" style="width: 100%;">
+                    <i class="fa-solid fa-check"></i>
+                    Verify &amp; Update
+                </button>
+                <button class="user-button" id="btn-cancel-email-modal" style="width: 100%; justify-content: center;">
+                    Cancel
+                </button>
             </div>
+
         </div>
     </div>
 </div>
 
-<!-- WhatsApp QR Verification Modal -->
+<!-- ── WhatsApp QR Verification ── -->
 <div id="modal-phone-qr" class="modal-overlay hidden">
-    <div class="modal animate-fade-in" style="max-width: 440px; border-radius: 24px; padding: 24px;">
-        <div class="modal-content" style="padding: 0;">
-            <div class="modal-header" style="text-align: center; display: block; padding: 0 0 16px 0; border-bottom: none;">
-                <div class="modal-icon-vessel" style="background: var(--nm-surface); color: var(--accent-primary); box-shadow: var(--nm-shadow-out-sm); margin: 0 auto 16px;">
+    <div class="modal nm-modal animate-fade-in" style="max-width: 460px;">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon accent">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
-                <h2 id="phone-qr-title" style="font-size: 24px; letter-spacing: -0.5px; font-weight: 850;">Secure Verification</h2>
-                <p id="phone-qr-subtitle" style="font-size: 13.5px; opacity: 0.7; font-weight: 600; margin-top: 4px;">Connect your WhatsApp to confirm your identity</p>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title" id="phone-qr-title">Secure Verification</h2>
+                    <p class="nm-modal-subtitle" id="phone-qr-subtitle">CONNECT YOUR WHATSAPP TO CONFIRM IDENTITY</p>
+                </div>
             </div>
 
-            <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; padding: 8px 0;">
-                <!-- QR Vessel -->
-                <div id="modal-wa-qr-vessel"
-                    style="background: var(--nm-surface); border-radius: 20px; padding: 16px; box-shadow: var(--nm-shadow-in); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px; width: fit-content; margin-left: auto; margin-right: auto; overflow: hidden;">
-                    <div id="modal-wa-loader"
-                        style="width: 220px; height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 12px;">
-                        <div class="loader-vessel" style="margin-bottom: 16px;">
+            <!-- Divider -->
+            <div class="nm-modal-divider"></div>
+
+            <!-- Body -->
+            <div class="modal-body" style="align-items: center;">
+
+                <!-- QR Code Vessel -->
+                <div class="nm-qr-vessel">
+                    <!-- Loader state -->
+                    <div id="modal-wa-loader" class="nm-qr-loader">
+                        <div class="loader-vessel">
                             <div class="loader-ring" style="width: 44px; height: 44px; border-width: 3px;"></div>
                         </div>
-                        <span id="modal-wa-status" style="font-size: 11px; font-weight: 850; letter-spacing: 1.5px; color: var(--accent-primary);">INITIALIZING...</span>
+                        <span id="modal-wa-status" class="nm-qr-status-label">INITIALIZING...</span>
                     </div>
-                    <img id="modal-wa-qr-image" class="hidden"
-                        style="width: 220px; height: 220px; border-radius: 8px; display: block; filter: contrast(1.1); margin: 0 auto;">
 
-                    <!-- Blurred Overlay during Verifying state -->
-                    <div id="wa-qr-overlay" class="hidden"
-                        style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
-                        <div class="loader-vessel" style="margin-bottom: 16px;">
-                            <div style="width: 40px; height: 40px; border: 3px solid rgba(255, 255, 255, 0.2); border-top-color: #ffffff; border-radius: 50%; animation: loader-spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;"></div>
-                        </div>
-                        <span style="font-size: 14px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.5);">Verifying Identity...</span>
+                    <!-- QR Image -->
+                    <img id="modal-wa-qr-image" class="hidden nm-qr-image"
+                        alt="WhatsApp QR Code">
+
+                    <!-- Verifying overlay -->
+                    <div id="wa-qr-overlay" class="hidden nm-qr-overlay">
+                        <div style="width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: nm-spin 1s linear infinite;"></div>
+                        <span class="nm-qr-overlay-label">Verifying Identity...</span>
                     </div>
                 </div>
 
-                <!-- Inline Error Container -->
-                <div id="wa-qr-error" class="hidden"
-                    style="width: 100%; margin-bottom: 16px; padding: 14px; background: rgba(255, 59, 48, 0.08); border: 1px solid rgba(255, 59, 48, 0.15); border-radius: var(--radius-md); text-align: center; display: flex; align-items: center; gap: 10px; justify-content: center;">
-                    <i class="fa-solid fa-triangle-exclamation danger-text"></i>
-                    <span id="wa-qr-error-text" style="font-size: 12.5px; font-weight: 700; color: #ff3b30; line-height: 1.4;"></span>
+                <!-- Inline Error -->
+                <div id="wa-qr-error" class="nm-inline-error hidden">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="wa-qr-error-text"></span>
                 </div>
 
-                <!-- Requirement Callout -->
-                <div style="width: 100%; padding: 16px 20px; background: var(--bg-primary); border-radius: var(--radius-lg); box-shadow: var(--nm-shadow-in); text-align: left; display: flex; align-items: flex-start; gap: 14px; border: 1px solid rgba(128, 128, 128, 0.05);">
-                    <div style="width: 36px; height: 36px; background: rgba(37, 211, 102, 0.1); color: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);">
-                        <i class="fa-solid fa-circle-info"></i>
+                <!-- Info callout -->
+                <div class="nm-info-callout">
+                    <div class="nm-callout-icon whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>
                     </div>
-                    <div>
-                        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">Important Requirement</div>
-                        <p style="font-size: 12.5px; color: var(--text-dim); line-height: 1.5; font-weight: 600; opacity: 0.85;">
-                            Scan this QR code using the WhatsApp account corresponding to <strong style="color: var(--text-primary);">the number you just entered</strong>.
+                    <div class="nm-callout-body">
+                        <div class="nm-callout-title">Important Requirement</div>
+                        <p class="nm-callout-text">
+                            Scan this QR code using the WhatsApp account linked to
+                            <strong>the number you just entered</strong>.
                         </p>
                     </div>
                 </div>
+
             </div>
 
-            <div class="modal-footer" style="padding: 16px 0 0 0; border-top: none;">
-                <button class="user-button secondary" id="btn-cancel-phone-qr"
-                    style="width: 100%; justify-content: center; height: 48px; font-size: 13px; font-weight: 800;">
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button class="user-button" id="btn-cancel-phone-qr" style="width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-xmark"></i>
                     Cancel Verification
                 </button>
             </div>
+
         </div>
     </div>
 </div>
 
-<!-- Premium Syncing Indicator (Floating Pill) -->
+<!-- ── Floating Sync Indicator Pill ── -->
 <div id="cloud-sync-indicator" class="cloud-sync-pill hidden">
     <i class="fa-solid fa-arrows-rotate sync-icon"></i>
     <span>Backing up...</span>
 </div>
 
-<!-- Sync Conflict Resolution Modal -->
+<!-- ── Sync Conflict Resolution ── -->
 <div id="modal-sync-conflict" class="modal-overlay hidden">
-    <div class="modal animate-fade-in" style="max-width: 480px;">
+    <div class="modal nm-modal animate-fade-in" style="max-width: 500px;">
         <div class="modal-content">
-            <div class="conflict-modal-header">
-                <div class="conflict-modal-icon">
+
+            <!-- Header -->
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon warning">
                     <i class="fa-solid fa-code-branch"></i>
                 </div>
-                <div>
-                    <h2 class="conflict-modal-title">Sync Conflict</h2>
-                    <p class="conflict-modal-subtitle">VERSION MISMATCH DETECTED</p>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title warning">Sync Conflict</h2>
+                    <p class="nm-modal-subtitle">VERSION MISMATCH DETECTED</p>
                 </div>
             </div>
 
-            <div class="conflict-info-banner">
+            <!-- Divider -->
+            <div class="nm-modal-divider"></div>
+
+            <!-- Info Banner -->
+            <div class="nm-info-banner warning">
                 <i class="fa-solid fa-circle-info"></i>
-                <span>Another device has modified your vault on GitHub since your last sync. Choose how to resolve this.</span>
+                <span>Another device modified your vault on GitHub since your last sync. Choose how to resolve this conflict.</span>
             </div>
 
-            <div class="conflict-options">
-                <div class="conflict-option-card" id="option-force-push">
-                    <div class="conflict-option-icon push">
+            <!-- Conflict Options -->
+            <div class="nm-conflict-options">
+
+                <div class="nm-conflict-card" id="option-force-push">
+                    <div class="nm-conflict-icon push">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                     </div>
-                    <div class="conflict-option-body">
-                        <div class="conflict-option-title">Keep Local</div>
-                        <div class="conflict-option-desc">Push your current changes to GitHub, overwriting the remote version.</div>
+                    <div class="nm-conflict-body">
+                        <div class="nm-conflict-title">Keep Local</div>
+                        <div class="nm-conflict-desc">Push your current changes to GitHub, overwriting the remote version.</div>
                     </div>
-                    <div class="conflict-option-check"><i class="fa-solid fa-check"></i></div>
+                    <div class="nm-conflict-check">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
                 </div>
 
-                <div class="conflict-option-card" id="option-pull-remote">
-                    <div class="conflict-option-icon pull">
+                <div class="nm-conflict-card" id="option-pull-remote">
+                    <div class="nm-conflict-icon pull">
                         <i class="fa-solid fa-cloud-arrow-down"></i>
                     </div>
-                    <div class="conflict-option-body">
-                        <div class="conflict-option-title">Use Remote</div>
-                        <div class="conflict-option-desc">Discard local changes and download the latest version from GitHub.</div>
+                    <div class="nm-conflict-body">
+                        <div class="nm-conflict-title">Use Remote</div>
+                        <div class="nm-conflict-desc">Discard local changes and download the latest version from GitHub.</div>
                     </div>
-                    <div class="conflict-option-check"><i class="fa-solid fa-check"></i></div>
+                    <div class="nm-conflict-check">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
                 </div>
+
             </div>
 
-            <div class="conflict-modal-footer">
+            <!-- Footer -->
+            <div class="modal-footer">
                 <button class="btn-nm-secondary" id="btn-close-sync-conflict">Later</button>
                 <button class="btn-nm-primary disabled" id="btn-resolve-sync-conflict" disabled>
                     <i class="fa-solid fa-check"></i>
                     <span>Resolve</span>
                 </button>
             </div>
+
         </div>
     </div>
 </div>
 
-<!-- Private Sync Setup Modal -->
+<!-- ── Private Cloud Sync Setup ── -->
 <div id="modal-private-sync" class="modal-overlay hidden">
-    <div class="modal animate-fade-in">
+    <div class="modal nm-modal animate-fade-in">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon-vessel highlight">
+
+            <!-- Header -->
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon accent">
                     <i class="fa-brands fa-github"></i>
                 </div>
-                <div class="modal-title-vessel">
-                    <h2>Private Cloud Sync</h2>
-                    <p>GITHUB REPOSITORY STORAGE</p>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title">Private Cloud Sync</h2>
+                    <p class="nm-modal-subtitle">GITHUB REPOSITORY STORAGE</p>
                 </div>
             </div>
-            <div class="modal-divider"></div>
+
+            <!-- Divider -->
+            <div class="nm-modal-divider"></div>
+
+            <!-- Body -->
             <div class="modal-body">
-                <p class="modal-help-text">Synchronize your local vault to your own private GitHub repository. Your data stays 100% yours.</p>
+                <p class="nm-modal-help">Synchronize your vault to your own private GitHub repository. Your data stays 100% yours — zero third-party access.</p>
 
-                <div class="settings-form" style="margin-top: 20px;">
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label class="form-label" style="display: block; margin-bottom: 8px;">GitHub Personal Access Token (PAT)</label>
-                        <input type="password" id="sync-github-pat" class="form-input" placeholder="ghp_xxxxxxxxxxxx" style="width: 100%;">
-                        <span class="form-help" style="font-size: 11px; opacity: 0.7; margin-top: 4px; display: block;">Requires 'repo' or 'Contents: Read &amp; Write' scope.</span>
+                <!-- Info Banner -->
+                <div class="nm-info-banner accent" style="margin-top: 16px;">
+                    <i class="fa-solid fa-lock"></i>
+                    <span>Requires a GitHub Personal Access Token with <strong>repo</strong> or <strong>Contents: Read &amp; Write</strong> scope.</span>
+                </div>
+
+                <!-- Form Fields -->
+                <div class="nm-form-stack">
+
+                    <div class="form-group">
+                        <label class="form-label">Personal Access Token (PAT)</label>
+                        <input type="password" id="sync-github-pat" class="form-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label class="form-label" style="display: block; margin-bottom: 8px;">Repository Owner (Username)</label>
-                        <input type="text" id="sync-github-owner" class="form-input" placeholder="Your GitHub Username" style="width: 100%;">
+                    <div class="nm-form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Repository Owner</label>
+                            <input type="text" id="sync-github-owner" class="form-input" placeholder="your-username">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Repository Name</label>
+                            <input type="text" id="sync-github-repo" class="form-input" placeholder="my-keyra-vault">
+                        </div>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 16px;">
-                        <label class="form-label" style="display: block; margin-bottom: 8px;">Repository Name</label>
-                        <input type="text" id="sync-github-repo" class="form-input" placeholder="my-keyra-vault" style="width: 100%;">
-                        <span class="form-help" style="font-size: 11px; opacity: 0.7; margin-top: 4px; display: block;">Existing or new repository name.</span>
-                    </div>
                 </div>
             </div>
-            <div class="modal-footer footer-grid" style="padding-top: 0;">
+
+            <!-- Footer -->
+            <div class="modal-footer footer-grid">
                 <button class="user-button secondary" id="btn-test-sync-connection">
                     <i class="fa-solid fa-plug"></i>
                     <span>Test Connection</span>
                 </button>
-                <button class="user-button" id="btn-close-private-sync">Cancel</button>
+                <button class="user-button" id="btn-close-private-sync">
+                    <i class="fa-solid fa-xmark"></i>
+                    Cancel
+                </button>
                 <button class="user-button highlight btn-full" id="btn-save-private-sync">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
                     <span>Enable Private Sync</span>
                 </button>
             </div>
+
         </div>
     </div>
 </div>
@@ -1350,49 +1431,44 @@
 
         <!-- View 1: Main Options -->
         <div id="forgot-pin-main-view" class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon-vessel danger">
-                    <i class="fa-solid fa-key"></i>
-                </div>
-                <div class="modal-title-vessel">
-                    <h2 class="danger">Reset PIN?</h2>
-                    <p>SECURITY ACTION REQUIRED</p>
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon danger"><i class="fa-solid fa-key"></i></div>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title danger">Reset PIN?</h2>
+                    <p class="nm-modal-subtitle">SECURITY ACTION REQUIRED</p>
                 </div>
             </div>
-            <div class="modal-divider"></div>
+            <div class="nm-modal-divider"></div>
             <div class="modal-body">
-                <div class="modal-entity-badge">
-                    <div class="entity-icon">
-                        <i class="fa-solid fa-unlock-keyhole"></i>
-                    </div>
-                    <div class="entity-info">
-                        <span class="entity-name">Reset Identity PIN</span>
-                        <span class="entity-label">Requires Verification</span>
+                <div class="nm-entity-card">
+                    <div class="nm-entity-icon"><i class="fa-solid fa-unlock-keyhole"></i></div>
+                    <div class="nm-entity-info">
+                        <span class="nm-entity-name">Reset Identity PIN</span>
+                        <span class="nm-entity-meta">Requires Verification</span>
                     </div>
                 </div>
-                <p class="modal-help-text spaced-top">Choose how you want to verify your identity to reset your PIN.</p>
+                <p class="nm-modal-help" style="margin-bottom: 16px;">Choose how you want to verify your identity to reset your PIN.</p>
 
-                <!-- Master Password Option -->
-                <form id="form-forgot-pin" class="settings-form hidden recovery-form">
-                    <div class="form-label recovery-label">Master Password</div>
-                    <input type="password" id="forgot-pin-password" class="form-input"
-                        placeholder="Enter your master password" autocomplete="current-password" required>
+                <form id="form-forgot-pin" class="nm-form-stack hidden recovery-form">
+                    <div class="form-group">
+                        <label class="form-label">Master Password</label>
+                        <input type="password" id="forgot-pin-password" class="form-input"
+                            placeholder="Enter your master password" autocomplete="current-password" required>
+                    </div>
                     <p id="forgot-pin-error" class="hidden recovery-error"></p>
                 </form>
             </div>
-            <div class="modal-footer recovery-footer">
+            <div class="modal-footer recovery-footer" style="flex-direction: column; gap: 10px;">
                 <button class="btn-danger recovery-btn" id="confirm-forgot-pin-btn">
                     <i class="fa-solid fa-trash-can"></i>
                     Reset PIN &amp; Sign Out
                 </button>
-
-                <!-- WhatsApp Option -->
                 <div id="forgot-pin-wa-divider" class="hidden recovery-divider">
                     <div class="recovery-divider-line"></div>
                     <span class="recovery-divider-text">Or</span>
                     <div class="recovery-divider-line"></div>
                 </div>
-                <button id="btn-forgot-pin-whatsapp" class="user-button hidden recovery-btn">
+                <button id="btn-forgot-pin-whatsapp" class="user-button hidden recovery-btn" style="justify-content: center;">
                     <i class="fa-brands fa-whatsapp wa-color"></i>
                     Receive PIN on WhatsApp
                 </button>
@@ -1401,42 +1477,35 @@
 
         <!-- View 2: WhatsApp QR Code -->
         <div id="forgot-pin-wa-view" class="modal-content hidden">
-            <div class="modal-header">
-                <div class="modal-icon-vessel wa-vessel">
-                    <i class="fa-brands fa-whatsapp wa-text"></i>
-                </div>
-                <div class="modal-title-vessel">
-                    <h2 class="wa-text">Scan QR Code</h2>
-                    <p>WHATSAPP VERIFICATION</p>
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon" style="color: #25d366;"><i class="fa-brands fa-whatsapp"></i></div>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title" style="color: #25d366;">Scan QR Code</h2>
+                    <p class="nm-modal-subtitle">WHATSAPP VERIFICATION</p>
                 </div>
             </div>
-            <div class="modal-divider"></div>
-            <div class="modal-body centered-body">
-                <div id="forgot-pin-qr-container" class="recovery-qr">
-                    <div id="forgot-pin-wa-loader" class="qr-loader">
+            <div class="nm-modal-divider"></div>
+            <div class="modal-body" style="align-items: center;">
+                <div class="nm-qr-vessel">
+                    <div id="forgot-pin-wa-loader" class="nm-qr-loader">
                         <div class="wa-loading-spinner"></div>
                     </div>
-                    <img id="forgot-pin-wa-qr" class="hidden qr-image">
-                    <div id="forgot-pin-wa-overlay" class="hidden qr-overlay">
+                    <img id="forgot-pin-wa-qr" class="hidden nm-qr-image">
+                    <div id="forgot-pin-wa-overlay" class="hidden nm-qr-overlay">
                         <div class="qr-spinner"></div>
-                        <span class="qr-overlay-text">Verifying...</span>
+                        <span class="nm-qr-overlay-label">Verifying...</span>
                     </div>
                 </div>
-
-                <span id="forgot-pin-wa-status" class="wa-status-text">INITIALIZING...</span>
-
-                <div id="forgot-pin-wa-error" class="hidden recovery-error-banner">
-                    <i class="fa-solid fa-triangle-exclamation danger-text"></i>
-                    <span id="forgot-pin-wa-error-text" class="error-banner-text"></span>
+                <span id="forgot-pin-wa-status" class="nm-qr-status-label" style="margin-bottom: 12px;">INITIALIZING...</span>
+                <div id="forgot-pin-wa-error" class="nm-inline-error hidden">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="forgot-pin-wa-error-text"></span>
                 </div>
-
-                <div class="recovery-instruction-box">
-                    <div class="instruction-icon-wa">
-                        <i class="fa-solid fa-circle-info"></i>
-                    </div>
-                    <div>
-                        <div class="instruction-title">Scan with WhatsApp</div>
-                        <p id="forgot-pin-wa-phone-hint" class="instruction-text">Use the WhatsApp account linked to your verified phone number.</p>
+                <div class="nm-info-callout">
+                    <div class="nm-callout-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div class="nm-callout-body">
+                        <div class="nm-callout-title">Scan with WhatsApp</div>
+                        <p id="forgot-pin-wa-phone-hint" class="nm-callout-text">Use the WhatsApp account linked to your verified phone number.</p>
                     </div>
                 </div>
             </div>
@@ -1445,43 +1514,37 @@
 
         <!-- View 3: PIN Sent Confirmation -->
         <div id="forgot-pin-code-view" class="modal-content hidden">
-            <div class="modal-header">
-                <div class="modal-icon-vessel wa-vessel">
-                    <i class="fa-solid fa-check-circle wa-text"></i>
-                </div>
-                <div class="modal-title-vessel">
-                    <h2 class="wa-text">PIN Sent!</h2>
-                    <p>CHECK YOUR WHATSAPP</p>
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon success"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title success">PIN Sent!</h2>
+                    <p class="nm-modal-subtitle">CHECK YOUR WHATSAPP</p>
                 </div>
             </div>
-            <div class="modal-divider"></div>
+            <div class="nm-modal-divider"></div>
             <div class="modal-body">
-                <div class="modal-entity-badge wa-badge">
-                    <div class="entity-icon wa-vessel">
-                        <i class="fa-brands fa-whatsapp wa-text"></i>
-                    </div>
-                    <div class="entity-info">
-                        <span class="entity-name">PIN Delivered Successfully</span>
-                        <span class="entity-label" id="forgot-pin-code-phone">+XX XXX XXX XXXX</span>
+                <div class="nm-entity-card">
+                    <div class="nm-entity-icon" style="color: #25d366;"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div class="nm-entity-info">
+                        <span class="nm-entity-name">PIN Delivered Successfully</span>
+                        <span class="nm-entity-meta" id="forgot-pin-code-phone">+XX XXX XXX XXXX</span>
                     </div>
                 </div>
-
-                <p class="modal-help-text">Your PIN has been sent to your WhatsApp. Check your messages and use it to unlock the vault.</p>
-
-                <div class="recovery-success-box">
-                    <div class="instruction-icon-wa">
+                <p class="nm-modal-help" style="margin-bottom: 16px;">Your PIN has been sent to your WhatsApp. Check your messages and use it to unlock the vault.</p>
+                <div class="nm-info-callout">
+                    <div class="nm-callout-icon" style="background: var(--accent-soft); color: var(--accent-primary);">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <div>
-                        <div class="instruction-title">Security Note</div>
-                        <p class="instruction-text">For your security, please delete the message after reading your PIN.</p>
+                    <div class="nm-callout-body">
+                        <div class="nm-callout-title">Security Note</div>
+                        <p class="nm-callout-text">For your security, please delete the message after reading your PIN.</p>
                     </div>
                 </div>
             </div>
             <div class="modal-footer recovery-footer">
-                <button id="btn-pin-sent-done" class="user-button recovery-btn btn-success-wa">
+                <button id="btn-pin-sent-done" class="btn-primary recovery-btn" style="width: 100%;">
                     <i class="fa-solid fa-check"></i>
-                    Done - Return to PIN Entry
+                    Done — Return to PIN Entry
                 </button>
             </div>
         </div>

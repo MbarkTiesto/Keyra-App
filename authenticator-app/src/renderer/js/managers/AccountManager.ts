@@ -255,17 +255,16 @@ export class AccountManager {
     public showAddModal() {
         const content = `
             <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-icon-vessel">
-                        <i class="fa-solid fa-circle-plus"></i>
-                    </div>
-                    <div class="modal-title-vessel">
-                        <h2>Add Token</h2>
-                        <p>SAVE DIGITAL IDENTITY</p>
+                <div class="nm-modal-header">
+                    <div class="nm-modal-icon accent"><i class="fa-solid fa-circle-plus"></i></div>
+                    <div class="nm-modal-titles">
+                        <h2 class="nm-modal-title">Add Token</h2>
+                        <p class="nm-modal-subtitle">SAVE DIGITAL IDENTITY</p>
                     </div>
                 </div>
-                <div class="modal-divider"></div>
+                <div class="nm-modal-divider"></div>
                 <div class="modal-body">
+                    <div class="nm-form-stack">
                     <div class="form-group">
                         <label class="form-label">Service</label>
                         <input type="text" id="new-issuer" class="form-input" placeholder="e.g. GitHub, Google">
@@ -277,6 +276,7 @@ export class AccountManager {
                     <div class="form-group">
                         <label class="form-label">TOTP Secret</label>
                         <input type="text" id="new-secret" class="form-input" placeholder="Enter secret key" autocomplete="off">
+                    </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -336,24 +336,23 @@ export class AccountManager {
     public showEditModal(account: any) {
         const content = `
             <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-icon-vessel">
-                        <i class="fa-solid fa-sliders"></i>
-                    </div>
-                    <div class="modal-title-vessel">
-                        <h2>Edit Identity</h2>
-                        <p>UPDATE SERVICE DETAILS</p>
+                <div class="nm-modal-header">
+                    <div class="nm-modal-icon accent"><i class="fa-solid fa-sliders"></i></div>
+                    <div class="nm-modal-titles">
+                        <h2 class="nm-modal-title">Edit Identity</h2>
+                        <p class="nm-modal-subtitle">UPDATE SERVICE DETAILS</p>
                     </div>
                 </div>
-                <div class="modal-divider"></div>
+                <div class="nm-modal-divider"></div>
                 <div class="modal-body">
-                    <div class="modal-entity-badge">
-                        <div class="entity-icon"><i class="fa-solid fa-shield"></i></div>
-                        <div class="entity-info">
-                            <span class="entity-name">${account.issuer}</span>
-                            <span class="entity-label">${account.account || 'Vault Token'}</span>
+                    <div class="nm-entity-card">
+                        <div class="nm-entity-icon"><i class="fa-solid fa-shield"></i></div>
+                        <div class="nm-entity-info">
+                            <span class="nm-entity-name">${account.issuer}</span>
+                            <span class="nm-entity-meta">${account.account || 'Vault Token'}</span>
                         </div>
                     </div>
+                    <div class="nm-form-stack">
                     <div class="form-group">
                         <label class="form-label">Service</label>
                         <input type="text" id="edit-issuer" class="form-input" value="${account.issuer}">
@@ -361,6 +360,7 @@ export class AccountManager {
                     <div class="form-group">
                         <label class="form-label">Account</label>
                         <input type="text" id="edit-account" class="form-input" value="${account.account}" inputmode="email">
+                    </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -406,25 +406,23 @@ export class AccountManager {
     public showDeleteConfirm(account: any) {
         const content = `
             <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-icon-vessel danger">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </div>
-                    <div class="modal-title-vessel">
-                        <h2 class="danger">Delete Token?</h2>
-                        <p>PERMANENT ACTION</p>
+                <div class="nm-modal-header">
+                    <div class="nm-modal-icon danger"><i class="fa-solid fa-trash-can"></i></div>
+                    <div class="nm-modal-titles">
+                        <h2 class="nm-modal-title danger">Delete Token?</h2>
+                        <p class="nm-modal-subtitle">PERMANENT ACTION</p>
                     </div>
                 </div>
-                <div class="modal-divider"></div>
+                <div class="nm-modal-divider"></div>
                 <div class="modal-body">
-                    <div class="modal-entity-badge">
-                        <div class="entity-icon"><i class="fa-solid fa-shield"></i></div>
-                        <div class="entity-info">
-                            <span class="entity-name">${account.issuer}</span>
-                            <span class="entity-label">${account.account || 'Vault Token'}</span>
+                    <div class="nm-entity-card">
+                        <div class="nm-entity-icon"><i class="fa-solid fa-shield"></i></div>
+                        <div class="nm-entity-info">
+                            <span class="nm-entity-name">${account.issuer}</span>
+                            <span class="nm-entity-meta">${account.account || 'Vault Token'}</span>
                         </div>
                     </div>
-                    <p class="modal-help-text">Removing this token is permanent. You will lose access to its OTP codes.</p>
+                    <p class="nm-modal-help">Removing this token is permanent. You will lose access to its OTP codes.</p>
                 </div>
                 <div class="modal-footer">
                     <button class="btn-danger" id="confirm-delete">
@@ -460,77 +458,70 @@ export class AccountManager {
 
     public showExportOptionsModal() {
         const content = `
-            <div class="custom-scrollbar" style="max-height: 85vh; overflow-y: auto; max-width: 580px; padding: clamp(24px, 5vw, 32px); margin: 0 auto;">
-                <div style="display: flex; align-items: flex-start; gap: 18px; margin-bottom: 24px;">
-                    <div class="account-icon nm-icon-large" style="width: 64px; height: 64px; flex-shrink: 0;">
-                        <i class="fa-solid fa-download" style="font-size: 28px;"></i>
-                    </div>
-                    <div style="flex: 1; min-width: 0;">
-                        <h2 style="font-weight: 900; font-size: clamp(20px, 4vw, 24px); color: var(--text-primary); margin: 0 0 6px 0; line-height: 1.2;">Export Vault</h2>
-                        <p style="font-size: 12px; color: var(--text-secondary); font-weight: 600; line-height: 1.4;">Choose your preferred export format</p>
+            <div class="modal-content">
+                <div class="nm-modal-header">
+                    <div class="nm-modal-icon accent"><i class="fa-solid fa-download"></i></div>
+                    <div class="nm-modal-titles">
+                        <h2 class="nm-modal-title">Export Vault</h2>
+                        <p class="nm-modal-subtitle">CHOOSE YOUR EXPORT FORMAT</p>
                     </div>
                 </div>
-                <div style="display: grid; gap: 10px; margin-bottom: 20px;">
-                    <button class="export-option-card" data-format="encrypted" style="display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 12px; box-shadow: var(--nm-shadow-out); cursor: pointer; transition: all 0.2s ease; text-align: left; width: 100%;">
-                        <div class="export-option-icon"><i class="fa-solid fa-lock" style="font-size: 18px; color: var(--accent-primary);"></i></div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px;">Full Encrypted Backup</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; line-height: 1.3;">Complete vault with settings (.keyra)</div>
-                        </div>
-                        <div class="export-check" style="width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--text-secondary); display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.2s ease;">
-                            <i class="fa-solid fa-check" style="font-size: 11px; color: var(--success);"></i>
-                        </div>
-                    </button>
-                    <button class="export-option-card" data-format="qr-pdf" style="display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 12px; box-shadow: var(--nm-shadow-out); cursor: pointer; transition: all 0.2s ease; text-align: left; width: 100%;">
-                        <div class="export-option-icon"><i class="fa-solid fa-qrcode" style="font-size: 18px; color: var(--accent-primary);"></i></div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px;">QR Codes (PDF)</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; line-height: 1.3;">Printable QR codes for each account</div>
-                        </div>
-                        <div class="export-check" style="width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--text-secondary); display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.2s ease;">
-                            <i class="fa-solid fa-check" style="font-size: 11px; color: var(--success);"></i>
-                        </div>
-                    </button>
-                    <button class="export-option-card" data-format="json" style="display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 12px; box-shadow: var(--nm-shadow-out); cursor: pointer; transition: all 0.2s ease; text-align: left; width: 100%;">
-                        <div class="export-option-icon"><i class="fa-solid fa-file-code" style="font-size: 18px; color: #ff9500;"></i></div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px;">Plain JSON</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; line-height: 1.3;">Unencrypted JSON for migration (.json)</div>
-                        </div>
-                        <div class="export-check" style="width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--text-secondary); display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.2s ease;">
-                            <i class="fa-solid fa-check" style="font-size: 11px; color: var(--success);"></i>
-                        </div>
-                    </button>
-                    <button class="export-option-card" data-format="text" style="display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 12px; box-shadow: var(--nm-shadow-out); cursor: pointer; transition: all 0.2s ease; text-align: left; width: 100%;">
-                        <div class="export-option-icon"><i class="fa-solid fa-file-lines" style="font-size: 18px; color: var(--text-secondary);"></i></div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px;">Text File</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600; line-height: 1.3;">Human-readable text format (.txt)</div>
-                        </div>
-                        <div class="export-check" style="width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--text-secondary); display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.2s ease;">
-                            <i class="fa-solid fa-check" style="font-size: 11px; color: var(--success);"></i>
-                        </div>
-                    </button>
-                </div>
-                <div id="export-selection-container" style="background: var(--bg-primary); border-radius: 12px; padding: 14px; box-shadow: var(--nm-shadow-in-sm); margin-bottom: 20px; display: none;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="flex: 1; min-width: 0; margin-right: 12px;">
-                            <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 3px;">Export Selection</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Choose specific accounts or export all</div>
-                        </div>
-                        <label class="switch" style="flex-shrink: 0;">
-                            <input type="checkbox" id="export-selective" checked>
-                            <span class="slider round"></span>
-                        </label>
+                <div class="nm-modal-divider"></div>
+                <div class="modal-body">
+                    <div class="nm-export-options">
+                        <button class="nm-export-card" data-format="encrypted">
+                            <div class="nm-export-icon"><i class="fa-solid fa-lock"></i></div>
+                            <div class="nm-export-body">
+                                <div class="nm-export-title">Full Encrypted Backup</div>
+                                <div class="nm-export-desc">Complete vault with settings (.keyra)</div>
+                            </div>
+                            <div class="nm-export-check"><i class="fa-solid fa-check"></i></div>
+                        </button>
+                        <button class="nm-export-card" data-format="qr-pdf">
+                            <div class="nm-export-icon accent"><i class="fa-solid fa-qrcode"></i></div>
+                            <div class="nm-export-body">
+                                <div class="nm-export-title">QR Codes (PDF)</div>
+                                <div class="nm-export-desc">Printable QR codes for each account</div>
+                            </div>
+                            <div class="nm-export-check"><i class="fa-solid fa-check"></i></div>
+                        </button>
+                        <button class="nm-export-card" data-format="json">
+                            <div class="nm-export-icon warning"><i class="fa-solid fa-file-code"></i></div>
+                            <div class="nm-export-body">
+                                <div class="nm-export-title">Plain JSON</div>
+                                <div class="nm-export-desc">Unencrypted JSON for migration (.json)</div>
+                            </div>
+                            <div class="nm-export-check"><i class="fa-solid fa-check"></i></div>
+                        </button>
+                        <button class="nm-export-card" data-format="text">
+                            <div class="nm-export-icon muted"><i class="fa-solid fa-file-lines"></i></div>
+                            <div class="nm-export-body">
+                                <div class="nm-export-title">Text File</div>
+                                <div class="nm-export-desc">Human-readable text format (.txt)</div>
+                            </div>
+                            <div class="nm-export-check"><i class="fa-solid fa-check"></i></div>
+                        </button>
                     </div>
-                    <div id="export-accounts-list" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--bg-secondary);"></div>
+                    <div id="export-selection-container" class="nm-export-selection hidden">
+                        <div class="nm-export-sel-row">
+                            <div class="nm-export-sel-info">
+                                <div class="nm-export-sel-title">Export Selection</div>
+                                <div class="nm-export-sel-desc">Choose specific accounts or export all</div>
+                            </div>
+                            <label class="switch" style="flex-shrink: 0;">
+                                <input type="checkbox" id="export-selective" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div id="export-accounts-list" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--bg-secondary);"></div>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-primary" id="confirm-export" style="flex: 2; height: 52px; font-size: 14px; font-weight: 800; border-radius: 12px;">
+                <div class="modal-footer">
+                    <button class="btn-primary" id="confirm-export" style="flex: 2;">
                         <i class="fa-solid fa-download"></i>
                         <span>Export Vault</span>
                     </button>
-                    <button class="user-button" id="cancel-export" style="flex: 1; justify-content: center; height: 52px; font-weight: 800; border-radius: 12px;">Cancel</button>
+                    <button class="user-button" id="cancel-export" style="justify-content: center;">Cancel</button>
                 </div>
             </div>
         `;
@@ -539,32 +530,24 @@ export class AccountManager {
         let selectedFormat = 'encrypted';
         const selectionContainer = document.getElementById('export-selection-container');
 
-        document.querySelectorAll('.export-option-card').forEach(card => {
+        document.querySelectorAll('.nm-export-card').forEach(card => {
             card.addEventListener('click', () => {
-                document.querySelectorAll('.export-option-card').forEach(c => {
-                    (c as HTMLElement).style.borderColor = 'transparent';
-                    (c as HTMLElement).style.boxShadow = 'var(--nm-shadow-out)';
+                document.querySelectorAll('.nm-export-card').forEach(c => {
+                    c.classList.remove('selected');
                     (c as HTMLElement).classList.remove('selected');
                     const check = c.querySelector('.export-check') as HTMLElement;
                     if (check) check.style.opacity = '0';
+                c.classList.remove('selected');
                 });
-                (card as HTMLElement).style.borderColor = 'var(--accent-primary)';
-                (card as HTMLElement).style.boxShadow = '0 0 0 3px rgba(var(--accent-rgb), 0.15)';
                 (card as HTMLElement).classList.add('selected');
-                const check = card.querySelector('.export-check') as HTMLElement;
-                if (check) {
-                    check.style.opacity = '1';
-                    check.style.borderColor = 'var(--accent-primary)';
-                    check.style.background = 'var(--accent-primary)';
-                }
                 selectedFormat = card.getAttribute('data-format') || 'encrypted';
                 if (selectionContainer) {
-                    selectionContainer.style.display = selectedFormat === 'encrypted' ? 'none' : 'block';
+                    selectionContainer.classList.toggle('hidden', selectedFormat === 'encrypted');
                 }
             });
         });
 
-        const firstCard = document.querySelector('.export-option-card') as HTMLElement;
+        const firstCard = document.querySelector('.nm-export-card') as HTMLElement;
         if (firstCard) firstCard.click();
 
         const selectiveToggle = document.getElementById('export-selective') as HTMLInputElement;

@@ -180,11 +180,11 @@ export class PinManager {
 
         const content = `
             <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-icon-vessel"><i class="fa-solid fa-shield-halved"></i></div>
-                    <div class="modal-title-vessel"><h2>Verify Identity</h2><p>ENTER CURRENT PIN TO PROCEED</p></div>
+                <div class="nm-modal-header">
+                    <div class="nm-modal-icon accent"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="nm-modal-titles"><h2 class="nm-modal-title">Verify Identity</h2><p class="nm-modal-subtitle">ENTER CURRENT PIN TO PROCEED</p></div>
                 </div>
-                <div class="modal-divider"></div>
+                <div class="nm-modal-divider"></div>
                 <div class="modal-body">
                     <div class="pin-input-vessel" style="margin: 20px 0;">
                         <input type="password" id="verify-pin-field" maxlength="4" class="pin-field" style="opacity: 0; position: absolute;" autocomplete="off" autofocus>
@@ -238,11 +238,11 @@ export class PinManager {
                 const isEntry = phase === 'entry';
                 const content = `
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <div class="modal-icon-vessel"><i class="fa-solid ${isEntry ? 'fa-shield-halved' : 'fa-circle-check'}"></i></div>
-                            <div class="modal-title-vessel"><h2>${isEntry ? 'Set Master PIN' : 'Verify PIN'}</h2><p>${isEntry ? 'ESTABLISH 4-DIGIT VAULT KEY' : 'RE-ENTER KEY TO CONFIRM'}</p></div>
+                        <div class="nm-modal-header">
+                            <div class="nm-modal-icon accent"><i class="fa-solid ${isEntry ? 'fa-shield-halved' : 'fa-circle-check'}"></i></div>
+                            <div class="nm-modal-titles"><h2 class="nm-modal-title">${isEntry ? 'Set Master PIN' : 'Verify PIN'}</h2><p class="nm-modal-subtitle">${isEntry ? 'ESTABLISH 4-DIGIT VAULT KEY' : 'RE-ENTER KEY TO CONFIRM'}</p></div>
                         </div>
-                        <div class="modal-divider"></div>
+                        <div class="nm-modal-divider"></div>
                         <div class="modal-body">
                             <div class="form-group">
                                 <label class="form-label">${isEntry ? 'Choose New PIN' : 'Confirm New PIN'}</label>
@@ -253,7 +253,7 @@ export class PinManager {
                                         <div class="pin-dot" data-digit="3"></div><div class="pin-dot" data-digit="4"></div>
                                     </div>
                                 </div>
-                                <p class="modal-help-text" style="text-align: center;">${isEntry ? 'Keep this code safe. It is required to unlock your identities.' : 'Passwords must match exactly to synchronize security.'}</p>
+                                <p class="nm-modal-help" style="text-align: center;">${isEntry ? 'Keep this code safe. It is required to unlock your identities.' : 'Passwords must match exactly to synchronize security.'}</p>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -300,17 +300,17 @@ export class PinManager {
         this.verifyCurrentPin(() => {
             const content = `
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <div class="modal-icon-vessel danger"><i class="fa-solid fa-shield-halved"></i></div>
-                        <div class="modal-title-vessel"><h2 class="danger">Deactivate Security?</h2><p>VAULT WILL BE UNPROTECTED</p></div>
+                    <div class="nm-modal-header">
+                        <div class="nm-modal-icon danger"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="nm-modal-titles"><h2 class="nm-modal-title danger">Deactivate Security?</h2><p class="nm-modal-subtitle">VAULT WILL BE UNPROTECTED</p></div>
                     </div>
-                    <div class="modal-divider"></div>
+                    <div class="nm-modal-divider"></div>
                     <div class="modal-body">
-                        <div class="modal-entity-badge">
-                            <div class="entity-icon"><i class="fa-solid fa-lock"></i></div>
-                            <div class="entity-info"><span class="entity-name">Master PIN Policy</span><span class="entity-label">Active Protection</span></div>
+                        <div class="nm-entity-card">
+                            <div class="nm-entity-icon"><i class="fa-solid fa-lock"></i></div>
+                            <div class="nm-entity-info"><span class="nm-entity-name">Master PIN Policy</span><span class="nm-entity-meta">Active Protection</span></div>
                         </div>
-                        <p class="modal-help-text">Removing the PIN means anyone with access to this device can view your identities. This action is immediate.</p>
+                        <p class="nm-modal-help">Removing the PIN means anyone with access to this device can view your identities. This action is immediate.</p>
                     </div>
                     <div class="modal-footer">
                         <button class="btn-danger" id="confirm-remove-pin"><i class="fa-solid fa-trash-can"></i>Remove Security</button>

@@ -60,49 +60,44 @@
 
         <!-- View 1: Main Options -->
         <div id="forgot-pin-main-view" class="modal-content">
-            <div class="modal-header">
-                <div class="modal-icon-vessel danger">
-                    <i class="fa-solid fa-key"></i>
-                </div>
-                <div class="modal-title-vessel">
-                    <h2 class="danger">Reset PIN?</h2>
-                    <p>SECURITY ACTION REQUIRED</p>
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon danger"><i class="fa-solid fa-key"></i></div>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title danger">Reset PIN?</h2>
+                    <p class="nm-modal-subtitle">SECURITY ACTION REQUIRED</p>
                 </div>
             </div>
-            <div class="modal-divider"></div>
+            <div class="nm-modal-divider"></div>
             <div class="modal-body">
-                <div class="modal-entity-badge">
-                    <div class="entity-icon">
-                        <i class="fa-solid fa-unlock-keyhole"></i>
-                    </div>
-                    <div class="entity-info">
-                        <span class="entity-name">Reset Identity PIN</span>
-                        <span class="entity-label">Requires Verification</span>
+                <div class="nm-entity-card">
+                    <div class="nm-entity-icon"><i class="fa-solid fa-unlock-keyhole"></i></div>
+                    <div class="nm-entity-info">
+                        <span class="nm-entity-name">Reset Identity PIN</span>
+                        <span class="nm-entity-meta">Requires Verification</span>
                     </div>
                 </div>
-                <p class="modal-help-text spaced-top">Choose how you want to verify your identity to reset your PIN.</p>
+                <p class="nm-modal-help" style="margin-bottom: 16px;">Choose how you want to verify your identity to reset your PIN.</p>
 
-                <!-- Master Password Option -->
-                <form id="form-forgot-pin" class="settings-form hidden recovery-form">
-                    <div class="form-label recovery-label">Master Password</div>
-                    <input type="password" id="forgot-pin-password" class="form-input"
-                        placeholder="Enter your master password" autocomplete="current-password" required>
+                <form id="form-forgot-pin" class="nm-form-stack hidden recovery-form">
+                    <div class="form-group">
+                        <label class="form-label">Master Password</label>
+                        <input type="password" id="forgot-pin-password" class="form-input"
+                            placeholder="Enter your master password" autocomplete="current-password" required>
+                    </div>
                     <p id="forgot-pin-error" class="hidden recovery-error"></p>
                 </form>
             </div>
-            <div class="modal-footer recovery-footer">
+            <div class="modal-footer recovery-footer" style="flex-direction: column; gap: 10px;">
                 <button class="btn-danger recovery-btn" id="confirm-forgot-pin-btn">
                     <i class="fa-solid fa-trash-can"></i>
                     Reset PIN &amp; Sign Out
                 </button>
-
-                <!-- WhatsApp Option -->
                 <div id="forgot-pin-wa-divider" class="hidden recovery-divider">
                     <div class="recovery-divider-line"></div>
                     <span class="recovery-divider-text">Or</span>
                     <div class="recovery-divider-line"></div>
                 </div>
-                <button id="btn-forgot-pin-whatsapp" class="user-button hidden recovery-btn">
+                <button id="btn-forgot-pin-whatsapp" class="user-button hidden recovery-btn" style="justify-content: center;">
                     <i class="fa-brands fa-whatsapp wa-color"></i>
                     Receive PIN on WhatsApp
                 </button>
@@ -111,42 +106,35 @@
 
         <!-- View 2: WhatsApp QR Code -->
         <div id="forgot-pin-wa-view" class="modal-content hidden">
-            <div class="modal-header">
-                <div class="modal-icon-vessel wa-vessel">
-                    <i class="fa-brands fa-whatsapp wa-text"></i>
-                </div>
-                <div class="modal-title-vessel">
-                    <h2 class="wa-text">Scan QR Code</h2>
-                    <p>WHATSAPP VERIFICATION</p>
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon" style="color: #25d366;"><i class="fa-brands fa-whatsapp"></i></div>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title" style="color: #25d366;">Scan QR Code</h2>
+                    <p class="nm-modal-subtitle">WHATSAPP VERIFICATION</p>
                 </div>
             </div>
-            <div class="modal-divider"></div>
-            <div class="modal-body centered-body">
-                <div id="forgot-pin-qr-container" class="recovery-qr">
-                    <div id="forgot-pin-wa-loader" class="qr-loader">
+            <div class="nm-modal-divider"></div>
+            <div class="modal-body" style="align-items: center;">
+                <div class="nm-qr-vessel">
+                    <div id="forgot-pin-wa-loader" class="nm-qr-loader">
                         <div class="wa-loading-spinner"></div>
                     </div>
-                    <img id="forgot-pin-wa-qr" class="hidden qr-image">
-                    <div id="forgot-pin-wa-overlay" class="hidden qr-overlay">
+                    <img id="forgot-pin-wa-qr" class="hidden nm-qr-image">
+                    <div id="forgot-pin-wa-overlay" class="hidden nm-qr-overlay">
                         <div class="qr-spinner"></div>
-                        <span class="qr-overlay-text">Verifying...</span>
+                        <span class="nm-qr-overlay-label">Verifying...</span>
                     </div>
                 </div>
-
-                <span id="forgot-pin-wa-status" class="wa-status-text">INITIALIZING...</span>
-
-                <div id="forgot-pin-wa-error" class="hidden recovery-error-banner">
-                    <i class="fa-solid fa-triangle-exclamation danger-text"></i>
-                    <span id="forgot-pin-wa-error-text" class="error-banner-text"></span>
+                <span id="forgot-pin-wa-status" class="nm-qr-status-label" style="margin-bottom: 12px;">INITIALIZING...</span>
+                <div id="forgot-pin-wa-error" class="nm-inline-error hidden">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="forgot-pin-wa-error-text"></span>
                 </div>
-
-                <div class="recovery-instruction-box">
-                    <div class="instruction-icon-wa">
-                        <i class="fa-solid fa-circle-info"></i>
-                    </div>
-                    <div>
-                        <div class="instruction-title">Scan with WhatsApp</div>
-                        <p id="forgot-pin-wa-phone-hint" class="instruction-text">Use the WhatsApp account linked to your verified phone number.</p>
+                <div class="nm-info-callout">
+                    <div class="nm-callout-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div class="nm-callout-body">
+                        <div class="nm-callout-title">Scan with WhatsApp</div>
+                        <p id="forgot-pin-wa-phone-hint" class="nm-callout-text">Use the WhatsApp account linked to your verified phone number.</p>
                     </div>
                 </div>
             </div>
@@ -155,43 +143,37 @@
 
         <!-- View 3: PIN Sent Confirmation -->
         <div id="forgot-pin-code-view" class="modal-content hidden">
-            <div class="modal-header">
-                <div class="modal-icon-vessel wa-vessel">
-                    <i class="fa-solid fa-check-circle wa-text"></i>
-                </div>
-                <div class="modal-title-vessel">
-                    <h2 class="wa-text">PIN Sent!</h2>
-                    <p>CHECK YOUR WHATSAPP</p>
+            <div class="nm-modal-header">
+                <div class="nm-modal-icon success"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="nm-modal-titles">
+                    <h2 class="nm-modal-title success">PIN Sent!</h2>
+                    <p class="nm-modal-subtitle">CHECK YOUR WHATSAPP</p>
                 </div>
             </div>
-            <div class="modal-divider"></div>
+            <div class="nm-modal-divider"></div>
             <div class="modal-body">
-                <div class="modal-entity-badge wa-badge">
-                    <div class="entity-icon wa-vessel">
-                        <i class="fa-brands fa-whatsapp wa-text"></i>
-                    </div>
-                    <div class="entity-info">
-                        <span class="entity-name">PIN Delivered Successfully</span>
-                        <span class="entity-label" id="forgot-pin-code-phone">+XX XXX XXX XXXX</span>
+                <div class="nm-entity-card">
+                    <div class="nm-entity-icon" style="color: #25d366;"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div class="nm-entity-info">
+                        <span class="nm-entity-name">PIN Delivered Successfully</span>
+                        <span class="nm-entity-meta" id="forgot-pin-code-phone">+XX XXX XXX XXXX</span>
                     </div>
                 </div>
-
-                <p class="modal-help-text">Your PIN has been sent to your WhatsApp. Check your messages and use it to unlock the vault.</p>
-
-                <div class="recovery-success-box">
-                    <div class="instruction-icon-wa">
+                <p class="nm-modal-help" style="margin-bottom: 16px;">Your PIN has been sent to your WhatsApp. Check your messages and use it to unlock the vault.</p>
+                <div class="nm-info-callout">
+                    <div class="nm-callout-icon" style="background: var(--accent-soft); color: var(--accent-primary);">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    <div>
-                        <div class="instruction-title">Security Note</div>
-                        <p class="instruction-text">For your security, please delete the message after reading your PIN.</p>
+                    <div class="nm-callout-body">
+                        <div class="nm-callout-title">Security Note</div>
+                        <p class="nm-callout-text">For your security, please delete the message after reading your PIN.</p>
                     </div>
                 </div>
             </div>
             <div class="modal-footer recovery-footer">
-                <button id="btn-pin-sent-done" class="user-button recovery-btn btn-success-wa">
+                <button id="btn-pin-sent-done" class="btn-primary recovery-btn" style="width: 100%;">
                     <i class="fa-solid fa-check"></i>
-                    Done - Return to PIN Entry
+                    Done — Return to PIN Entry
                 </button>
             </div>
         </div>
