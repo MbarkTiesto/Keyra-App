@@ -165,6 +165,30 @@ class NotifierService {
         };
     }
 
+    public async stopWhatsApp() {
+        if (!this.waClient) {
+            this.resetState();
+            return { success: true };
+        }
+        console.log("[Notifier] Stopping WhatsApp client (modal closed)...");
+        try {
+            await Promise.race([
+                this.waClient.destroy(),
+                new Promise((_, reject) => setTimeout(() => reject(new Error("Destroy timeout")), 5000))
+            ]);
+        } catch (e) {
+            console.warn("[Notifier] Forced stop:", e instanceof Error ? e.message : e);
+        }
+        this.waClient = null;
+        this.resetState();
+        // Clean up session so next open always shows a fresh QR
+        const sessionPath = path.join(app.getPath('userData'), 'wa-session');
+        if (fs.existsSync(sessionPath)) {
+            try { fs.rmSync(sessionPath, { recursive: true, force: true }); } catch (_) {}
+        }
+        return { success: true };
+    }
+
     public async logoutWhatsApp() {
         if (this.waClient) {
             try {

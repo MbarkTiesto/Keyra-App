@@ -157,6 +157,7 @@ ipcMain.handle('send-pin-reset-code', async (_event, phone: string, message: str
     });
 }),
 ipcMain.handle('logout-whatsapp', () => service.logoutWhatsApp()),
+ipcMain.handle('stop-whatsapp', () => service.stopWhatsApp()),
 ipcMain.handle('start-whatsapp-linking', () => service.ensureWhatsAppStarted()),
 
 

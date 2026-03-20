@@ -320,6 +320,10 @@ export class AuthManager {
                 document.getElementById('wa-qr-overlay')?.classList.add('hidden');
             }, 300);
         }
+        // Stop the WA client and clean up IPC listeners
+        (window as any).api.stopWhatsApp();
+        this.waListenerCleanups.forEach(fn => fn());
+        this.waListenerCleanups = [];
     }
 
     initPhoneSecurity() {

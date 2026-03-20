@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('api', {
     startWhatsAppLinking: () => ipcRenderer.invoke('start-whatsapp-linking'),
     getWaStatus: () => ipcRenderer.invoke('get-wa-status'),
     logoutWhatsApp: () => ipcRenderer.invoke('logout-whatsapp'),
+    stopWhatsApp: () => ipcRenderer.invoke('stop-whatsapp'),
     removePhone: () => ipcRenderer.invoke('remove-phone'),
     verifyMasterPassword: (password: string) => ipcRenderer.invoke('verify-master-password', password),
     generatePinResetCode: () => ipcRenderer.invoke('generate-pin-reset-code'),
