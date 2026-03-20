@@ -19,14 +19,16 @@ export class PinManager {
     async migratePin() {
         const pin = localStorage.getItem(this.cb.getStorageKey('vault_pin'));
         if (pin && pin.length === 4 && /^\d+$/.test(pin)) {
-            console.log("Migrating legacy plaintext PIN to encrypted storage...");
             try {
                 const encrypted = await (window as any).api.encryptPIN(pin);
+                if (!encrypted) throw new Error("Encryption returned empty result");
                 localStorage.setItem(this.cb.getStorageKey('vault_pin'), encrypted);
                 await this.cb.pushSettings();
-                console.log("PIN migration successful");
             } catch (e) {
-                console.error("PIN migration failed", e);
+                console.error("PIN migration failed — removing plaintext PIN for security", e);
+                // Remove plaintext PIN rather than leaving it unencrypted
+                localStorage.removeItem(this.cb.getStorageKey('vault_pin'));
+                this.cb.showToast("PIN migration failed. Please set a new PIN.", "error");
             }
         }
     }

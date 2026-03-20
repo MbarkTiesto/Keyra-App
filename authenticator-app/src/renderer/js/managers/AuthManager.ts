@@ -112,13 +112,7 @@ export class AuthManager {
             badge?.classList.remove('hidden');
             if (badge) {
                 badge.textContent = 'NOT VERIFIED';
-                badge.style.background = 'rgba(255, 59, 48, 0.1)';
-                badge.style.color = '#ff3b30';
-                badge.style.border = '1px solid rgba(255, 59, 48, 0.2)';
-                badge.style.fontSize = '10px';
-                badge.style.fontWeight = '850';
-                badge.style.padding = '4px 10px';
-                badge.style.borderRadius = '20px';
+                badge.className = 'badge danger';
             }
             actionBox?.classList.remove('hidden');
             if (pendingText) pendingText.textContent = `Verify: ${user.pendingEmail}`;
@@ -217,14 +211,14 @@ export class AuthManager {
         if (user.phone && user.isPhoneVerified) {
             if (phoneDisplay) phoneDisplay.textContent = user.phone;
             if (phoneStatusText) phoneStatusText.textContent = "VERIFIED NUMBER";
-            if (phoneBadge) { phoneBadge.textContent = "SECURE"; phoneBadge.className = "badge success"; phoneBadge.style.background = "rgba(40, 167, 69, 0.1)"; phoneBadge.style.color = "#28a745"; phoneBadge.style.border = "1px solid rgba(40, 167, 69, 0.2)"; }
+            if (phoneBadge) { phoneBadge.textContent = "SECURE"; phoneBadge.className = "badge success"; }
             phoneActionBox?.classList.add('hidden');
             requestForm?.classList.add('hidden');
             removeBtn?.classList.remove('hidden');
         } else if (user.pendingPhone) {
             if (phoneDisplay) phoneDisplay.textContent = user.pendingPhone;
             if (phoneStatusText) phoneStatusText.textContent = "AWAITING VERIFICATION";
-            if (phoneBadge) { phoneBadge.textContent = "PENDING"; phoneBadge.style.color = "#007aff"; phoneBadge.style.border = "1px solid rgba(0, 122, 255, 0.2)"; }
+            if (phoneBadge) { phoneBadge.textContent = "PENDING"; phoneBadge.className = "badge info"; }
             phoneActionBox?.classList.remove('hidden');
             const verifyNowBtn = document.getElementById('btn-verify-now');
             if (verifyNowBtn) verifyNowBtn.onclick = () => this.showPhoneQrModal();
@@ -233,7 +227,7 @@ export class AuthManager {
         } else {
             if (phoneDisplay) phoneDisplay.textContent = "No Phone Set";
             if (phoneStatusText) phoneStatusText.textContent = "NOT VERIFIED";
-            if (phoneBadge) { phoneBadge.textContent = "UNPROTECTED"; phoneBadge.className = "badge danger"; phoneBadge.style.background = "rgba(255, 59, 48, 0.1)"; phoneBadge.style.color = "#ff3b30"; phoneBadge.style.border = "1px solid rgba(255, 59, 48, 0.2)"; }
+            if (phoneBadge) { phoneBadge.textContent = "UNPROTECTED"; phoneBadge.className = "badge danger"; }
             phoneActionBox?.classList.add('hidden');
             requestForm?.classList.remove('hidden');
             removeBtn?.classList.add('hidden');
@@ -243,7 +237,23 @@ export class AuthManager {
             removeBtn.onclick = async () => {
                 const user = await (window as any).api.getCurrentUser();
                 if (user?.isLocal) { this.cb.showToast("Phone removal is not available for local accounts", "info"); return; }
-                if (confirm("Are you sure you want to remove your phone number? This will disable dual-channel protection.")) {
+                this.cb.showModal(`
+                    <div class="modal-content">
+                        <div class="nm-modal-header">
+                            <div class="nm-modal-icon danger"><i class="fa-solid fa-phone-slash"></i></div>
+                            <div class="nm-modal-titles"><h2 class="nm-modal-title danger">Remove Phone?</h2><p class="nm-modal-subtitle">DUAL-CHANNEL PROTECTION WILL BE DISABLED</p></div>
+                        </div>
+                        <div class="nm-modal-divider"></div>
+                        <div class="modal-body">
+                            <p class="nm-modal-help">Removing your phone number disables WhatsApp-based PIN recovery and dual-channel protection. This action is immediate.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-danger" id="confirm-remove-phone"><i class="fa-solid fa-trash-can"></i>Remove Phone</button>
+                            <button class="user-button" id="cancel-remove-phone" style="justify-content: center;">Keep Phone</button>
+                        </div>
+                    </div>`);
+                document.getElementById('confirm-remove-phone')?.addEventListener('click', async () => {
+                    this.cb.hideModal();
                     this.cb.setLoading(true, "Removing", "PHONE SECURITY");
                     try {
                         const res = await (window as any).api.removePhone();
@@ -257,7 +267,8 @@ export class AuthManager {
                     } finally {
                         this.cb.setLoading(false);
                     }
-                }
+                });
+                document.getElementById('cancel-remove-phone')?.addEventListener('click', () => this.cb.hideModal());
             };
         }
     }
@@ -421,7 +432,12 @@ export class AuthManager {
         ];
     }
 
+    private accountEventsSetup = false;
+
     setupAccountEvents() {
+        if (this.accountEventsSetup) return;
+        this.accountEventsSetup = true;
+
         document.getElementById('form-change-username')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newName = (document.getElementById('new-username') as HTMLInputElement).value.trim();

@@ -14,6 +14,7 @@ export interface SyncCallbacks {
 
 export class SyncManager {
     private syncCount: number = 0;
+    private isManuallySyncing: boolean = false;
     private liveSyncInterval: any = null;
     private lastSyncUpdateInterval: any = null;
     public syncVisible: boolean = true;
@@ -162,8 +163,11 @@ export class SyncManager {
             return;
         }
 
-        // Reset counter to avoid stale state from previous operations
-        this.syncCount = 0;
+        if (this.isManuallySyncing) {
+            this.cb.showToast("Sync already in progress", "info");
+            return;
+        }
+        this.isManuallySyncing = true;
 
         this.cb.setLoading(true, "Synchronizing Vault", "CLOUD BACKUP IN PROGRESS");
         this.updateSyncIndicator('syncing');
@@ -201,7 +205,7 @@ export class SyncManager {
             this.updateSyncIndicator('error', err.message || 'Sync failed');
             if (statusDesc) statusDesc.textContent = 'Sync Failed';
         } finally {
-            this.syncCount = 0;
+            this.isManuallySyncing = false;
             if (icon) icon.classList.remove('sync-spin');
             this.cb.setLoading(false);
             this.cb.onActivityUpdate();

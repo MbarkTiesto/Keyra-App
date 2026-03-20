@@ -438,19 +438,12 @@ export function logout(): void {
 export async function getActiveAccounts(): Promise<AuthenticatorAccount[]> {
     if (!currentUser || !currentKey) throw new Error("No active user session.");
     try {
-        console.log("getActiveAccounts called for user:", currentUser.username);
-        
         const users = await getUsers();
         const freshUser = users.find(u => u.id === currentUser!.id);
         if (!freshUser) throw new Error("User missing from disk");
 
-        console.log("Fresh user encryptedVaultData length:", freshUser.encryptedVaultData.length);
-        console.log("CurrentUser encryptedVaultData length:", currentUser.encryptedVaultData.length);
-        
         const jsonStr = decryptVault(freshUser.encryptedVaultData, currentKey);
         const accounts = JSON.parse(jsonStr) as AuthenticatorAccount[];
-        
-        console.log("getActiveAccounts returning", accounts.length, "accounts");
         return accounts;
     } catch (err) {
         console.error("getActiveAccounts failed:", err);
@@ -461,28 +454,17 @@ export async function getActiveAccounts(): Promise<AuthenticatorAccount[]> {
 export async function saveActiveAccounts(accounts: AuthenticatorAccount[], force: boolean = false): Promise<SyncResult> {
     if (!currentUser || !currentKey) throw new Error("No active user session.");
 
-    console.log("saveActiveAccounts called with", accounts.length, "accounts");
-
     const users = await getUsers();
     const userIndex = users.findIndex(u => u.id === currentUser!.id);
     if (userIndex === -1) throw new Error("User missing from disk.");
 
     const newEncryptedVault = encryptVault(JSON.stringify(accounts), currentKey);
-    console.log("Encrypted vault data length:", newEncryptedVault.length);
-    
     users[userIndex].encryptedVaultData = newEncryptedVault;
-    
-    // Update the in-memory session
     currentUser.encryptedVaultData = newEncryptedVault;
-    console.log("Updated currentUser.encryptedVaultData");
 
     await saveUsers(users);
-    console.log("Saved users to disk");
 
-    // Sync specifically this user's data folder
     const res = await syncUserData(currentUser.username, users[userIndex], force);
-    console.log("Sync result:", res);
-    
     return {
         ...res,
         message: res.success ? "Vault saved successfully." : (res.message || "Sync failed")
@@ -713,41 +695,15 @@ export async function importVaultData(
     if (!currentUser || !currentKey) throw new Error("No active user session.");
 
     try {
-        console.log("=== Starting Vault Import ===");
-        console.log("Current user:", currentUser.username);
-        console.log("Backup salt:", salt);
-        console.log("Backup encryptedVaultData length:", encryptedVaultData.length);
-        console.log("Has encryptedSettings:", !!encryptedSettings);
-        console.log("Has legacy autolock:", autolock);
-        console.log("Has legacy desktopSettings:", !!desktopSettings);
-        console.log("Has legacy webSettings:", !!webSettings);
-        
         const key = deriveKey(password, salt);
-        console.log("Derived key from backup password");
-        
         const decryptedJson = decryptVault(encryptedVaultData, key);
-        console.log("Decrypted vault JSON:", decryptedJson);
-        
         const accounts = JSON.parse(decryptedJson) as AuthenticatorAccount[];
 
-        console.log("Decrypted accounts from backup:", accounts.length);
-        console.log("Account details:", accounts.map(a => ({ issuer: a.issuer, account: a.account })));
-
-        // 1. Restore Vault Data - this will re-encrypt with current user's key
-        console.log("Saving accounts with current user's key...");
+        // 1. Restore Vault Data - re-encrypt with current user's key
         const saveResult = await saveActiveAccounts(accounts, true);
-        console.log("Save result:", saveResult);
-        
         if (!saveResult.success) {
-            console.error("Failed to save accounts:", saveResult.message);
             return { success: false, message: "Failed to restore vault data." };
         }
-
-        // Verify the save worked by reading back
-        console.log("Verifying saved data...");
-        const verifyAccounts = await getActiveAccounts();
-        console.log("Verified accounts count:", verifyAccounts.length);
-        console.log("Verified account details:", verifyAccounts.map(a => ({ issuer: a.issuer, account: a.account })));
 
         // 2. Restore Settings
         const users = await getUsers();
@@ -800,7 +756,6 @@ export async function importVaultData(
             }
         }
 
-        console.log("=== Vault Import Completed Successfully ===");
         return { success: true, message: "Vault and settings successfully restored." };
     } catch (err) {
         console.error("Vault Import Error:", err);
@@ -1101,6 +1056,8 @@ export async function verifyMasterPassword(password: string): Promise<{ success:
 
 let pinResetCode: string | null = null;
 let pinResetCodeExpiry: number | null = null;
+let pinResetAttempts: number = 0;
+const PIN_RESET_MAX_ATTEMPTS = 5;
 
 export function generatePinResetCode(): { code: string, phone: string } | null {
     if (!currentUser) return null;
@@ -1108,6 +1065,7 @@ export function generatePinResetCode(): { code: string, phone: string } | null {
     
     pinResetCode = Math.floor(100000 + Math.random() * 900000).toString();
     pinResetCodeExpiry = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
+    pinResetAttempts = 0; // reset attempt counter on new code
     
     return { code: pinResetCode, phone: currentUser.phone };
 }
@@ -1121,16 +1079,27 @@ export function verifyPinResetCode(code: string): { success: boolean, message: s
     if (Date.now() > pinResetCodeExpiry) {
         pinResetCode = null;
         pinResetCodeExpiry = null;
+        pinResetAttempts = 0;
         return { success: false, message: "Verification code expired. Please try again." };
+    }
+
+    if (pinResetAttempts >= PIN_RESET_MAX_ATTEMPTS) {
+        pinResetCode = null;
+        pinResetCodeExpiry = null;
+        pinResetAttempts = 0;
+        return { success: false, message: "Too many attempts. Please request a new code." };
     }
     
     if (code !== pinResetCode) {
-        return { success: false, message: "Incorrect verification code." };
+        pinResetAttempts++;
+        const remaining = PIN_RESET_MAX_ATTEMPTS - pinResetAttempts;
+        return { success: false, message: remaining > 0 ? `Incorrect code. ${remaining} attempt${remaining > 1 ? 's' : ''} remaining.` : "Too many attempts. Please request a new code." };
     }
     
     // Clear the code after successful verification
     pinResetCode = null;
     pinResetCodeExpiry = null;
+    pinResetAttempts = 0;
     
     return { success: true, message: "Code verified successfully." };
 }
@@ -1138,6 +1107,7 @@ export function verifyPinResetCode(code: string): { success: boolean, message: s
 export function clearPinResetCode(): void {
     pinResetCode = null;
     pinResetCodeExpiry = null;
+    pinResetAttempts = 0;
 }
 
 export async function pollForUpdates(): Promise<{ changed: boolean, settings?: any, accounts?: AuthenticatorAccount[] }> {

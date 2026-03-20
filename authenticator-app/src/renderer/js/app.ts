@@ -1,4 +1,3 @@
-import { syncVault } from './store.js';
 import { UIManager } from './ui.js';
 import { setupAuthUI, setAppInitCallback } from './auth.js';
 
@@ -58,4 +57,4 @@ async function init() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => { init().catch(e => console.error("App init failed:", e)); });

@@ -3690,6 +3690,31 @@ body.light-theme .setting-row:hover {
     border-radius: 20px;
 }
 
+/* ─── Badge utility classes ─────────────────────────────────────────────── */
+.badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+.badge.success {
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+.badge.danger {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.2);
+}
+.badge.info {
+    background: rgba(0, 122, 255, 0.1);
+    color: #007aff;
+    border: 1px solid rgba(0, 122, 255, 0.2);
+}
+
 .phone-verify-box {
     display: flex;
     align-items: center;
@@ -4756,9 +4781,11 @@ body.light-theme .cloud-sync-pill {
 }
 
 .auth-header .brand-icon {
-    margin-bottom: var(--space-sm);
+    margin: 0 auto var(--space-sm);
     display: flex;
     justify-content: center;
+    align-items: center;
+    width: fit-content;
 }
 
 .auth-header .brand-icon img {

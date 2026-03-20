@@ -49,6 +49,10 @@ export class AccountManager {
         this.renderer.startTimer(() => this.accounts);
     }
 
+    public stopTimer() {
+        this.renderer.stopTimer();
+    }
+
     // ─── Load & Refresh ───────────────────────────────────────────────────────
 
     public async loadInitialData() {

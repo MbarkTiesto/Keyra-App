@@ -88,8 +88,13 @@ export class UIManager {
         });
         this.nav = new NavigationManager({
             onTabSwitch: (tab) => {
-                if (tab === 'account') this.loadAccountInfo();
-                else if (tab === 'settings') this.updateLastActivityDisplay();
+                if (tab === 'vault') {
+                    this.accounts.startTimer();
+                } else {
+                    this.accounts.stopTimer();
+                    if (tab === 'account') this.loadAccountInfo();
+                    else if (tab === 'settings') this.updateLastActivityDisplay();
+                }
             },
             updateLastActivity: (action) => this.updateLastActivity(action),
         });
