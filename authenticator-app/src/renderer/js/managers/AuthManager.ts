@@ -136,7 +136,10 @@ export class AuthManager {
 
         if (user.isLocal) {
             document.body.classList.add('local-only');
-            if (user.privateSync && user.privateSync.pat) {
+            const hasPrivateSync = !!(user.privateSync && user.privateSync.pat);
+            document.getElementById('connectivity-status')?.classList.toggle('pill-disabled', !hasPrivateSync);
+
+            if (hasPrivateSync) {
                 if (syncTitle) syncTitle.textContent = "Private Sync";
                 if (syncSubtitle) syncSubtitle.textContent = "GITHUB REPOSITORY STORAGE";
                 if (syncStatusDesc) syncStatusDesc.textContent = user.privateSync.enabled ? "Private GitHub Sync Active" : "Private Sync Paused";
@@ -153,6 +156,7 @@ export class AuthManager {
             this.cb.updateSyncIndicator('synced');
         } else {
             document.body.classList.remove('local-only');
+            document.getElementById('connectivity-status')?.classList.remove('pill-disabled');
             if (syncTitle) syncTitle.textContent = "Cloud Sync";
             if (syncSubtitle) syncSubtitle.textContent = "Keep your Vault safe on GitHub";
             if (syncCard) syncCard.classList.remove('disabled-card');

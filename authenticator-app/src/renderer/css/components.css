@@ -110,6 +110,23 @@
     background: #ff3b30;
 }
 
+/* ── Disabled state (local account, no sync) ── */
+.nm-status-pill.pill-disabled {
+    opacity: 0.38;
+    pointer-events: none;
+    box-shadow: var(--nm-shadow-in-sm);
+}
+.nm-status-pill.pill-disabled #nm-status-icon {
+    color: var(--text-tertiary);
+}
+.nm-status-pill.pill-disabled .nm-status-dot {
+    background: var(--text-tertiary) !important;
+    animation: none !important;
+}
+.nm-status-pill.pill-disabled .nm-status-dot::after {
+    display: none;
+}
+
 /* ── Sync states ── */
 .nm-status-pill.sync-hidden #nm-status-icon {
     color: var(--text-tertiary);
