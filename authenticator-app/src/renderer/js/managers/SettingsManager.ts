@@ -10,13 +10,26 @@ export interface SettingsCallbacks {
     applyOledMode: (enabled: boolean) => void;
     getOledMode: () => boolean;
     applyPerformanceMode: (enabled: boolean) => void;
+    getPerformanceMode: () => boolean;
     applyPrivacyMode: (enabled: boolean, save: boolean) => void;
     getPrivacyMode: () => boolean;
     applyScreenGuardian: (enabled: boolean, save: boolean) => void;
     getScreenGuardian: () => boolean;
     applyPrivacyBlur: (enabled: boolean, save: boolean) => void;
     getPrivacyBlur: () => boolean;
+    applyVaultViewStyle: (style: 'unified' | 'compact' | 'secure') => void;
     getVaultViewStyle: () => string;
+    applyLaunchOnStartup: (enabled: boolean) => void;
+    getLaunchOnStartup: () => boolean;
+    applyMinimizeToTray: (enabled: boolean) => void;
+    getMinimizeToTray: () => boolean;
+    applyGlobalHotkey: (enabled: boolean) => void;
+    getGlobalHotkey: () => boolean;
+    getAutoCheckUpdates: () => boolean;
+    setAutoCheckUpdates: (val: boolean) => void;
+    getWallpaperPreset: () => string;
+    getVaultPin: () => string | null;
+    updateLockVaultVisibility: () => void;
     renderAccounts: () => void;
     setupAccentColorSelectorInTheme: (onChange: (accent: string) => void) => void;
 }
@@ -85,6 +98,104 @@ export class SettingsManager {
         });
         const savedAccent = this.cb.getAccentColor();
         this.cb.setAccentColor(savedAccent, true);
+    }
+
+    getSettingsObject(): any {
+        return {
+            "Desktop Settings": {
+                theme: localStorage.getItem(this.cb.getStorageKey('theme')) || 'auto',
+                accentColor: this.cb.getAccentColor(),
+                wallpaperPreset: this.cb.getWallpaperPreset(),
+                privacyMode: this.cb.getPrivacyMode(),
+                screenGuardian: this.cb.getScreenGuardian(),
+                autolock: localStorage.getItem(this.cb.getStorageKey('autolock')) || '0',
+                oledMode: this.cb.getOledMode(),
+                performanceMode: this.cb.getPerformanceMode(),
+                menuExitIntegration: this.menuExitIntegration,
+                privacyBlur: this.cb.getPrivacyBlur(),
+                windowResizable: this.windowResizable,
+                launchOnStartup: this.cb.getLaunchOnStartup(),
+                minimizeToTray: this.cb.getMinimizeToTray(),
+                globalHotkey: this.cb.getGlobalHotkey(),
+                autoCheckUpdates: this.cb.getAutoCheckUpdates(),
+                vaultViewStyle: this.cb.getVaultViewStyle(),
+                vaultPin: this.cb.getVaultPin(),
+            }
+        };
+    }
+
+    applySettings(settings: any, saveLocal: boolean = true) {
+        if (!settings) return;
+
+        if (settings.theme) this.cb.setTheme(settings.theme, true);
+        if (settings.accentColor) this.cb.setAccentColor(settings.accentColor, true);
+
+        this.cb.applyPrivacyMode(!!settings.privacyMode, false);
+        this.cb.applyScreenGuardian(!!settings.screenGuardian, false);
+
+        if (settings.autolock !== undefined) {
+            this.updateSegmentedUI('autolock-segmented', String(settings.autolock));
+        }
+
+        if (settings.launchOnStartup !== undefined) this.cb.applyLaunchOnStartup(!!settings.launchOnStartup);
+        if (settings.minimizeToTray !== undefined) this.cb.applyMinimizeToTray(!!settings.minimizeToTray);
+        if (settings.globalHotkey !== undefined) this.cb.applyGlobalHotkey(!!settings.globalHotkey);
+        if (settings.vaultViewStyle !== undefined) this.cb.applyVaultViewStyle(settings.vaultViewStyle as 'unified' | 'compact' | 'secure');
+
+        if (settings.oledMode !== undefined) {
+            this.cb.applyOledMode(!!settings.oledMode);
+            const oledToggle = document.getElementById('oled-mode-toggle') as HTMLInputElement;
+            if (oledToggle) oledToggle.checked = this.cb.getOledMode();
+            this.cb.setAccentColor(this.cb.getAccentColor(), true);
+        }
+
+        if (settings.performanceMode !== undefined) {
+            this.cb.applyPerformanceMode(!!settings.performanceMode);
+            const perfToggle = document.getElementById('performance-mode-toggle') as HTMLInputElement;
+            if (perfToggle) perfToggle.checked = this.cb.getPerformanceMode();
+        }
+
+        if (settings.menuExitIntegration !== undefined) {
+            this.menuExitIntegration = !!settings.menuExitIntegration;
+            const menuExitToggle = document.getElementById('menu-exit-toggle') as HTMLInputElement;
+            if (menuExitToggle) menuExitToggle.checked = this.menuExitIntegration;
+            this.updateCloseButtonVisibility();
+        }
+
+        if (settings.privacyBlur !== undefined) this.cb.applyPrivacyBlur(!!settings.privacyBlur, false);
+
+        if (settings.autoCheckUpdates !== undefined) {
+            this.cb.setAutoCheckUpdates(!!settings.autoCheckUpdates);
+            const autoToggle = document.getElementById('auto-update-toggle') as HTMLInputElement;
+            if (autoToggle) autoToggle.checked = this.cb.getAutoCheckUpdates();
+        }
+
+        if (settings.windowResizable !== undefined) {
+            this.windowResizable = !!settings.windowResizable;
+            const resizableToggle = document.getElementById('window-resizable-toggle') as HTMLInputElement;
+            if (resizableToggle) resizableToggle.checked = this.windowResizable;
+            (window as any).api.setResizable(this.windowResizable);
+        }
+
+        if (saveLocal) {
+            if (settings.theme) localStorage.setItem(this.cb.getStorageKey('theme'), settings.theme);
+            if (settings.accentColor) localStorage.setItem(this.cb.getStorageKey('accent_color'), settings.accentColor);
+            if (settings.wallpaperPreset) localStorage.setItem(this.cb.getStorageKey('wallpaperPreset'), settings.wallpaperPreset);
+            localStorage.setItem(this.cb.getStorageKey('privacyMode'), String(this.cb.getPrivacyMode()));
+            localStorage.setItem(this.cb.getStorageKey('screenGuardian'), String(this.cb.getScreenGuardian()));
+            if (settings.autolock !== undefined) localStorage.setItem(this.cb.getStorageKey('autolock'), String(settings.autolock));
+            localStorage.setItem(this.cb.getStorageKey('oled_mode'), String(this.cb.getOledMode()));
+            localStorage.setItem(this.cb.getStorageKey('performance_mode'), String(this.cb.getPerformanceMode()));
+            localStorage.setItem(this.cb.getStorageKey('menu_exit_integration'), String(this.menuExitIntegration));
+            localStorage.setItem(this.cb.getStorageKey('privacy_blur'), String(this.cb.getPrivacyBlur()));
+            localStorage.setItem(this.cb.getStorageKey('window_resizable'), String(this.windowResizable));
+            localStorage.setItem(this.cb.getStorageKey('auto_check_updates'), String(this.cb.getAutoCheckUpdates()));
+            localStorage.setItem(this.cb.getStorageKey('vault_view_style'), this.cb.getVaultViewStyle());
+            if (settings.vaultPin !== undefined) localStorage.setItem(this.cb.getStorageKey('vault_pin'), settings.vaultPin);
+        }
+
+        this.cb.updateLockVaultVisibility();
+        this.cb.renderAccounts();
     }
 
     setupEventListeners() {

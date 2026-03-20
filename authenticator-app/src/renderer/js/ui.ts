@@ -32,9 +32,9 @@ export class UIManager {
     constructor(public userId: string = 'default') {
         this.theme = new ThemeManager(userId, () => this.pushSettings());
         this.sync = new SyncManager(userId, {
-            getSettingsObject: () => this.getSettingsObject(),
+            getSettingsObject: () => this.settings.getSettingsObject(),
             onConflict: (action, data) => this.accounts.showSyncConflictModal(action, data),
-            onSettingsApply: (settings) => this.applySettings(settings, true),
+            onSettingsApply: (settings) => this.settings.applySettings(settings, true),
             onAccountsRefresh: () => this.refreshAccounts(),
             onActivityUpdate: () => this.updateLastActivityDisplay(),
             showToast: (msg, type) => this.showToast(msg, type),
@@ -49,11 +49,11 @@ export class UIManager {
             showModal: (content) => this.showModal(content),
             hideModal: () => this.hideModal(),
             showCopyFeedback: (el) => this.showCopyFeedback(el),
-            applySettings: (settings, saveLocal) => this.applySettings(settings, saveLocal),
+            applySettings: (settings, saveLocal) => this.settings.applySettings(settings, saveLocal),
             handleLocalAccountUI: (user) => this.handleLocalAccountUI(user),
             updateLastActivity: (action) => this.updateLastActivity(action),
             pushSettings: () => this.pushSettings(),
-            updateSegmentedUI: (id, val) => this.updateSegmentedUI(id, val),
+            updateSegmentedUI: (id, val) => this.settings.updateSegmentedUI(id, val),
             updateAccountView: () => this.updateAccountView(),
             showStaticModal: (id) => this.showStaticModal(id),
         });
@@ -113,7 +113,7 @@ export class UIManager {
             hideModal: () => this.hideModal(),
             refreshAccounts: () => this.refreshAccounts(),
             renderAccounts: () => this.renderAccounts(),
-            updateSegmentedUI: (id, val) => this.updateSegmentedUI(id, val),
+            updateSegmentedUI: (id, val) => this.settings.updateSegmentedUI(id, val),
             updateLastActivity: (action) => this.updateLastActivity(action),
             showExportOptionsModal: () => this.accounts.showExportOptionsModal(),
             performExport: (format, list) => this.accounts.performExport(format, list),
@@ -131,13 +131,26 @@ export class UIManager {
             applyOledMode: (enabled) => this.theme.applyOledMode(enabled),
             getOledMode: () => this.theme.oledMode,
             applyPerformanceMode: (enabled) => this.theme.applyPerformanceMode(enabled),
+            getPerformanceMode: () => this.theme.performanceMode,
             applyPrivacyMode: (enabled, save) => this.privacy.applyPrivacyMode(enabled, save),
             getPrivacyMode: () => this.privacy.privacyMode,
             applyScreenGuardian: (enabled, save) => this.privacy.applyScreenGuardian(enabled, save),
             getScreenGuardian: () => this.privacy.screenGuardian,
             applyPrivacyBlur: (enabled, save) => this.privacy.applyPrivacyBlur(enabled, save),
             getPrivacyBlur: () => this.privacy.privacyBlur,
+            applyVaultViewStyle: (style) => this.vault.applyVaultViewStyle(style),
             getVaultViewStyle: () => this.vault.vaultViewStyle,
+            applyLaunchOnStartup: (enabled) => this.system.applyLaunchOnStartup(enabled),
+            getLaunchOnStartup: () => this.system.launchOnStartup,
+            applyMinimizeToTray: (enabled) => this.system.applyMinimizeToTray(enabled),
+            getMinimizeToTray: () => this.system.minimizeToTray,
+            applyGlobalHotkey: (enabled) => this.system.applyGlobalHotkey(enabled),
+            getGlobalHotkey: () => this.system.globalHotkey,
+            getAutoCheckUpdates: () => this.updates.autoCheckUpdates,
+            setAutoCheckUpdates: (val) => { this.updates.autoCheckUpdates = val; },
+            getWallpaperPreset: () => this.wallpaperPreset,
+            getVaultPin: () => localStorage.getItem(this.getStorageKey('vault_pin')),
+            updateLockVaultVisibility: () => this.updateLockVaultVisibility(),
             renderAccounts: () => this.renderAccounts(),
             setupAccentColorSelectorInTheme: (onChange) => this.theme.setupAccentColorSelector(onChange),
         });
@@ -200,34 +213,13 @@ export class UIManager {
     private async initFromCloud() {
         const user = await (window as any).api.getCurrentUser();
         if (user) {
-            // Use Desktop Settings for this platform
             const desktopSettings = user["Desktop Settings"] || user.settings || {};
-            this.applySettings(desktopSettings, false);
+            this.settings.applySettings(desktopSettings, false);
         }
     }
 
     private getSettingsObject(): any {
-        return {
-            "Desktop Settings": {
-                theme: localStorage.getItem(this.getStorageKey('theme')) || 'auto',
-                accentColor: localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple',
-                wallpaperPreset: this.wallpaperPreset,
-                privacyMode: this.privacy.privacyMode,
-                screenGuardian: this.privacy.screenGuardian,
-                autolock: localStorage.getItem(this.getStorageKey('autolock')) || '0',
-                oledMode: this.theme.oledMode,
-                performanceMode: this.theme.performanceMode,
-                menuExitIntegration: this.settings.menuExitIntegration,
-                privacyBlur: this.privacy.privacyBlur,
-                windowResizable: this.settings.windowResizable,
-                launchOnStartup: this.system.launchOnStartup,
-                minimizeToTray: this.system.minimizeToTray,
-                globalHotkey: this.system.globalHotkey,
-                autoCheckUpdates: this.updates.autoCheckUpdates,
-                vaultViewStyle: this.vault.vaultViewStyle,
-                vaultPin: localStorage.getItem(this.getStorageKey('vault_pin'))
-            }
-        };
+        return this.settings.getSettingsObject();
     }
 
     public async pushSettings(updateLocal: boolean = true) {
@@ -235,91 +227,7 @@ export class UIManager {
     }
 
     public applySettings(settings: any, saveLocal: boolean = true) {
-        if (!settings) return;
-
-        if (settings.theme) this.setTheme(settings.theme, true);
-        if (settings.accentColor) this.setAccentColor(settings.accentColor, true);
-
-        this.privacy.applyPrivacyMode(!!settings.privacyMode, false);
-        this.privacy.applyScreenGuardian(!!settings.screenGuardian, false);
-
-        if (settings.autolock !== undefined) {
-            this.updateSegmentedUI('autolock-segmented', String(settings.autolock));
-        }
-
-        if (settings.launchOnStartup !== undefined) {
-            this.system.applyLaunchOnStartup(!!settings.launchOnStartup);
-        }
-
-        if (settings.minimizeToTray !== undefined) {
-            this.system.applyMinimizeToTray(!!settings.minimizeToTray);
-        }
-
-        if (settings.globalHotkey !== undefined) {
-            this.system.applyGlobalHotkey(!!settings.globalHotkey);
-        }
-
-        if (settings.vaultViewStyle !== undefined) {
-            this.vault.applyVaultViewStyle(settings.vaultViewStyle);
-        }
-
-        if (settings.oledMode !== undefined) {
-            this.theme.applyOledMode(!!settings.oledMode);
-            const oledToggle = document.getElementById('oled-mode-toggle') as HTMLInputElement;
-            if (oledToggle) oledToggle.checked = this.theme.oledMode;
-            const currentAccent = localStorage.getItem(this.getStorageKey('accent_color')) || 'royal-purple';
-            this.setAccentColor(currentAccent, true);
-        }
-
-        if (settings.performanceMode !== undefined) {
-            this.theme.applyPerformanceMode(!!settings.performanceMode);
-            const perfToggle = document.getElementById('performance-mode-toggle') as HTMLInputElement;
-            if (perfToggle) perfToggle.checked = this.theme.performanceMode;
-        }
-
-        if (settings.menuExitIntegration !== undefined) {
-            this.settings.menuExitIntegration = !!settings.menuExitIntegration;
-            const menuExitToggle = document.getElementById('menu-exit-toggle') as HTMLInputElement;
-            if (menuExitToggle) menuExitToggle.checked = this.settings.menuExitIntegration;
-            this.settings.updateCloseButtonVisibility();
-        }
-
-        if (settings.privacyBlur !== undefined) {
-            this.privacy.applyPrivacyBlur(!!settings.privacyBlur, false);
-        }
-
-        if (settings.autoCheckUpdates !== undefined) {
-            this.updates.autoCheckUpdates = !!settings.autoCheckUpdates;
-            const autoToggle = document.getElementById('auto-update-toggle') as HTMLInputElement;
-            if (autoToggle) autoToggle.checked = this.updates.autoCheckUpdates;
-        }
-        
-        if (settings.windowResizable !== undefined) {
-            this.settings.windowResizable = !!settings.windowResizable;
-            const resizableToggle = document.getElementById('window-resizable-toggle') as HTMLInputElement;
-            if (resizableToggle) resizableToggle.checked = this.settings.windowResizable;
-            (window as any).api.setResizable(this.settings.windowResizable);
-        }
-
-        if (saveLocal) {
-            if (settings.theme) localStorage.setItem(this.getStorageKey('theme'), settings.theme);
-            if (settings.accentColor) localStorage.setItem(this.getStorageKey('accent_color'), settings.accentColor);
-            if (settings.wallpaperPreset) localStorage.setItem(this.getStorageKey('wallpaperPreset'), settings.wallpaperPreset);
-            localStorage.setItem(this.getStorageKey('privacyMode'), String(this.privacy.privacyMode));
-            localStorage.setItem(this.getStorageKey('screenGuardian'), String(this.privacy.screenGuardian));
-            if (settings.autolock !== undefined) localStorage.setItem(this.getStorageKey('autolock'), String(settings.autolock));
-            localStorage.setItem(this.getStorageKey('oled_mode'), String(this.theme.oledMode));
-            localStorage.setItem(this.getStorageKey('performance_mode'), String(this.theme.performanceMode));
-            localStorage.setItem(this.getStorageKey('menu_exit_integration'), String(this.settings.menuExitIntegration));
-            localStorage.setItem(this.getStorageKey('privacy_blur'), String(this.privacy.privacyBlur));
-            localStorage.setItem(this.getStorageKey('window_resizable'), String(this.settings.windowResizable));
-            localStorage.setItem(this.getStorageKey('auto_check_updates'), String(this.updates.autoCheckUpdates));
-            localStorage.setItem(this.getStorageKey('vault_view_style'), this.vault.vaultViewStyle);
-            if (settings.vaultPin !== undefined) localStorage.setItem(this.getStorageKey('vault_pin'), settings.vaultPin);
-        }
-
-        this.updateLockVaultVisibility();
-        this.renderAccounts();
+        this.settings.applySettings(settings, saveLocal);
     }
 
     public setTheme(theme: string, silent: boolean = false) {
@@ -330,11 +238,6 @@ export class UIManager {
         this.theme.setAccentColor(accentColor, silent);
     }
 
-    private initMenuExitIntegration() { this.settings.initMenuExitIntegration(); }
-    private updateCloseButtonVisibility() { this.settings.updateCloseButtonVisibility(); }
-    private initWindowResizable() { this.settings.initWindowResizable(); }
-    private initSegmentedStates() { this.settings.initSegmentedStates(); }
-    private updateSegmentedUI(containerId: string, value: string) { this.settings.updateSegmentedUI(containerId, value); }
 
     private setupEventListeners() {
         // User Dropdown close on outside click (card dropdowns also handled here)
@@ -644,7 +547,7 @@ export class UIManager {
             autolockCtrl.classList.toggle('disabled', !hasPin);
             autolockRow.classList.toggle('disabled', !hasPin);
             if (!hasPin) {
-                this.updateSegmentedUI('autolock-segmented', '0');
+                this.settings.updateSegmentedUI('autolock-segmented', '0');
                 localStorage.setItem(this.getStorageKey('autolock'), '0');
                 this.pushSettings();
             }
@@ -652,41 +555,8 @@ export class UIManager {
     }
 
     private async loadInitialData() {
-        try {
-            const user = await (window as any).api.getCurrentUser();
-            if (user) {
-                const nameDisplay = document.getElementById('user-name-display');
-                if (nameDisplay) nameDisplay.textContent = user.username;
-
-                // Navbar avatar: show profile picture or initials
-                const navbarAvatarImg = document.getElementById('navbar-avatar-img') as HTMLImageElement;
-                const navbarAvatarInitials = document.getElementById('navbar-avatar-initials');
-                if (navbarAvatarImg && navbarAvatarInitials) {
-                    if (user.profilePicture) {
-                        navbarAvatarImg.src = user.profilePicture;
-                        navbarAvatarImg.classList.remove('hidden');
-                        navbarAvatarInitials.classList.add('hidden');
-                    } else {
-                        navbarAvatarImg.classList.add('hidden');
-                        navbarAvatarInitials.classList.remove('hidden');
-                        navbarAvatarInitials.textContent = user.username.charAt(0).toUpperCase();
-                    }
-                }
-
-                // Populate dropdown header
-                const dropdownName = document.getElementById('dropdown-user-name');
-                const dropdownEmail = document.getElementById('dropdown-user-email');
-                if (dropdownName) dropdownName.textContent = user.username;
-                if (dropdownEmail) dropdownEmail.textContent = user.isLocal ? "Local-Only Account" : (user.email || 'Keyra Secure Vault');
-
-                this.handleLocalAccountUI(user);
-            }
-            await this.refreshAccounts();
-            this.updateAccountView();
-            this.updateSyncIndicator('synced');
-        } catch (err) {
-            console.error("Load failed", err);
-        }
+        await this.accounts.loadInitialData();
+        this.updateSyncIndicator('synced');
     }
 
 
