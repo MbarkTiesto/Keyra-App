@@ -1,19 +1,23 @@
-<!-- Premium Splash Screen Overlay -->
+<!-- Splash Screen -->
 <div id="splash-screen" class="splash-screen">
     <div class="splash-content">
 
-        <!-- Logo vessel -->
+        <!-- Logo vessel stack -->
         <div class="splash-logo-vessel">
+            <!-- Layered neumorphic rings -->
             <div class="splash-ring-outer"></div>
+            <div class="splash-ring-mid"></div>
             <div class="splash-ring-inner"></div>
+            <!-- Spinning arcs -->
             <div class="splash-arc splash-arc--cw"></div>
             <div class="splash-arc splash-arc--ccw"></div>
+            <!-- Core logo disc -->
             <div class="splash-logo">
                 <img src="assets/logo.png" class="app-logo-large nm-logo">
             </div>
         </div>
 
-        <!-- Title as loading indicator -->
+        <!-- App name -->
         <div class="splash-text">
             <h1 class="splash-title" aria-label="Keyra">
                 <span class="splash-letter" style="--i:0">K</span>
@@ -22,6 +26,14 @@
                 <span class="splash-letter" style="--i:3">R</span>
                 <span class="splash-letter" style="--i:4">A</span>
             </h1>
+            <span class="splash-tagline">AUTHENTICATOR</span>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="splash-progress-wrap">
+            <div class="splash-progress-track">
+                <div class="splash-progress-bar"></div>
+            </div>
             <span id="splash-status-text" class="splash-status-text">Getting things ready...</span>
         </div>
 

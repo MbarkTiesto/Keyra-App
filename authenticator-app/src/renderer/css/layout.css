@@ -223,6 +223,7 @@ body.local-only #about-sync-row {
    MODALS SYSTEM
    ───────────────────────────────────────────────────────────────────────────── */
 
+/* modal overlay — blurred backdrop */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -230,8 +231,8 @@ body.local-only #about-sync-row {
     right: 0;
     bottom: 0;
     background: var(--modal-overlay);
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;

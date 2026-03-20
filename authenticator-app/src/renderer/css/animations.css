@@ -249,7 +249,7 @@
     border: 3px solid transparent;
     border-top-color: var(--accent-primary);
     border-right-color: var(--accent-primary);
-    filter: drop-shadow(0 0 8px var(--accent-primary));
+    filter: none;
     animation: nm-spin 1.2s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
 }
 
@@ -259,8 +259,7 @@
     inset: -12px;
     background: var(--accent-primary);
     border-radius: 50%;
-    opacity: 0.1;
-    filter: blur(16px);
+    opacity: 0.08;
     animation: nm-pulse 2s ease-in-out infinite;
 }
 
