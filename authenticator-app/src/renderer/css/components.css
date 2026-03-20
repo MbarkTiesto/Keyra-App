@@ -5,37 +5,82 @@
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: 12px;
     transition: transform var(--transition-fast);
     cursor: pointer;
+    text-decoration: none;
 }
 
 #navbar-brand:hover {
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 
 #navbar-brand:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
 }
 
 .brand-icon {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    background: var(--nm-surface);
+    border-radius: 12px;
+    box-shadow: var(--nm-shadow-out-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--accent-primary);
-    flex-shrink: 0;
+    transition: box-shadow var(--transition-fast);
 }
 
-.brand-text {
-    font-size: var(--font-size-xl);
+.brand-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 16px;
+    background: var(--accent-primary);
+    opacity: 0.08;
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+#navbar-brand:hover .brand-icon {
+    box-shadow: var(--nm-shadow-out);
+}
+
+.brand-icon img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    position: relative;
+    z-index: 1;
+}
+
+.brand-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    line-height: 1;
+}
+
+.brand-name {
+    font-family: var(--font-heading);
+    font-size: 16px;
     font-weight: var(--weight-black);
-    letter-spacing: var(--ls-tight);
-    background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent-primary));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.brand-sub {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 2px;
     text-transform: uppercase;
+    color: var(--accent-primary);
+    opacity: 0.6;
 }
 
 /* ── Merged Status Pill: Connectivity + Sync ── */
@@ -356,7 +401,7 @@
     transform: scale(1.05);
 }
 
-/* Nav Tabs - Neuomorphic Capsule */
+/* Nav Tabs - Full-width Neuomorphic Track */
 .nav-tabs {
     display: flex;
     gap: 8px;
@@ -366,8 +411,6 @@
     box-shadow: var(--nm-shadow-in-sm);
     border: none;
     width: 100%;
-    max-width: 800px;
-    /* Prevents them from being TOO wide on ultra-wide screens */
 }
 
 .nav-tab {

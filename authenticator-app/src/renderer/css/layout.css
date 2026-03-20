@@ -104,8 +104,7 @@ body.local-only #about-sync-row {
     display: flex;
     justify-content: center;
     min-width: 0;
-    padding: 0 40px;
-    /* Leave some space for brand and user menu */
+    padding: 0 16px;
 }
 
 .navbar-right {
