@@ -47,7 +47,6 @@ body.local-only .online-only:not(#sync-settings-card) {
     display: none !important;
 }
 
-body.local-only #connectivity-status .nm-status-icon-wrap,
 body.local-only #about-sync-row {
     display: none !important;
 }

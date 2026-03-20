@@ -106,7 +106,7 @@ export class AuthManager {
         const badge = document.getElementById('pending-email-badge');
         const actionBox = document.getElementById('pending-email-action-box');
         const pendingText = document.getElementById('pending-email-text');
-        if (user.pendingEmail) {
+        if (!user.isLocal && user.pendingEmail) {
             badge?.classList.remove('hidden');
             if (badge) {
                 badge.textContent = 'NOT VERIFIED';
@@ -177,8 +177,15 @@ export class AuthManager {
         const emailDisplay = document.getElementById('acc-primary-email');
         const initials = document.getElementById('acc-initials');
         if (nameDisplay) nameDisplay.textContent = user.username;
-        if (emailDisplay) emailDisplay.textContent = user.email;
+        if (emailDisplay) emailDisplay.textContent = user.isLocal ? "Local-Only Account" : user.email;
         if (initials) initials.textContent = user.username.charAt(0).toUpperCase();
+
+        // Local users have no cloud email/phone features
+        if (user.isLocal) {
+            document.getElementById('pending-email-badge')?.classList.add('hidden');
+            document.getElementById('pending-email-action-box')?.classList.add('hidden');
+            return;
+        }
 
         const pendingBadge = document.getElementById('pending-email-badge');
         const pendingAction = document.getElementById('pending-email-action-box');
@@ -226,6 +233,8 @@ export class AuthManager {
 
         if (removeBtn) {
             removeBtn.onclick = async () => {
+                const user = await (window as any).api.getCurrentUser();
+                if (user?.isLocal) { this.cb.showToast("Phone removal is not available for local accounts", "info"); return; }
                 if (confirm("Are you sure you want to remove your phone number? This will disable dual-channel protection.")) {
                     this.cb.setLoading(true, "Removing", "PHONE SECURITY");
                     try {
@@ -371,7 +380,9 @@ export class AuthManager {
             } finally { this.cb.setLoading(false); }
         });
 
-        document.getElementById('btn-change-avatar')?.addEventListener('click', () => {
+        document.getElementById('btn-change-avatar')?.addEventListener('click', async () => {
+            const user = await (window as any).api.getCurrentUser();
+            if (user?.isLocal) { this.cb.showToast("Avatar upload is not available for local accounts", "info"); return; }
             const input = document.createElement('input');
             input.type = 'file'; input.accept = 'image/png, image/jpeg, image/webp';
             input.onchange = async (e) => {
@@ -397,6 +408,8 @@ export class AuthManager {
 
         document.getElementById('form-request-email-change')?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const user = await (window as any).api.getCurrentUser();
+            if (user?.isLocal) { this.cb.showToast("Email change is not available for local accounts", "info"); return; }
             const newEmail = (document.getElementById('new-email') as HTMLInputElement).value.trim();
             if (!newEmail) return;
             this.cb.setLoading(true, "Requesting Change", "INITIATING EMAIL ROTATION");
@@ -413,6 +426,8 @@ export class AuthManager {
         });
 
         document.getElementById('btn-show-email-verify')?.addEventListener('click', async () => {
+            const user = await (window as any).api.getCurrentUser();
+            if (user?.isLocal) { this.cb.showToast("Email verification is not available for local accounts", "info"); return; }
             this.cb.setLoading(true, "Requesting Code", "ROTATING VERIFICATION KEY");
             try {
                 const res = await (window as any).api.resendEmailChangeCode();
@@ -427,6 +442,8 @@ export class AuthManager {
 
         document.getElementById('form-request-phone-verification')?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const user = await (window as any).api.getCurrentUser();
+            if (user?.isLocal) { this.cb.showToast("Phone verification is not available for local accounts", "info"); return; }
             const phone = (document.getElementById('new-phone') as HTMLInputElement).value.trim();
             if (!phone) return;
             const phoneRegex = /^\+[0-9]{8,15}$/;
@@ -469,6 +486,8 @@ export class AuthManager {
         });
 
         document.getElementById('btn-cancel-email-change')?.addEventListener('click', async () => {
+            const user = await (window as any).api.getCurrentUser();
+            if (user?.isLocal) return;
             this.cb.setLoading(true, "Cancelling", "REVERTING IDENTITY CHANGES");
             try { await (window as any).api.cancelEmailChange(); await this.loadAccountInfo(); this.cb.showToast("Email change cancelled", "info"); }
             finally { this.cb.setLoading(false); }

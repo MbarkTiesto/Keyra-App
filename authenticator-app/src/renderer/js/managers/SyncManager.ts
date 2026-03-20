@@ -123,6 +123,12 @@ export class SyncManager {
             return { success: false, message: 'Rate limited' };
         }
 
+        // Skip cloud push for local users without private sync
+        const user = await (window as any).api.getCurrentUser();
+        if (user?.isLocal && !(user.privateSync?.enabled && user.privateSync?.pat)) {
+            return { success: true };
+        }
+
         this.setSyncing(true);
         try {
             rateLimiter.recordAttempt('sync', this.userId);
