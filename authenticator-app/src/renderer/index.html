@@ -1641,25 +1641,25 @@
 
         <!-- Neumorphic spinner stack -->
         <div class="nm-loader-stack">
-            <!-- Outer raised ring -->
+            <!-- Layer 1: outermost raised disc -->
             <div class="nm-loader-outer-ring"></div>
-            <!-- Spinning accent arc -->
-            <div class="nm-loader-arc"></div>
-            <!-- Middle inset well -->
-            <div class="nm-loader-well">
-                <!-- Inner raised core -->
-                <div class="nm-loader-core">
-                    <img src="assets/logo.png" class="nm-loader-logo" alt="">
-                </div>
+            <!-- Layer 2: inset groove (arc track) -->
+            <div class="nm-loader-groove"></div>
+            <!-- Spinning arcs inside the groove -->
+            <div class="nm-loader-arc nm-loader-arc--cw"></div>
+            <div class="nm-loader-arc nm-loader-arc--ccw"></div>
+            <!-- Layer 3: inner raised platform -->
+            <div class="nm-loader-platform"></div>
+            <!-- Layer 4: core logo disc -->
+            <div class="nm-loader-core">
+                <img src="assets/logo.png" class="nm-loader-logo" alt="">
             </div>
-            <!-- Pulsing aura -->
-            <div class="nm-loader-aura-ring"></div>
         </div>
 
         <!-- Text -->
         <div class="loading-text-group">
-            <h2 id="loading-title" class="loading-title">Processing</h2>
-            <p id="loading-subtitle" class="loading-subtitle">VAULT SECURITY SYNCHRONIZATION</p>
+            <h2 id="loading-title" class="loading-title">Loading</h2>
+            <p id="loading-subtitle" class="loading-subtitle">Please wait a moment</p>
         </div>
 
         <!-- Animated dots -->
