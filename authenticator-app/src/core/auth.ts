@@ -583,7 +583,7 @@ export function getBackupData(): {
     
     // Create backup object
     const backup = {
-        version: "1.2.0",
+        version: "1.3.0",
         timestamp: Date.now(),
         accountCount,
         salt: currentUser.salt,
