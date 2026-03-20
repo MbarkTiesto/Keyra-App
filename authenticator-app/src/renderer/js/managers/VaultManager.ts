@@ -143,7 +143,7 @@ export class VaultManager {
                 </div>
                 <div>
                     <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">${label}</div>
-                    <div style="font-size: 15px; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">${value}</div>
+                    <div style="font-size: 15px; font-weight: 800; color: var(--text-primary);">${value}</div>
                 </div>
             </div>`;
 
@@ -174,7 +174,7 @@ export class VaultManager {
                             </div>
                             <div>
                                 <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Encryption</div>
-                                <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;">${verification.encrypted ? 'AES-256-GCM' : 'Partial (Legacy)'}</div>
+                                <div style="font-size: 14px; font-weight: 800; color: var(--text-primary);">${verification.encrypted ? 'AES-256-GCM' : 'Partial (Legacy)'}</div>
                             </div>
                         </div>
                     </div>

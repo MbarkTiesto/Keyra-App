@@ -160,7 +160,9 @@ export class AuthManager {
             document.body.classList.remove('local-only');
             document.getElementById('connectivity-status')?.classList.remove('pill-disabled');
             if (syncTitle) syncTitle.textContent = "Cloud Sync";
-            if (syncSubtitle) syncSubtitle.textContent = "Keep your Vault safe on GitHub";
+            if (syncSubtitle) syncSubtitle.textContent = "Keep your Vault safe";
+            const autosyncDesc = document.getElementById('autosync-desc');
+            if (autosyncDesc) autosyncDesc.textContent = "Save changes instantly";
             if (syncCard) syncCard.classList.remove('disabled-card');
             if (syncOverlay) syncOverlay.classList.add('hidden');
             this.cb.setSyncVisible(true);

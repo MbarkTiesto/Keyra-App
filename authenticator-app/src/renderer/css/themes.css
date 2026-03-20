@@ -150,8 +150,8 @@
 
     /* Typography System - Fluid Elite Scale */
     --font-main: 'Inter', system-ui, sans-serif;
-    --font-heading: 'Outfit', system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --font-heading: 'Inter', system-ui, sans-serif;
+    --font-mono: 'Inter', system-ui, sans-serif;
 
     --font-size-2xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.72rem);
     --font-size-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.82rem);

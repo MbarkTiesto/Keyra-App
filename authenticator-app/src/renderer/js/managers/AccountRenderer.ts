@@ -74,6 +74,9 @@ export class AccountRenderer {
         searchEmptyState?.classList.add('hidden');
         grid.classList.remove('hidden');
         grid.innerHTML = '';
+        // Reset cache and viewStyle so the next renderAccounts always does a full rebuild
+        this.cardCache = [];
+        delete grid.dataset.viewStyle;
         for (let i = 0; i < count; i++) {
             grid.appendChild(this.createSkeletonCard(i));
         }
