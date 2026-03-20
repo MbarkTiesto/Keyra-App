@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Keyra Authenticator</title>
+    <!-- Local Fonts & Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Inter';
+            src: url('fonts/Inter-Regular.woff2') format('woff2');
+            font-weight: 400 800;
+            font-display: swap;
+        }
+    </style>
+
+    <!-- Font Awesome 6 (Local/Offline) -->
+    <link rel="stylesheet" href="css/all.min.css">
+
+    <!-- CSS Architecture -->
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+
+    <!-- Instant Theme Application: OS Detection for Auth ONLY -->
+    <script>
+        (function () {
+            function applyAppTheme() {
+                const theme = localStorage.getItem('keyra_theme') || 'auto';
+                const authVessel = document.getElementById('auth-vessel');
+                const isAuthActive = !authVessel || !authVessel.classList.contains('hidden');
+
+                let themeToApply = theme;
+                if (theme === 'auto' || isAuthActive) {
+                    themeToApply = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+
+                document.documentElement.setAttribute('data-theme', themeToApply);
+                document.body.classList.remove('light-theme', 'dark-theme');
+                document.body.classList.add(themeToApply + '-theme');
+            }
+            applyAppTheme();
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyAppTheme);
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'keyra_theme') applyAppTheme();
+            });
+        })();
+    </script>
+</head>
+
+<body>
+    <!--#include file="partials/_splash.html" -->
+    <!--#include file="partials/_auth.html" -->
+    <!--#include file="partials/_overlays.html" -->
+
+    <div class="app-container">
+        <!--#include file="partials/_navbar.html" -->
+
+        <main class="main-content">
+            <!--#include file="partials/_vault.html" -->
+            <!--#include file="partials/_settings.html" -->
+            <!--#include file="partials/_account.html" -->
+        </main>
+
+        <!--#include file="partials/_modals.html" -->
+    </div>
+
+    <!--#include file="partials/_lock.html" -->
+    <!--#include file="partials/_scripts.html" -->
+</body>
+
+</html>

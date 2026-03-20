@@ -1,0 +1,364 @@
+<!-- Settings View -->
+<section id="settings-view" class="view-section hidden">
+    <div class="section-header" style="margin-bottom: var(--space-xl);">
+        <div class="header-main">
+            <h1 class="section-title">Settings</h1>
+            <p class="section-subtitle">CUSTOMIZE YOUR EXPERIENCE</p>
+        </div>
+    </div>
+
+    <div class="settings-grid">
+
+        <!-- Security Card -->
+        <div class="account-card bento-card">
+            <div class="bento-header">
+                <div class="bento-icon">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="bento-title-vessel">
+                    <h3 class="bento-title">Security</h3>
+                    <div class="bento-subtitle">How you access your Vault</div>
+                </div>
+            </div>
+            <div class="bento-content">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">App PIN</div>
+                        <div class="setting-desc">A 4-digits to unlock the app</div>
+                    </div>
+                    <div id="pin-status-badge"></div>
+                    <button class="btn-icon danger hidden" id="remove-pin-btn" title="Remove Security Policy" style="margin-right: 8px;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                    <button class="user-button" id="setup-pin-btn" style="min-width: 100px; justify-content: center;">Setup</button>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Auto-Lock App</div>
+                        <div class="setting-desc">Lock automatically when inactive</div>
+                    </div>
+                    <div class="segmented-control" id="autolock-segmented">
+                        <button class="segment" data-val="0">Off</button>
+                        <button class="segment" data-val="1">1m</button>
+                        <button class="segment" data-val="5">5m</button>
+                        <button class="segment" data-val="15">15m</button>
+                        <div class="segment-indicator"></div>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Hide Codes</div>
+                        <div class="setting-desc">Tap to reveal your security codes</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="privacy-mode-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Anti-Peek Protection</div>
+                        <div class="setting-desc">Block screenshots and recordings</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="screen-guardian-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Auto-Blur</div>
+                        <div class="setting-desc">Blur the app when you click away</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="privacy-blur-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Look & Feel Card -->
+        <div class="account-card bento-card">
+            <div class="bento-header">
+                <div class="bento-icon">
+                    <i class="fa-solid fa-palette" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="bento-title-vessel">
+                    <h3 class="bento-title">Look & Feel</h3>
+                    <div class="bento-subtitle">Theme and colors</div>
+                </div>
+            </div>
+            <div class="bento-content">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Appearance</div>
+                        <div class="setting-desc">Manual control or follow system</div>
+                    </div>
+                    <div class="segmented-control" id="theme-segmented">
+                        <button class="segment" data-val="light">Light</button>
+                        <button class="segment" data-val="dark">Dark</button>
+                        <button class="segment" data-val="auto">Auto</button>
+                        <div class="segment-indicator"></div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Accent Color</div>
+                        <div class="setting-desc">Choose your favorite color</div>
+                    </div>
+                    <div class="accent-color-selector">
+                        <button class="accent-color-option active" data-accent="royal-purple" style="background: hsl(258, 100%, 68%);" title="Royal Purple"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="electric-blue" style="background: hsl(200, 100%, 68%);" title="Electric Blue"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="emerald-green" style="background: hsl(145, 100%, 68%);" title="Emerald Green"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="solar-orange" style="background: hsl(15, 100%, 68%);" title="Solar Orange"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="rose-quartz" style="background: hsl(330, 100%, 68%);" title="Rose Quartz"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="peach-blossom" style="background: hsl(20, 100%, 68%);" title="Peach Blossom"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="lavender-dream" style="background: hsl(270, 100%, 68%);" title="Lavender Dream"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="bubblegum" style="background: hsl(320, 100%, 68%);" title="Bubblegum"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="sky-blue" style="background: hsl(190, 100%, 68%);" title="Sky Blue"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="coral-sunset" style="background: hsl(10, 100%, 68%);" title="Coral Sunset"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="lemon-zest" style="background: hsl(45, 100%, 68%);" title="Lemon Zest"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="amethyst-glow" style="background: hsl(280, 100%, 68%);" title="Amethyst Glow"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="golden-hour" style="background: hsl(35, 100%, 68%);" title="Golden Hour"><span class="accent-check">✓</span></button>
+                        <button class="accent-color-option" data-accent="orchid-mystic" style="background: hsl(300, 100%, 68%);" title="Orchid Mystic"><span class="accent-check">✓</span></button>
+                    </div>
+                </div>
+
+                <div class="setting-row" id="oled-mode-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Darkest Black</div>
+                        <div class="setting-desc">Saves battery on OLED screens</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="oled-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Performance Mode</div>
+                        <div class="setting-desc">Makes the app faster on older PCs</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="performance-mode-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Close App Shortcut</div>
+                        <div class="setting-desc">Add a close button to your menu</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="menu-exit-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Allow Resizing</div>
+                        <div class="setting-desc">Let you resize the app window</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="window-resizable-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Integration Card -->
+        <div class="account-card bento-card">
+            <div class="bento-header">
+                <div class="bento-icon">
+                    <i class="fa-solid fa-desktop" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="bento-title-vessel">
+                    <h3 class="bento-title">System Integration</h3>
+                    <div class="bento-subtitle">DESKTOP POWER FEATURES</div>
+                </div>
+            </div>
+            <div class="bento-content">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Launch on Startup</div>
+                        <div class="setting-desc">Open Keyra when Windows starts</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="launch-on-startup-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Minimize to Tray</div>
+                        <div class="setting-desc">Keep app running in background</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="minimize-to-tray-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Global Shortcut</div>
+                        <div class="setting-desc">Alt + Shift + K to toggle app</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="global-hotkey-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Software Update Card -->
+        <div class="account-card bento-card">
+            <div class="bento-header">
+                <div class="bento-icon">
+                    <i class="fa-solid fa-arrows-rotate" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="bento-title-vessel">
+                    <h3 class="bento-title">Software Update</h3>
+                    <div class="bento-subtitle">KEEP KEYRA CURRENT</div>
+                </div>
+            </div>
+            <div class="bento-content">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Auto check Updates</div>
+                        <div class="setting-desc">Check for new versions on startup</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="auto-update-toggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">App Version</div>
+                        <div id="current-version-text" class="setting-desc">Version 1.2.0</div>
+                    </div>
+                    <div id="update-status-badge" class="badge hidden"
+                        style="background: var(--accent-primary); color: white; display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; margin-top: 8px;">
+                        NEW</div>
+                </div>
+
+                <div id="update-info-container" style="margin-top: 16px;">
+                    <div id="nm-update-loader" class="nm-update-loader-vessel hidden">
+                        <div class="nm-loader-outer">
+                            <div class="nm-loader-aura"></div>
+                            <div class="nm-loader-ring"></div>
+                            <div class="nm-loader-inner">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="update-message" style="font-size: 13px; opacity: 0.8; font-weight: 600; margin-bottom: 20px;">Checking for updates...</p>
+
+                    <div id="download-progress-container" class="hidden" style="margin-bottom: 20px;">
+                        <div class="progress-track" style="height: 10px; background: var(--nm-shadow-dark); border-radius: 6px; overflow: hidden; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);">
+                            <div id="download-progress-bar" style="width: 0%; height: 100%; background: var(--accent-primary); box-shadow: 0 0 12px var(--accent-primary); transition: width 0.3s ease;"></div>
+                        </div>
+                        <div id="download-percent-text" style="font-size: 11px; font-weight: 850; text-align: right; margin-top: 6px; color: var(--accent-primary);">0%</div>
+                    </div>
+
+                    <button class="btn-primary" id="btn-check-updates" style="width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span style="font-weight: 800;">Check for Updates</span>
+                    </button>
+                    <button class="btn-primary hidden" id="btn-download-update" style="width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fa-solid fa-download"></i>
+                        <span style="font-weight: 800;">Download v1.1.0</span>
+                    </button>
+                    <button class="btn-primary hidden" id="btn-install-update" style="width: 100%; height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span style="font-weight: 800;">Restart & Install</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cloud Synchronization Card -->
+        <div class="account-card bento-card" id="sync-settings-card">
+            <div class="bento-header">
+                <div class="bento-icon">
+                    <i class="fa-solid fa-cloud" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="bento-title-vessel">
+                    <h3 class="bento-title" id="sync-settings-title">Cloud Sync</h3>
+                    <div class="bento-subtitle" id="sync-settings-subtitle">Keep your Vault safe on GitHub</div>
+                </div>
+            </div>
+            <div class="bento-content">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Auto-Sync</div>
+                        <div class="setting-desc">Save changes to GitHub instantly</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="cloud-sync-toggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-name">Status</div>
+                        <div class="setting-desc" id="sync-status-desc">All set!</div>
+                        <div class="setting-desc-small" id="sync-last-time">Never synced</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; color: #28a745; font-size: 13px; font-weight: 800;">
+                        <i class="fa-solid fa-circle-check"></i>
+                        ACTIVE
+                    </div>
+                </div>
+                <button class="btn-sync-premium" id="btn-sync-now">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>Sync Now</span>
+                </button>
+            </div>
+            <!-- Disabled Overlay for Local Accounts -->
+            <div id="sync-disabled-overlay" class="disabled-card-overlay hidden">
+                <i class="fa-solid fa-cloud-slash"></i>
+                <span>Sync Disabled (Local Account)</span>
+                <button class="btn-nm-setup" id="btn-open-private-sync">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Enable Private Sync</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Vault Maintenance Card -->
+        <div class="account-card bento-card">
+            <div class="bento-header">
+                <div class="bento-icon">
+                    <i class="fa-solid fa-shield" style="color: var(--accent-primary);"></i>
+                </div>
+                <div class="bento-title-vessel">
+                    <h3 class="bento-title">Maintenance</h3>
+                    <div class="bento-subtitle">Backup and Restore</div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                <button class="btn-primary btn-maintenance" id="btn-export-vault">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Backup Vault</span>
+                </button>
+                <button class="btn-primary btn-maintenance" id="btn-import-vault">
+                    <i class="fa-solid fa-upload"></i>
+                    <span>Restore Vault</span>
+                </button>
+            </div>
+            <div style="margin-top: 12px; font-size: 11.5px; opacity: 0.6; font-weight: 600; line-height: 1.5;">
+                <i class="fa-solid fa-circle-exclamation footer-info-icon"></i>
+                Backups are protected by your master password.
+            </div>
+        </div>
+
+    </div>
+</section>

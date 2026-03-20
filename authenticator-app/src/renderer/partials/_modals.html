@@ -1,0 +1,255 @@
+<!-- Modals -->
+<div id="modal-overlay" class="modal-overlay">
+    <!-- Content injected by JS -->
+</div>
+
+<!-- Logout Confirm -->
+<div id="modal-logout" class="modal-overlay">
+    <div class="modal animate-fade-in">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon-vessel danger">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+                <div class="modal-title-vessel">
+                    <h2 class="danger">Sign Out?</h2>
+                    <p>YOUR VAULT WILL BE LOCKED</p>
+                </div>
+            </div>
+            <div class="modal-divider"></div>
+            <div class="modal-body">
+                <div class="modal-entity-badge">
+                    <div class="entity-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="entity-info">
+                        <span class="entity-name">Your Keyra Vault</span>
+                        <span class="entity-label">Active Session</span>
+                    </div>
+                </div>
+                <p class="modal-help-text">Signing out will lock your vault. You'll need your password to get back in.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-danger" id="btn-confirm-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Sign Out
+                </button>
+                <button class="user-button" id="btn-cancel-logout" style="justify-content: center;">Stay Signed In</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Verification Modal -->
+<div id="modal-email-verify" class="modal-overlay hidden">
+    <div class="modal animate-fade-in" style="max-width: 400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon-vessel">
+                    <i class="fa-solid fa-envelope-circle-check"></i>
+                </div>
+                <div class="modal-title-vessel">
+                    <h2>Check your Email</h2>
+                    <p>Enter the 6-digit code we just sent you</p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="verify-inputs" style="justify-content: center; margin: 20px 0;">
+                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
+                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
+                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
+                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
+                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
+                    <input type="text" maxlength="1" class="email-verify-digit form-input" style="width: 45px; text-align: center;">
+                </div>
+                <div id="email-verify-error" class="auth-error opacity-0"></div>
+                <div style="text-align: center; font-size: 13px; margin-top: 16px;">
+                    <span>Didn't get the code?</span>
+                    <button id="btn-resend-email-code" class="auth-resend-btn">Send again <span id="email-resend-timer"></span></button>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top: 0;">
+                <button class="btn-primary" id="btn-confirm-email-change" style="width: 100%;">Verify & Update</button>
+                <button class="user-button" id="btn-cancel-email-modal" style="width: 100%; justify-content: center; margin-top: 8px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WhatsApp QR Verification Modal -->
+<div id="modal-phone-qr" class="modal-overlay hidden">
+    <div class="modal animate-fade-in" style="max-width: 440px; border-radius: 24px; padding: 24px;">
+        <div class="modal-content" style="padding: 0;">
+            <div class="modal-header" style="text-align: center; display: block; padding: 0 0 16px 0; border-bottom: none;">
+                <div class="modal-icon-vessel" style="background: var(--nm-surface); color: var(--accent-primary); box-shadow: var(--nm-shadow-out-sm); margin: 0 auto 16px;">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h2 id="phone-qr-title" style="font-size: 24px; letter-spacing: -0.5px; font-weight: 850;">Secure Verification</h2>
+                <p id="phone-qr-subtitle" style="font-size: 13.5px; opacity: 0.7; font-weight: 600; margin-top: 4px;">Connect your WhatsApp to confirm your identity</p>
+            </div>
+
+            <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; padding: 8px 0;">
+                <!-- QR Vessel -->
+                <div id="modal-wa-qr-vessel"
+                    style="background: var(--nm-surface); border-radius: 20px; padding: 16px; box-shadow: var(--nm-shadow-in); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px; width: fit-content; margin-left: auto; margin-right: auto; overflow: hidden;">
+                    <div id="modal-wa-loader"
+                        style="width: 220px; height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 12px;">
+                        <div class="loader-vessel" style="margin-bottom: 16px;">
+                            <div class="loader-ring" style="width: 44px; height: 44px; border-width: 3px;"></div>
+                        </div>
+                        <span id="modal-wa-status" style="font-size: 11px; font-weight: 850; letter-spacing: 1.5px; color: var(--accent-primary);">INITIALIZING...</span>
+                    </div>
+                    <img id="modal-wa-qr-image" class="hidden"
+                        style="width: 220px; height: 220px; border-radius: 8px; display: block; filter: contrast(1.1); margin: 0 auto;">
+
+                    <!-- Blurred Overlay during Verifying state -->
+                    <div id="wa-qr-overlay" class="hidden"
+                        style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+                        <div class="loader-vessel" style="margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; border: 3px solid rgba(255, 255, 255, 0.2); border-top-color: #ffffff; border-radius: 50%; animation: loader-spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;"></div>
+                        </div>
+                        <span style="font-size: 14px; font-weight: 800; letter-spacing: 0.5px; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.5);">Verifying Identity...</span>
+                    </div>
+                </div>
+
+                <!-- Inline Error Container -->
+                <div id="wa-qr-error" class="hidden"
+                    style="width: 100%; margin-bottom: 16px; padding: 14px; background: rgba(255, 59, 48, 0.08); border: 1px solid rgba(255, 59, 48, 0.15); border-radius: var(--radius-md); text-align: center; display: flex; align-items: center; gap: 10px; justify-content: center;">
+                    <i class="fa-solid fa-triangle-exclamation danger-text"></i>
+                    <span id="wa-qr-error-text" style="font-size: 12.5px; font-weight: 700; color: #ff3b30; line-height: 1.4;"></span>
+                </div>
+
+                <!-- Requirement Callout -->
+                <div style="width: 100%; padding: 16px 20px; background: var(--bg-primary); border-radius: var(--radius-lg); box-shadow: var(--nm-shadow-in); text-align: left; display: flex; align-items: flex-start; gap: 14px; border: 1px solid rgba(128, 128, 128, 0.05);">
+                    <div style="width: 36px; height: 36px; background: rgba(37, 211, 102, 0.1); color: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">Important Requirement</div>
+                        <p style="font-size: 12.5px; color: var(--text-dim); line-height: 1.5; font-weight: 600; opacity: 0.85;">
+                            Scan this QR code using the WhatsApp account corresponding to <strong style="color: var(--text-primary);">the number you just entered</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 0 0 0; border-top: none;">
+                <button class="user-button secondary" id="btn-cancel-phone-qr"
+                    style="width: 100%; justify-content: center; height: 48px; font-size: 13px; font-weight: 800;">
+                    Cancel Verification
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Premium Syncing Indicator (Floating Pill) -->
+<div id="cloud-sync-indicator" class="cloud-sync-pill hidden">
+    <i class="fa-solid fa-arrows-rotate sync-icon"></i>
+    <span>Backing up...</span>
+</div>
+
+<!-- Sync Conflict Resolution Modal -->
+<div id="modal-sync-conflict" class="modal-overlay hidden">
+    <div class="modal animate-fade-in" style="max-width: 480px;">
+        <div class="modal-content">
+            <div class="conflict-modal-header">
+                <div class="conflict-modal-icon">
+                    <i class="fa-solid fa-code-branch"></i>
+                </div>
+                <div>
+                    <h2 class="conflict-modal-title">Sync Conflict</h2>
+                    <p class="conflict-modal-subtitle">VERSION MISMATCH DETECTED</p>
+                </div>
+            </div>
+
+            <div class="conflict-info-banner">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Another device has modified your vault on GitHub since your last sync. Choose how to resolve this.</span>
+            </div>
+
+            <div class="conflict-options">
+                <div class="conflict-option-card" id="option-force-push">
+                    <div class="conflict-option-icon push">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div class="conflict-option-body">
+                        <div class="conflict-option-title">Keep Local</div>
+                        <div class="conflict-option-desc">Push your current changes to GitHub, overwriting the remote version.</div>
+                    </div>
+                    <div class="conflict-option-check"><i class="fa-solid fa-check"></i></div>
+                </div>
+
+                <div class="conflict-option-card" id="option-pull-remote">
+                    <div class="conflict-option-icon pull">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                    </div>
+                    <div class="conflict-option-body">
+                        <div class="conflict-option-title">Use Remote</div>
+                        <div class="conflict-option-desc">Discard local changes and download the latest version from GitHub.</div>
+                    </div>
+                    <div class="conflict-option-check"><i class="fa-solid fa-check"></i></div>
+                </div>
+            </div>
+
+            <div class="conflict-modal-footer">
+                <button class="btn-nm-secondary" id="btn-close-sync-conflict">Later</button>
+                <button class="btn-nm-primary disabled" id="btn-resolve-sync-conflict" disabled>
+                    <i class="fa-solid fa-check"></i>
+                    <span>Resolve</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Private Sync Setup Modal -->
+<div id="modal-private-sync" class="modal-overlay hidden">
+    <div class="modal animate-fade-in">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon-vessel highlight">
+                    <i class="fa-brands fa-github"></i>
+                </div>
+                <div class="modal-title-vessel">
+                    <h2>Private Cloud Sync</h2>
+                    <p>GITHUB REPOSITORY STORAGE</p>
+                </div>
+            </div>
+            <div class="modal-divider"></div>
+            <div class="modal-body">
+                <p class="modal-help-text">Synchronize your local vault to your own private GitHub repository. Your data stays 100% yours.</p>
+
+                <div class="settings-form" style="margin-top: 20px;">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" style="display: block; margin-bottom: 8px;">GitHub Personal Access Token (PAT)</label>
+                        <input type="password" id="sync-github-pat" class="form-input" placeholder="ghp_xxxxxxxxxxxx" style="width: 100%;">
+                        <span class="form-help" style="font-size: 11px; opacity: 0.7; margin-top: 4px; display: block;">Requires 'repo' or 'Contents: Read &amp; Write' scope.</span>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" style="display: block; margin-bottom: 8px;">Repository Owner (Username)</label>
+                        <input type="text" id="sync-github-owner" class="form-input" placeholder="Your GitHub Username" style="width: 100%;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label" style="display: block; margin-bottom: 8px;">Repository Name</label>
+                        <input type="text" id="sync-github-repo" class="form-input" placeholder="my-keyra-vault" style="width: 100%;">
+                        <span class="form-help" style="font-size: 11px; opacity: 0.7; margin-top: 4px; display: block;">Existing or new repository name.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer footer-grid" style="padding-top: 0;">
+                <button class="user-button secondary" id="btn-test-sync-connection">
+                    <i class="fa-solid fa-plug"></i>
+                    <span>Test Connection</span>
+                </button>
+                <button class="user-button" id="btn-close-private-sync">Cancel</button>
+                <button class="user-button highlight btn-full" id="btn-save-private-sync">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Enable Private Sync</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

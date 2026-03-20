@@ -1,0 +1,107 @@
+<!-- Screen Capture Selection Overlay -->
+<div id="screen-capture-overlay" class="screen-capture-overlay hidden">
+    <div class="capture-hint">Drag a box over the QR code (Esc to Cancel)</div>
+    <div id="selection-box" class="selection-box"></div>
+</div>
+
+<!-- Dynamic Privacy Blur Overlay -->
+<div id="privacy-blur-overlay" class="modal-overlay privacy-overlay">
+    <div class="privacy-content">
+        <div class="privacy-shield-vessel">
+            <div class="privacy-shield-icon">
+                <img src="assets/logo.png" class="app-logo-large">
+            </div>
+            <div class="privacy-scan-line"></div>
+        </div>
+        <h2>Vault Hidden</h2>
+        <p>We've hidden your data to keep it private.</p>
+        <div class="privacy-hint">Click or focus here to continue</div>
+    </div>
+</div>
+
+<!-- Premium Neumorphic About Modal -->
+<div id="about-modal" class="modal-overlay hidden">
+    <div class="modal about-modal-card animate-fade-in">
+        <div class="about-header-hero">
+            <div class="about-hero-vessel">
+                <img src="assets/logo.png" alt="Keyra Logo" class="app-logo-medium">
+            </div>
+            <div class="about-title-group">
+                <h1 class="about-app-name">Keyra Authenticator</h1>
+                <p class="about-mission-tag">Professional Security Made Simple</p>
+            </div>
+        </div>
+
+        <div class="modal-divider"></div>
+
+        <div class="about-info-sections">
+            <div class="about-info-row">
+                <div class="info-row-label">
+                    <i class="fa-solid fa-code-branch"></i>
+                    <span class="label-text">VERSION</span>
+                </div>
+                <div class="info-row-content">
+                    <span class="version-badge">v1.2.0</span>
+                </div>
+            </div>
+
+            <div class="about-info-row">
+                <div class="info-row-label">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span class="label-text">STATUS</span>
+                </div>
+                <div class="info-row-content">
+                    <span class="status-indicator online">
+                        <span class="status-dot"></span>
+                        PROTECTED
+                    </span>
+                </div>
+            </div>
+
+            <div class="about-info-row">
+                <div class="info-row-label">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span class="label-text">ACTIVITY</span>
+                </div>
+                <div class="info-row-content">
+                    <span id="about-last-action" style="font-size: 11px; font-weight: 700;">Nothing yet</span>
+                </div>
+            </div>
+
+            <div id="about-sync-row" class="about-info-row online-only">
+                <div class="info-row-label">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span class="label-text">CLOUD SYNC</span>
+                </div>
+                <div class="info-row-content">
+                    <span id="about-last-sync" style="font-size: 11px; font-weight: 700;">Never Secured</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-divider"></div>
+
+        <div class="about-footer-actions">
+            <p class="footer-label">Connect with us</p>
+            <div class="about-social-group">
+                <button class="social-btn" title="GitHub"
+                    onclick="window.api.openExternal('https://github.com/MbarkT3STO/Keyra-App')">
+                    <i class="fa-brands fa-github"></i>
+                </button>
+                <button class="social-btn" title="X (Twitter)"
+                    onclick="window.api.openExternal('https://x.com/mbarkt3sto')">
+                    <i class="fa-brands fa-x-twitter"></i>
+                </button>
+                <button class="social-btn" title="Website"
+                    onclick="window.api.openExternal('https://keyraauth.netlify.app/')">
+                    <i class="fa-solid fa-globe"></i>
+                </button>
+            </div>
+        </div>
+
+        <button class="auth-close-btn"
+            onclick="document.getElementById('about-modal').classList.remove('show'); setTimeout(() => document.getElementById('about-modal').classList.add('hidden'), 300)">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+</div>

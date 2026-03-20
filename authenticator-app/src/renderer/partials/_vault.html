@@ -1,0 +1,69 @@
+<!-- Vault View -->
+<section id="vault-view" class="view-section">
+    <div class="section-header">
+        <div class="header-main">
+            <h1 class="section-title">My Vault</h1>
+            <p class="section-subtitle">YOUR SAVED ACCOUNTS</p>
+        </div>
+        <div class="search-add-group">
+            <div class="segmented-control vault-view-toggle" id="countdown-style-segmented">
+                <button class="segment" data-val="unified" title="Unified Progress Bar">
+                    <i class="fa-solid fa-grip-lines"></i>
+                </button>
+                <button class="segment" data-val="compact" title="Individual Progress Bars">
+                    <i class="fa-solid fa-grip"></i>
+                </button>
+                <button class="segment" data-val="secure" title="Secure Hidden Codes">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </button>
+                <div class="segment-indicator"></div>
+            </div>
+            <div class="search-vessel">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="vault-search" class="search-input" placeholder="Search your accounts...">
+            </div>
+            <button class="btn-primary" id="add-account-btn">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Account</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="global-timer-vessel hidden" id="global-timer-vessel">
+        <div class="global-timer-label">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>Security Sync</span>
+        </div>
+        <div class="timer-linear-vessel global-bar">
+            <div class="timer-linear-progress" id="global-otp-timer"></div>
+        </div>
+    </div>
+
+    <div class="accounts-grid" id="accounts-grid">
+        <!-- Cards dynamically inserted by JS -->
+    </div>
+
+    <!-- Empty State (No Accounts) -->
+    <div id="empty-state" class="hidden">
+        <div class="empty-state-vessel">
+            <i class="fa-solid fa-fingerprint empty-state-icon"></i>
+            <h2>Your Vault is Empty</h2>
+            <p>Add your first account to get started.</p>
+            <button class="btn-primary" id="empty-add-btn">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Account</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Empty State (No Results) -->
+    <div id="search-empty-state" class="hidden">
+        <div class="empty-state-vessel nm-search-empty-state">
+            <div class="nm-search-icon-vessel">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+            </div>
+            <h2>No Results Found</h2>
+            <p>We couldn't find what you're looking for. Try a different search.</p>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,113 @@
+<!-- Modern Top Navigation Bar -->
+<header class="navbar">
+    <div class="navbar-wrapper">
+        <div class="navbar-section navbar-left">
+            <div class="navbar-brand" id="navbar-brand">
+                <div class="brand-icon">
+                    <img src="assets/logo.png" class="app-logo-small">
+                </div>
+                <span class="brand-text">Keyra</span>
+            </div>
+        </div>
+
+        <div class="navbar-section navbar-center">
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="vault">
+                    <i class="fa-solid fa-box-archive"></i>
+                    <span>My Vault</span>
+                </button>
+                <button class="nav-tab" data-tab="settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="navbar-section navbar-right">
+            <!-- Pill + Popover anchor wrapper -->
+            <div class="nm-pill-anchor">
+                <!-- Merged Connectivity + Sync Indicator -->
+                <div id="connectivity-status" class="nm-status-pill online" title="Status">
+                    <i class="fa-solid fa-cloud-arrow-up" id="nm-status-icon"></i>
+                    <div class="nm-pill-ring" id="nm-pill-ring"></div>
+                    <span class="nm-status-dot" id="nm-conn-dot"></span>
+                </div>
+
+                <!-- Status Popover -->
+                <div id="status-popover" class="nm-status-popover">
+                    <div class="nm-popover-row">
+                        <div class="nm-popover-icon" id="popover-conn-icon">
+                            <i class="fa-solid fa-wifi"></i>
+                        </div>
+                        <div class="nm-popover-info">
+                            <span class="nm-popover-label">Network</span>
+                            <span class="nm-popover-value" id="popover-conn-text">Online</span>
+                        </div>
+                    </div>
+                    <div class="nm-popover-divider online-only" id="popover-sync-section"></div>
+                    <div class="nm-popover-row online-only" id="popover-sync-row">
+                        <div class="nm-popover-icon" id="popover-sync-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div class="nm-popover-info">
+                            <span class="nm-popover-label">Cloud Sync</span>
+                            <span class="nm-popover-value" id="popover-sync-text">Synced</span>
+                        </div>
+                    </div>
+                    <div class="nm-popover-divider online-only"></div>
+                    <button class="nm-popover-sync-btn online-only" id="btn-popover-sync">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Sync Now</span>
+                    </button>
+                </div>
+            </div><!-- /.nm-pill-anchor -->
+
+            <div class="user-menu">
+                <button class="user-button" id="user-dropdown-btn">
+                    <div class="user-avatar" id="user-avatar" style="overflow: hidden;">
+                        <img id="navbar-avatar-img" class="hidden"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <span id="navbar-avatar-initials">?</span>
+                    </div>
+                    <span class="user-name" id="user-name-display">User</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+
+                <div class="dropdown-menu" id="user-dropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdown-user-name">User</div>
+                        <div class="dropdown-user-email" id="dropdown-user-email">Secure Session</div>
+                    </div>
+                    <div class="dropdown-item" id="account-settings-btn">
+                        <i class="fa-solid fa-user"></i>
+                        <span>Account</span>
+                    </div>
+                    <div class="dropdown-item" id="lock-vault-btn">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Lock Vault</span>
+                    </div>
+                    <div class="dropdown-item" id="theme-toggle-btn">
+                        <i id="theme-icon-fa" class="fa-solid fa-moon"></i>
+                        <span id="theme-text">Dark Mode</span>
+                    </div>
+                    <div class="dropdown-item hidden" id="menu-close-app-btn">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span>Close App</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item danger" id="btn-logout-trigger">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Sign Out</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Window Controls -->
+            <div class="window-controls">
+                <button id="btn-close-app" class="btn-control btn-close" title="Close App">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
