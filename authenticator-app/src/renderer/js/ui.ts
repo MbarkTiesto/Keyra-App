@@ -470,16 +470,36 @@ export class UIManager {
     public showToast(message: string, type: 'info' | 'success' | 'error' = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
-        const iconMap = { success: 'fa-solid fa-circle-check', error: 'fa-solid fa-circle-exclamation', info: 'fa-solid fa-bell' };
+
+        const DURATION = 3000;
+        const iconMap = {
+            success: 'fa-solid fa-circle-check',
+            error:   'fa-solid fa-circle-exclamation',
+            info:    'fa-solid fa-circle-info'
+        };
+
         const toast = document.createElement('div');
-        toast.className = 'toast ' + type;
-        toast.innerHTML = `<i class="toast-icon ${iconMap[type]}"></i><span>${message}</span>`;
-        container.appendChild(toast);
-        setTimeout(() => {
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <div class="toast-icon-vessel">
+                <i class="${iconMap[type]}"></i>
+            </div>
+            <span class="toast-text">${message}</span>
+            <button class="toast-close" aria-label="Dismiss">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="toast-progress" style="animation-duration: ${DURATION}ms;"></div>
+        `;
+
+        const dismiss = () => {
             toast.style.opacity = '0';
-            toast.style.transform = 'translateY(8px) scale(0.95)';
-            setTimeout(() => toast.remove(), 350);
-        }, 2800);
+            toast.style.transform = 'translateX(16px) scale(0.95)';
+            setTimeout(() => toast.remove(), 320);
+        };
+
+        toast.querySelector('.toast-close')?.addEventListener('click', dismiss);
+        container.appendChild(toast);
+        setTimeout(dismiss, DURATION);
     }
 
 
