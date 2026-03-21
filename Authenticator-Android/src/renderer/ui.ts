@@ -340,6 +340,7 @@ export class UIManager {
 
     private updateLockVaultVisibility() {
         const lockBtn = document.getElementById('lock-vault-btn');
+        const mobileLockBtn = document.getElementById('mobile-lock-btn');
         const setupBtn = document.getElementById('setup-pin-btn');
         const changeBtn = document.getElementById('change-pin-btn');
         const removeBtn = document.getElementById('remove-pin-btn');
@@ -347,6 +348,7 @@ export class UIManager {
         const hasPin = !!localStorage.getItem(`${this.userId}_vault_pin`);
 
         if (lockBtn) lockBtn.classList.toggle('hidden', !hasPin);
+        if (mobileLockBtn) mobileLockBtn.classList.toggle('hidden', !hasPin);
         if (setupBtn) setupBtn.style.display = hasPin ? 'none' : 'flex';
         if (changeBtn) changeBtn.style.display = hasPin ? 'flex' : 'none';
         if (removeBtn) removeBtn.style.display = hasPin ? 'flex' : 'none';
@@ -375,16 +377,16 @@ export class UIManager {
         // Update segmented control
         this.updateSegmentedUI('theme-segmented', theme);
 
-        // Update legacy theme icons
+        // Update legacy theme icons (desktop + mobile)
         const themeIcon = document.getElementById('theme-icon-lucide');
         const themeText = document.getElementById('theme-text');
+        const mobileThemeIcon = document.getElementById('mobile-theme-icon');
+        const mobileThemeText = document.getElementById('mobile-theme-text');
 
-        if (themeIcon) {
-            themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        }
-        if (themeText) {
-            themeText.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
-        }
+        if (themeIcon) themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        if (themeText) themeText.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+        if (mobileThemeIcon) mobileThemeIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        if (mobileThemeText) mobileThemeText.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
 
         if (!silent) this.pushWebSettings();
     }
@@ -422,6 +424,7 @@ export class UIManager {
 
         document.addEventListener('click', () => {
             dropdownMenu?.classList.remove('show');
+            document.getElementById('mobile-user-dropdown')?.classList.remove('show');
         });
 
         // Dropdown Actions
@@ -433,6 +436,27 @@ export class UIManager {
         document.getElementById('btn-logout-trigger')?.addEventListener('click', () => {
             document.getElementById('modal-logout')?.classList.add('show');
             this.refreshLucide();
+        });
+
+        // ── Mobile inline header actions ──
+        const mobileAvatarBtn = document.getElementById('mobile-avatar-btn');
+        const mobileDropdown = document.getElementById('mobile-user-dropdown');
+        mobileAvatarBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileDropdown?.classList.toggle('show');
+        });
+
+        document.getElementById('mobile-lock-btn')?.addEventListener('click', () => this.lockVault());
+
+        document.getElementById('mobile-theme-toggle-btn')?.addEventListener('click', () => {
+            const nextTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+            this.setTheme(nextTheme);
+            mobileDropdown?.classList.remove('show');
+        });
+
+        document.getElementById('mobile-logout-trigger')?.addEventListener('click', () => {
+            mobileDropdown?.classList.remove('show');
+            document.getElementById('modal-logout')?.classList.add('show');
         });
 
         // Logout Confirmation
@@ -990,32 +1014,33 @@ export class UIManager {
             const userNameDisplay = document.getElementById('user-name-display');
             const dropdownName = document.getElementById('dropdown-user-name');
             const dropdownEmail = document.getElementById('dropdown-user-email');
+            const mobileDropdownName = document.getElementById('mobile-dropdown-user-name');
+            const mobileDropdownEmail = document.getElementById('mobile-dropdown-user-email');
 
-            if (userNameDisplay && user) {
-                userNameDisplay.textContent = user.username;
-            }
-            if (dropdownName && user) {
-                dropdownName.textContent = user.username;
-            }
-            if (dropdownEmail && user) {
-                dropdownEmail.textContent = user.email || '';
-            }
+            if (userNameDisplay && user) userNameDisplay.textContent = user.username;
+            if (dropdownName && user) dropdownName.textContent = user.username;
+            if (dropdownEmail && user) dropdownEmail.textContent = user.email || '';
+            if (mobileDropdownName && user) mobileDropdownName.textContent = user.username;
+            if (mobileDropdownEmail && user) mobileDropdownEmail.textContent = user.email || '';
 
-            // Navbar avatar: show profile picture or initials
+            // Sync both desktop navbar avatar and mobile inline avatar
             if (user) {
-                const navbarAvatarImg = document.getElementById('navbar-avatar-img') as HTMLImageElement;
-                const navbarAvatarInitials = document.getElementById('navbar-avatar-initials');
-                if (navbarAvatarImg && navbarAvatarInitials) {
+                const syncAvatar = (imgId: string, initialsId: string) => {
+                    const img = document.getElementById(imgId) as HTMLImageElement;
+                    const initials = document.getElementById(initialsId);
+                    if (!img || !initials) return;
                     if (user.profilePicture) {
-                        navbarAvatarImg.src = user.profilePicture;
-                        navbarAvatarImg.classList.remove('hidden');
-                        navbarAvatarInitials.classList.add('hidden');
+                        img.src = user.profilePicture;
+                        img.classList.remove('hidden');
+                        initials.classList.add('hidden');
                     } else {
-                        navbarAvatarImg.classList.add('hidden');
-                        navbarAvatarInitials.classList.remove('hidden');
-                        navbarAvatarInitials.textContent = user.username.charAt(0).toUpperCase();
+                        img.classList.add('hidden');
+                        initials.classList.remove('hidden');
+                        initials.textContent = user.username.charAt(0).toUpperCase();
                     }
-                }
+                };
+                syncAvatar('navbar-avatar-img', 'navbar-avatar-initials');
+                syncAvatar('mobile-avatar-img', 'mobile-avatar-initials');
             }
 
             await this.refreshAccounts();

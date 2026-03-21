@@ -55,45 +55,127 @@ input, textarea {
 }
 
 @media (max-width: 768px) {
+    /* Hide the desktop navbar entirely — mobile uses inline tab headers */
     .navbar {
-        height: calc(var(--mobile-navbar-h) + env(safe-area-inset-top));
-        box-shadow:
-            0 4px 12px var(--nm-shadow-dark),
-            0 -1px 0 var(--nm-shadow-light);
+        display: none !important;
     }
 
-    .navbar-wrapper {
-        padding: 0 16px;
+    /* ── Mobile inline tab header ── */
+    .mobile-tab-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: calc(env(safe-area-inset-top) + 14px) 16px 10px;
+        flex-shrink: 0;
     }
 
-    /* Hide top nav tabs — replaced by bottom nav */
-    .navbar-center {
-        display: none;
+    .mobile-tab-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    /* Slim brand */
-    .brand-text {
-        font-size: 18px;
+    .mobile-brand-logo {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .mobile-brand-name {
+        font-size: 20px;
+        font-weight: 900;
         letter-spacing: -1px;
+        background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
-    /* Compact user button */
-    .user-button {
-        padding: 0 12px;
+    .mobile-tab-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mobile-action-btn {
+        width: 40px;
         height: 40px;
-        gap: 6px;
+        border-radius: 14px;
+        background: var(--bg-primary);
+        box-shadow:
+            4px 4px 10px var(--nm-shadow-dark),
+            -4px -4px 10px var(--nm-shadow-light);
+        border: none;
+        color: var(--text-secondary);
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: box-shadow 0.12s ease, transform 0.12s ease;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    .user-name,
-    .user-button .fa-chevron-down {
+    .mobile-action-btn:active {
+        box-shadow: var(--nm-shadow-in-sm);
+        transform: scale(0.91);
+    }
+
+    .mobile-action-btn.hidden {
         display: none;
     }
 
-    .user-avatar {
-        width: 34px;
-        height: 34px;
-        font-size: 12px;
-        box-shadow: var(--nm-shadow-out-sm);
+    /* Lock button gets accent color */
+    #mobile-lock-btn {
+        color: var(--accent-primary);
+    }
+
+    /* Avatar button */
+    .mobile-avatar-btn {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .mobile-avatar-btn .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 800;
+        box-shadow: none;
+        border: 2px solid var(--accent-soft);
+    }
+
+    /* Mobile dropdown — anchored below the avatar button */
+    .mobile-dropdown {
+        position: fixed;
+        top: calc(env(safe-area-inset-top) + 62px);
+        right: 12px;
+        left: auto;
+        min-width: 220px;
+        border-radius: 20px;
+        transform: translateY(-8px) scale(0.96);
+        transform-origin: top right;
+        z-index: 300;
+    }
+
+    .mobile-dropdown.show {
+        transform: translateY(0) scale(1);
+    }
+
+    .mobile-dropdown .dropdown-item {
+        padding: 14px 18px;
+        font-size: 14px;
+        min-height: 48px;
+    }
+
+    /* Adjust main-content top padding — no navbar anymore */
+    .main-content {
+        padding-top: 0;
+    }
+
+    /* Settings/Account containers: top starts from 0 since no navbar */
+    .settings-container {
+        top: 0 !important;
     }
 }
 
@@ -169,7 +251,7 @@ input, textarea {
         box-shadow: 0 0 8px var(--aura-1);
     }
 
-    /* Content clearance */
+    /* Content clearance — no navbar on mobile, just bottom nav */
     .main-content {
         padding-bottom: calc(var(--mobile-bottom-nav-h) + env(safe-area-inset-bottom) + 16px);
     }
@@ -683,7 +765,7 @@ input, textarea {
 /* Override both toast-container definitions from components.css */
 .toast-container {
     position: fixed;
-    top: calc(var(--mobile-navbar-h, 64px) + env(safe-area-inset-top) + 12px);
+    top: calc(env(safe-area-inset-top) + 12px);
     left: 50%;
     transform: translateX(-50%);
     bottom: auto;
@@ -699,7 +781,7 @@ input, textarea {
 
 @media (max-width: 768px) {
     .toast-container {
-        top: calc(var(--mobile-navbar-h) + env(safe-area-inset-top) + 12px);
+        top: calc(env(safe-area-inset-top) + 12px);
     }
 
     .neumorphic-toast {
