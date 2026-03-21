@@ -116,7 +116,10 @@ export class UIManager {
 
     // ─── PIN delegations ───────────────────────────────────────────────────────
 
-    public lockVault() { this.pinManager.lockVault(); }
+    public lockVault() {
+        (window as any).__connectivityManager?.setHidden();
+        this.pinManager.lockVault();
+    }
     public handleUnlock() { this.pinManager.handleUnlock(); }
     public showForgotPinConfirm() { this.pinManager.showForgotPinConfirm(); }
     public showPinSetup() { this.pinManager.showPinSetup(); }

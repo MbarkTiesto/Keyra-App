@@ -7,9 +7,24 @@ export class ConnectivityManager {
     private host: ConnectivityManagerHost;
     private wasOffline: boolean = false;
     private hideTimer: any = null;
+    private uiReady: boolean = false;
 
     constructor(host: ConnectivityManagerHost) {
         this.host = host;
+    }
+
+    /** Call this once the main UI is visible — enables the indicator */
+    public setReady() {
+        this.uiReady = true;
+        this.updateIndicator(false);
+    }
+
+    /** Call this when vault is locked — hides the indicator */
+    public setHidden() {
+        this.uiReady = false;
+        const el = document.getElementById('connectivity-indicator');
+        if (el) el.classList.remove('visible');
+        if (this.hideTimer) { clearTimeout(this.hideTimer); this.hideTimer = null; }
     }
 
     public init() {
@@ -47,8 +62,12 @@ export class ConnectivityManager {
         const label = el.querySelector('.connectivity-label');
         if (label) label.textContent = isOnline ? 'Online' : 'Offline';
 
-        // Make visible
-        el.classList.add('visible');
+        // Only show the pill once the main UI is ready
+        if (this.uiReady) {
+            el.classList.add('visible');
+        } else {
+            el.classList.remove('visible');
+        }
 
         // Also update the settings cloud status row
         const statusDisplay = document.getElementById('cloud-status-display');
@@ -65,7 +84,7 @@ export class ConnectivityManager {
 
         // Auto-hide the online pill after 3 s — keep offline pill always visible
         if (this.hideTimer) clearTimeout(this.hideTimer);
-        if (isOnline) {
+        if (isOnline && this.uiReady) {
             this.hideTimer = setTimeout(() => {
                 el.classList.add('auto-hide');
             }, 3000);

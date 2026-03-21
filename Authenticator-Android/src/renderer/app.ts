@@ -114,7 +114,12 @@ async function init() {
 
         (window as any).ui = new UIManager(uid);
 
-        if (resumed && hasPin) (window as any).ui.lockVault();
+        if (resumed && hasPin) {
+            (window as any).ui.lockVault();
+        } else {
+            // Main UI is visible — allow connectivity indicator to show
+            (window as any).__connectivityManager?.setReady();
+        }
 
         initAutoLock();
     });

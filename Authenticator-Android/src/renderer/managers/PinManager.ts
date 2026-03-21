@@ -126,6 +126,8 @@ export class PinManager {
                         if (pinIn) pinIn.value = '';
                         progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
                         this.host.renderAccounts();
+                        // Main UI is now visible — allow connectivity indicator
+                        (window as any).__connectivityManager?.setReady();
                     }, 800);
                     this.host.showToast('Identity Verified', 'success');
                 } else {
