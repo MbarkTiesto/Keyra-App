@@ -645,10 +645,50 @@ input, textarea {
         font-size: 15px;
         flex: 1;
         justify-content: center;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light);
     }
 
     .modal-footer .btn-primary {
         flex: 2;
+    }
+
+    .modal-footer .btn-primary:hover,
+    .modal-footer .user-button:hover,
+    .modal-footer .btn-danger:hover {
+        transform: none;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light);
+    }
+
+    .modal-footer .btn-primary:active,
+    .modal-footer .user-button:active,
+    .modal-footer .btn-danger:active {
+        box-shadow: var(--nm-shadow-in-sm) !important;
+        transform: scale(0.97) !important;
+    }
+
+    .modal-footer .user-button {
+        color: var(--text-secondary);
+        background: var(--bg-primary);
+    }
+
+    .modal-footer .btn-danger {
+        color: #ff3b30;
+        background: var(--bg-primary);
+    }
+
+    /* Disabled state */
+    .modal-footer .btn-primary:disabled,
+    .modal-footer .user-button:disabled,
+    .modal-footer .btn-danger:disabled {
+        opacity: 0.45;
+        pointer-events: none;
+        box-shadow:
+            3px 3px 8px var(--nm-shadow-dark),
+            -3px -3px 8px var(--nm-shadow-light);
     }
 
     /* ── Help text ── */
@@ -810,6 +850,14 @@ input, textarea {
         height: var(--mobile-btn-h) !important;
         border-radius: var(--radius-full) !important;
         font-size: 15px !important;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light) !important;
+    }
+
+    .pin-continue-btn:active {
+        box-shadow: var(--nm-shadow-in-sm) !important;
+        transform: scale(0.97) !important;
     }
 
     .pin-cancel-btn,
@@ -819,6 +867,17 @@ input, textarea {
         border-radius: var(--radius-full) !important;
         justify-content: center !important;
         font-size: 14px !important;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light) !important;
+        color: var(--text-secondary) !important;
+        background: var(--bg-primary) !important;
+    }
+
+    .pin-cancel-btn:active,
+    .pin-back-btn:active {
+        box-shadow: var(--nm-shadow-in-sm) !important;
+        transform: scale(0.97) !important;
     }
 
     /* ── OTP modal ── */
@@ -2052,6 +2111,14 @@ body.keyboard-open .auth-overlay {
         border-radius: var(--radius-full) !important;
         font-size: 15px !important;
         min-height: unset !important;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light) !important;
+    }
+
+    .recovery-btn:active {
+        box-shadow: var(--nm-shadow-in-sm) !important;
+        transform: scale(0.97) !important;
     }
 
     /* Password input inside recovery form */
@@ -2073,13 +2140,6 @@ body.keyboard-open .auth-overlay {
     /* When modal-header has 3 children (back-btn + icon + title), tighten gap */
     .modal-header:has(.modal-back-btn) {
         gap: 10px;
-    }
-
-    /* Disabled/loading state for modal buttons */
-    .modal-footer .btn-primary:disabled,
-    .modal-footer .btn-danger:disabled {
-        opacity: 0.45;
-        pointer-events: none;
     }
 
     /* Import modal — password input */
@@ -2117,4 +2177,230 @@ body.keyboard-open .auth-overlay {
     .modal-content {
         scrollbar-width: none;
     }
+}
+
+/* ── 31. IMPORT MODAL — SEMANTIC CLASSES ─────────────────────────────────────── */
+
+/* Encryption / legacy badge in modal header */
+.import-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-out-sm);
+    flex-shrink: 0;
+}
+
+.import-badge--encrypted {
+    color: var(--success, #28a745);
+}
+
+.import-badge--legacy {
+    color: #ff9500;
+}
+
+/* Warning banner — neumorphic raised card with red tint, no CSS border */
+.import-warning-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--bg-primary);
+    box-shadow:
+        6px 6px 14px var(--nm-shadow-dark),
+        -6px -6px 14px var(--nm-shadow-light);
+    background-image: radial-gradient(circle at 0% 0%, rgba(255,59,48,0.10), transparent 70%);
+    margin-bottom: 16px;
+    color: #ff3b30;
+}
+
+.import-warning-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.import-warning-title {
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.import-warning-body {
+    font-size: 12px;
+    opacity: 0.85;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+/* Info section wrapper */
+.import-info-section {
+    background: var(--bg-primary);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--nm-shadow-in-sm);
+    margin-bottom: 16px;
+}
+
+.import-info-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 12px;
+}
+
+.import-info-rows {
+    display: grid;
+    gap: 10px;
+}
+
+/* Individual info row */
+.import-info-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-out-sm);
+    border-radius: 12px;
+}
+
+.import-info-row-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 15px;
+    color: var(--accent-primary);
+}
+
+.import-info-row-icon--success { color: var(--success, #28a745); }
+.import-info-row-icon--warn    { color: #ff9500; }
+
+.import-info-row-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.import-info-row-key {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.import-info-row-val {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.import-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+}
+
+/* Checksum status rows */
+.import-checksum {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 12px;
+}
+
+.import-checksum--ok   { color: var(--success, #28a745); }
+.import-checksum--fail { color: #ff3b30; }
+
+/* ── 32. EXPORT OPTION CARDS — CSS-DRIVEN SELECTED STATE ─────────────────────── */
+
+.export-option-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: var(--bg-primary);
+    border-radius: 14px;
+    box-shadow: var(--nm-shadow-out);
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+    text-align: left;
+    width: 100%;
+    border: none;
+}
+
+.export-option-card:active {
+    transform: scale(0.98);
+}
+
+.export-option-card.selected {
+    box-shadow:
+        var(--nm-shadow-in-sm),
+        0 0 0 2px var(--accent-soft);
+}
+
+/* Check indicator */
+.export-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    background: transparent;
+}
+
+.export-check.visible {
+    opacity: 1;
+    border-color: var(--accent-primary);
+    background: var(--accent-primary);
+    color: white;
+}
+
+/* Export option card icon vessel */
+.export-option-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+
+.export-option-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+}
+
+.export-option-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 600;
 }

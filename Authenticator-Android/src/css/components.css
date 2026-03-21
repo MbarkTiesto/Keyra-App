@@ -721,12 +721,49 @@ i.fa-regular {
     flex: 1;
     height: clamp(44px, 9vw, 52px);
     font-size: clamp(13px, 2vw, 14px);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-full);
     font-weight: 800;
+    box-shadow: var(--nm-shadow-out);
+    justify-content: center;
 }
 
 .modal-footer .btn-primary {
     flex: 2;
+}
+
+.modal-footer .btn-primary:hover {
+    transform: none;
+    box-shadow: var(--nm-shadow-out);
+}
+
+.modal-footer .btn-primary:active {
+    box-shadow: var(--nm-shadow-in-sm);
+    transform: scale(0.97);
+}
+
+.modal-footer .user-button {
+    color: var(--text-secondary);
+}
+
+.modal-footer .user-button:active {
+    box-shadow: var(--nm-shadow-in-sm);
+    transform: scale(0.97);
+}
+
+.modal-footer .btn-danger {
+    color: #ff3b30;
+}
+
+.modal-footer .btn-danger:hover {
+    background: var(--bg-primary);
+    color: #ff3b30;
+    transform: none;
+    box-shadow: var(--nm-shadow-out);
+}
+
+.modal-footer .btn-danger:active {
+    box-shadow: var(--nm-shadow-in-sm);
+    transform: scale(0.97);
 }
 
 .modal-content .form-group {
