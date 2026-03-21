@@ -53,6 +53,8 @@ export class UIManager {
         this.initVaultViewStyle();
         this.initSegmentedStates();
         this.setupEventListeners();
+        this.setupPullToRefresh();
+        this.setupSearchFocus();
         this.updateLockVaultVisibility(); // Check PIN on startup
         this.startTimer();
         this.loadInitialData();
@@ -1250,6 +1252,17 @@ export class UIManager {
             this.copyOTPToClipboard(otp, codeElement);
         });
 
+        // #6 Full card tap to copy (mobile-friendly)
+        card.addEventListener('click', async (e) => {
+            // Ignore if clicking interactive elements
+            const target = e.target as HTMLElement;
+            if (target.closest('.card-actions, .copy-btn, .secure-view-btn')) return;
+            if (document.body.classList.contains('vault-is-locked')) return;
+            if (this.vaultViewStyle === 'secure') return;
+            const otp = await (window as any).api.generateTOTP(account.secret);
+            this.copyOTPToClipboard(otp, card.querySelector('.otp-code') as HTMLElement || card);
+        });
+
         const copyBtn = card.querySelector('.copy-btn') as HTMLElement;
         if (copyBtn) copyBtn.onclick = async () => {
             if (document.body.classList.contains('vault-is-locked')) {
@@ -1419,6 +1432,88 @@ export class UIManager {
                 lastActionElement.textContent = lastAction;
             }
         }
+    }
+
+    // ── #4 Pull-to-refresh ──────────────────────────────────────────────────
+    private setupPullToRefresh() {
+        const mainContent = document.querySelector('.main-content') as HTMLElement;
+        if (!mainContent) return;
+
+        let startY = 0;
+        let pulling = false;
+        let indicator: HTMLElement | null = null;
+
+        const getIndicator = () => {
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.className = 'pull-refresh-indicator';
+                indicator.innerHTML = '<i class="fa-solid fa-rotate"></i><span>Pull to refresh</span>';
+                mainContent.prepend(indicator);
+            }
+            return indicator;
+        };
+
+        mainContent.addEventListener('touchstart', (e: TouchEvent) => {
+            if (mainContent.scrollTop === 0) {
+                startY = e.touches[0].clientY;
+                pulling = true;
+            }
+        }, { passive: true });
+
+        mainContent.addEventListener('touchmove', (e: TouchEvent) => {
+            if (!pulling) return;
+            const dy = e.touches[0].clientY - startY;
+            if (dy > 0 && dy < 100) {
+                const ind = getIndicator();
+                ind.style.height = `${dy}px`;
+                ind.style.opacity = String(dy / 80);
+                ind.classList.toggle('pull-refresh-ready', dy > 64);
+            }
+        }, { passive: true });
+
+        mainContent.addEventListener('touchend', async (e: TouchEvent) => {
+            if (!pulling) return;
+            pulling = false;
+            const dy = e.changedTouches[0].clientY - startY;
+            const ind = getIndicator();
+
+            if (dy > 64) {
+                ind.classList.add('pull-refresh-loading');
+                ind.querySelector('span')!.textContent = 'Refreshing...';
+                try {
+                    await this.loadInitialData();
+                    this.showToast('Vault refreshed', 'success');
+                } catch {
+                    this.showToast('Refresh failed', 'error');
+                }
+            }
+
+            ind.style.height = '0';
+            ind.style.opacity = '0';
+            ind.classList.remove('pull-refresh-ready', 'pull-refresh-loading');
+        }, { passive: true });
+    }
+
+    // ── #9 Search focus animation ────────────────────────────────────────────
+    private setupSearchFocus() {
+        const searchInput = document.getElementById('vault-search') as HTMLInputElement;
+        const searchVessel = searchInput?.closest('.search-vessel') as HTMLElement;
+        if (!searchInput || !searchVessel) return;
+
+        searchInput.addEventListener('focus', () => {
+            searchVessel.classList.add('search-focused');
+        });
+
+        searchInput.addEventListener('blur', () => {
+            searchVessel.classList.remove('search-focused');
+            if (!searchInput.value) {
+                searchVessel.classList.remove('search-expanded');
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            searchVessel.classList.toggle('search-expanded', searchInput.value.length > 0);
+        });
     }
 
     private async startTimer() {
