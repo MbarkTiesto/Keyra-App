@@ -1,0 +1,57 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # allows manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        working-directory: Authenticator-Android
+        run: npm ci
+
+      - name: Build web assets
+        working-directory: Authenticator-Android
+        run: |
+          node scripts/build-html.cjs
+          npm run build
+
+      - name: Add Android platform (if not present)
+        working-directory: Authenticator-Android
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+
+      - name: Sync Capacitor
+        working-directory: Authenticator-Android
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: Authenticator-Android/android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: keyra-debug-apk
+          path: Authenticator-Android/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30

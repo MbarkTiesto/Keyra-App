@@ -10,7 +10,8 @@
     "build:html": "node scripts/build-html.cjs",
     "cap:sync": "npm run build && npx cap sync",
     "cap:android": "npm run build && npx cap sync && npx cap open android",
-    "cap:run": "npm run build && npx cap sync && npx cap run android --livereload --external"
+    "cap:run": "npm run build && npx cap sync && npx cap run android --livereload --external",
+    "apk": "node scripts/build-html.cjs && npm run build && npx cap sync android && cd android && gradlew assembleDebug"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^7.2.0",
