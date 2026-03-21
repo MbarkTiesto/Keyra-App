@@ -3395,21 +3395,14 @@ body.vault-is-locked .main-app-content,
 #loading-overlay {
     position: fixed;
     inset: 0;
-    background: hsla(var(--h), 20%, 5%, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: var(--bg-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 99999;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Light mode loading overlay */
-body.light-theme #loading-overlay {
-    background: hsla(var(--h), 20%, 95%, 0.85);
+    transition: opacity 0.35s ease, visibility 0.35s ease;
 }
 
 #loading-overlay.show {
@@ -3423,81 +3416,149 @@ body.light-theme #loading-overlay {
     visibility: hidden;
 }
 
+/* ── Card vessel ── */
 .loading-content {
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 32px;
+    gap: 28px;
+    padding: 48px 40px;
+    border-radius: 32px;
+    background: var(--bg-primary);
+    box-shadow:
+        20px 20px 48px var(--nm-shadow-dark),
+        -20px -20px 48px var(--nm-shadow-light);
+    min-width: 260px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Accent aura behind the spinner */
+.loading-content::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+    pointer-events: none;
+    animation: loadingAuraPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes loadingAuraPulse {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    50%       { opacity: 1;   transform: translateX(-50%) scale(1.15); }
+}
+
+/* ── Progress bar at bottom of card ── */
+.loading-content::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 0 var(--radius-full) var(--radius-full) 0;
+    background: var(--accent-primary);
+    box-shadow: 0 0 8px var(--aura-1);
+    animation: loadingBar 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes loadingBar {
+    0%   { left: 0;    width: 0%; }
+    40%  { left: 0;    width: 60%; }
+    60%  { left: 40%;  width: 60%; }
+    100% { left: 100%; width: 0%; }
 }
 
 .loading-title {
     font-family: var(--font-heading);
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 900;
-    letter-spacing: -1px;
+    letter-spacing: -0.8px;
     color: var(--text-primary);
     margin: 0;
-    text-align: center;
 }
 
 .loading-subtitle {
-    font-size: 11px;
-    font-weight: 850;
+    font-size: 10px;
+    font-weight: 800;
     color: var(--accent-primary);
     text-transform: uppercase;
     letter-spacing: 2.5px;
-    text-align: center;
+    animation: loadingSubShimmer 1.8s ease-in-out infinite;
 }
 
+@keyframes loadingSubShimmer {
+    0%, 100% { opacity: 0.5; }
+    50%       { opacity: 1; }
+}
+
+/* ── Spinner vessel ── */
 .nm-spinner-vessel {
     position: relative;
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
+/* Outer neumorphic raised ring — rotates */
 .nm-spinner {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     border-radius: 50%;
     background: var(--bg-primary);
-    box-shadow: var(--nm-shadow-out);
-    animation: spin 2s linear infinite;
+    box-shadow:
+        8px 8px 20px var(--nm-shadow-dark),
+        -8px -8px 20px var(--nm-shadow-light);
+    animation: nmSpinRing 2.2s linear infinite;
 }
 
+/* Accent dot on the outer ring */
 .nm-spinner::after {
     content: '';
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 14px;
-    height: 14px;
+    top: 8px;
+    right: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: var(--accent-primary);
-    box-shadow: 0 0 10px var(--accent-soft);
+    box-shadow: 0 0 12px var(--aura-1), 0 0 4px var(--accent-primary);
 }
 
+/* Inner neumorphic inset circle — static */
 .nm-spinner-inner {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: var(--bg-primary);
     box-shadow: var(--nm-shadow-in);
     z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Lock icon inside inner circle */
+.nm-spinner-inner::after {
+    content: '\f023';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--accent-primary);
+    opacity: 0.7;
+}
+
+@keyframes nmSpinRing {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 
 /* Auth Specific Loader */
@@ -3510,39 +3571,70 @@ body.light-theme #loading-overlay {
     justify-content: center;
     z-index: 1000;
     border-radius: var(--radius-auth);
-    transition: all 0.4s ease;
+    transition: opacity 0.35s ease;
 }
 
 .auth-loader-content {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
+/* ── Auth spinner: neumorphic raised ring + accent arc ── */
 .auth-spinner-ring {
-    width: 80px;
-    height: 80px;
+    width: 72px;
+    height: 72px;
     position: relative;
-    margin: 0 auto 24px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.auth-spinner-inner {
+/* Outer raised ring */
+.auth-spinner-ring::before {
+    content: '';
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 4px solid transparent;
+    background: var(--bg-primary);
+    box-shadow:
+        6px 6px 16px var(--nm-shadow-dark),
+        -6px -6px 16px var(--nm-shadow-light);
+    animation: nmSpinRing 2s linear infinite;
+}
+
+/* Inner inset circle */
+.auth-spinner-ring::after {
+    content: '';
+    position: absolute;
+    inset: 18px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in-sm);
+    z-index: 1;
+}
+
+/* Accent arc */
+.auth-spinner-inner {
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    border: 3px solid transparent;
     border-top-color: var(--accent-primary);
     border-right-color: var(--accent-primary);
+    box-shadow: 0 0 10px var(--aura-1);
     animation: nm-spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    z-index: 2;
 }
 
 .auth-loader-label {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 900;
     color: var(--text-primary);
     letter-spacing: -0.5px;
-    margin-bottom: 4px;
+    margin: 0;
 }
 
 .auth-loader-sublabel {
@@ -3552,6 +3644,7 @@ body.light-theme #loading-overlay {
     letter-spacing: 1.5px;
     text-transform: uppercase;
     opacity: 0.8;
+    animation: loadingSubShimmer 1.8s ease-in-out infinite;
 }
 
 
