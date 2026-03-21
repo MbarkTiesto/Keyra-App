@@ -72,6 +72,34 @@ export async function setupAuthUI() {
         toShow.classList.remove('hidden');
     }
 
+    let loginLockoutInterval: any = null;
+    function startLoginLockoutCountdown(errEl: HTMLElement, until: Date) {
+        if (loginLockoutInterval) clearInterval(loginLockoutInterval);
+        const submitBtn = document.querySelector('#form-login button[type="submit"]') as HTMLButtonElement | null;
+        if (submitBtn) submitBtn.disabled = true;
+
+        const tick = () => {
+            const remaining = until.getTime() - Date.now();
+            if (remaining <= 0) {
+                clearInterval(loginLockoutInterval);
+                loginLockoutInterval = null;
+                errEl.style.opacity = '0';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+            const mins = Math.floor(remaining / 60000);
+            const secs = Math.floor((remaining % 60000) / 1000);
+            const label = mins > 0
+                ? `Too many attempts. Try again in ${mins}m ${secs.toString().padStart(2, '0')}s`
+                : `Too many attempts. Try again in ${secs}s`;
+            errEl.textContent = label;
+            errEl.style.opacity = '1';
+        };
+
+        tick();
+        loginLockoutInterval = setInterval(tick, 1000);
+    }
+
     // Navigation
     document.getElementById('btn-show-signup')?.addEventListener('click', () => {
         switchState(boxLogin, boxSignup);
@@ -114,10 +142,8 @@ export async function setupAuthUI() {
         // Rate limiting check
         const rateLimitCheck = rateLimiter.isAllowed('login', user);
         if (!rateLimitCheck.allowed) {
-            err.textContent = rateLimitCheck.message || "Too many attempts. Please try again later.";
-            err.style.opacity = '1';
-            void (err as HTMLElement).offsetWidth;
-            err.classList.add('animate-shake');
+            // Show live countdown
+            startLoginLockoutCountdown(err, rateLimitCheck.blockedUntil);
             return;
         }
 
@@ -127,15 +153,19 @@ export async function setupAuthUI() {
             if (result.success) {
                 // Reset rate limit on successful login
                 rateLimiter.reset('login', user);
+                if (loginLockoutInterval) { clearInterval(loginLockoutInterval); loginLockoutInterval = null; }
+                const submitBtn = document.querySelector('#form-login button[type="submit"]') as HTMLButtonElement | null;
+                if (submitBtn) submitBtn.disabled = false;
                 completeLogin();
             } else {
                 // Record failed attempt
-                rateLimiter.recordAttempt('login', user);
-                const remaining = rateLimiter.getRemainingAttempts('login', user);
+                const rlResult = rateLimiter.recordAttempt('login', user);
                 
                 let errorMsg = result.message;
-                if (remaining > 0 && remaining <= 3) {
-                    errorMsg += ` (${remaining} attempt${remaining > 1 ? 's' : ''} remaining)`;
+                if (!rlResult.allowed) {
+                    errorMsg = rlResult.message;
+                } else if (rlResult.remainingAttempts <= 3) {
+                    errorMsg += ` (${rlResult.remainingAttempts} attempt${rlResult.remainingAttempts !== 1 ? 's' : ''} remaining)`;
                 }
                 
                 err.textContent = errorMsg;
@@ -182,12 +212,23 @@ export async function setupAuthUI() {
 
         setAuthLoading(true, "Creating Vault...");
         try {
+            // Rate limit signup by email
+            const rlCheck = rateLimiter.isAllowed('signup', email);
+            if (!rlCheck.allowed) {
+                err.textContent = rlCheck.message;
+                err.style.opacity = '1';
+                void (err as HTMLElement).offsetWidth;
+                err.classList.add('animate-shake');
+                return;
+            }
+
             const result = await window.api.signup(user, email, pass);
             if (result.success) {
                 switchState(boxSignup, boxVerify);
                 (document.getElementById('verify-email-field') as HTMLInputElement).value = email;
                 if (result.code) showSimulationToast(result.code);
             } else {
+                rateLimiter.recordAttempt('signup', email);
                 err.textContent = result.message;
                 err.style.opacity = '1';
                 void (err as HTMLElement).offsetWidth; // Trigger reflow
@@ -244,12 +285,13 @@ export async function setupAuthUI() {
                 rateLimiter.reset('verification', email);
                 switchState(boxVerify, boxLogin);
             } else {
-                rateLimiter.recordAttempt('verification', email);
-                const remaining = rateLimiter.getRemainingAttempts('verification', email);
+                const rlResult = rateLimiter.recordAttempt('verification', email);
                 
                 let errorMsg = result.message;
-                if (remaining > 0) {
-                    errorMsg += ` (${remaining} attempt${remaining > 1 ? 's' : ''} remaining)`;
+                if (!rlResult.allowed) {
+                    errorMsg = rlResult.message;
+                } else if (rlResult.remainingAttempts > 0) {
+                    errorMsg += ` (${rlResult.remainingAttempts} attempt${rlResult.remainingAttempts !== 1 ? 's' : ''} remaining)`;
                 }
                 
                 err.textContent = errorMsg;

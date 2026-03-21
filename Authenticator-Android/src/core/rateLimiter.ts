@@ -1,6 +1,7 @@
 /**
- * Rate Limiter for Security Operations
- * Prevents brute force attacks and abuse
+ * Persistent Rate Limiter
+ * Survives app restarts via localStorage.
+ * Covers: login, pin, verification, signup
  */
 
 interface RateLimitConfig {
@@ -15,169 +16,182 @@ interface AttemptRecord {
     blockedUntil?: number;
 }
 
+type RateLimitResult =
+    | { allowed: true; remainingAttempts: number }
+    | { allowed: false; blockedUntil: Date; message: string; remainingMs: number };
+
+const CONFIGS: Record<string, RateLimitConfig> = {
+    login: {
+        maxAttempts: 5,
+        windowMs: 15 * 60 * 1000,       // 15 min window
+        blockDurationMs: 30 * 60 * 1000  // 30 min block
+    },
+    pin: {
+        maxAttempts: 5,
+        windowMs: 10 * 60 * 1000,        // 10 min window
+        blockDurationMs: 5 * 60 * 1000   // 5 min block (escalates)
+    },
+    verification: {
+        maxAttempts: 3,
+        windowMs: 10 * 60 * 1000,        // 10 min window
+        blockDurationMs: 60 * 60 * 1000  // 1 hour block
+    },
+    signup: {
+        maxAttempts: 5,
+        windowMs: 60 * 60 * 1000,        // 1 hour window
+        blockDurationMs: 60 * 60 * 1000  // 1 hour block
+    }
+};
+
+const STORAGE_PREFIX = '__rl_';
+
 class RateLimiter {
-    private attempts: Map<string, AttemptRecord> = new Map();
-    private configs: Map<string, RateLimitConfig> = new Map();
-
-    constructor() {
-        // Default configurations
-        this.configs.set('login', {
-            maxAttempts: 5,
-            windowMs: 15 * 60 * 1000, // 15 minutes
-            blockDurationMs: 30 * 60 * 1000 // 30 minutes block
-        });
-
-        this.configs.set('sync', {
-            maxAttempts: 10,
-            windowMs: 60 * 1000, // 1 minute
-            blockDurationMs: 5 * 60 * 1000 // 5 minutes block
-        });
-
-        this.configs.set('verification', {
-            maxAttempts: 3,
-            windowMs: 10 * 60 * 1000, // 10 minutes
-            blockDurationMs: 60 * 60 * 1000 // 1 hour block
-        });
-
-        // Clean up old records every 5 minutes
-        setInterval(() => this.cleanup(), 5 * 60 * 1000);
+    private getKey(operation: string, identifier: string): string {
+        return `${STORAGE_PREFIX}${operation}:${identifier}`;
     }
 
-    /**
-     * Check if an operation is allowed
-     */
-    public isAllowed(operation: string, identifier: string): { allowed: boolean; remainingAttempts?: number; blockedUntil?: Date; message?: string } {
-        const key = `${operation}:${identifier}`;
-        const config = this.configs.get(operation);
-
-        if (!config) {
-            console.warn(`No rate limit config for operation: ${operation}`);
-            return { allowed: true };
+    private load(operation: string, identifier: string): AttemptRecord | null {
+        try {
+            const raw = localStorage.getItem(this.getKey(operation, identifier));
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
         }
+    }
+
+    private save(operation: string, identifier: string, record: AttemptRecord): void {
+        try {
+            localStorage.setItem(this.getKey(operation, identifier), JSON.stringify(record));
+        } catch {
+            // localStorage full — fail open
+        }
+    }
+
+    private remove(operation: string, identifier: string): void {
+        localStorage.removeItem(this.getKey(operation, identifier));
+    }
+
+    // ─── Public API ────────────────────────────────────────────────────────────
+
+    public isAllowed(operation: string, identifier: string): RateLimitResult {
+        const config = CONFIGS[operation];
+        if (!config) return { allowed: true, remainingAttempts: Infinity };
 
         const now = Date.now();
-        const record = this.attempts.get(key);
+        const record = this.load(operation, identifier);
 
-        // Check if currently blocked
+        // Currently blocked
         if (record?.blockedUntil && record.blockedUntil > now) {
-            const blockedUntilDate = new Date(record.blockedUntil);
-            const minutesRemaining = Math.ceil((record.blockedUntil - now) / 60000);
+            const remainingMs = record.blockedUntil - now;
+            const minutes = Math.ceil(remainingMs / 60000);
             return {
                 allowed: false,
-                blockedUntil: blockedUntilDate,
-                message: `Too many attempts. Please try again in ${minutesRemaining} minute${minutesRemaining > 1 ? 's' : ''}.`
+                blockedUntil: new Date(record.blockedUntil),
+                remainingMs,
+                message: `Too many attempts. Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`
             };
         }
 
-        // Check if window has expired
+        // Window expired — clean slate
         if (record && (now - record.firstAttempt) > config.windowMs) {
-            // Reset the record
-            this.attempts.delete(key);
+            this.remove(operation, identifier);
             return { allowed: true, remainingAttempts: config.maxAttempts };
         }
 
-        // Check attempt count
-        if (record && record.count >= config.maxAttempts) {
-            // Block the user
-            record.blockedUntil = now + config.blockDurationMs;
-            const blockedUntilDate = new Date(record.blockedUntil);
-            const minutesRemaining = Math.ceil(config.blockDurationMs / 60000);
-            return {
-                allowed: false,
-                blockedUntil: blockedUntilDate,
-                message: `Too many attempts. Blocked for ${minutesRemaining} minutes.`
-            };
-        }
-
-        const remainingAttempts = config.maxAttempts - (record?.count || 0);
-        return { allowed: true, remainingAttempts };
+        const used = record?.count ?? 0;
+        const remaining = config.maxAttempts - used;
+        return { allowed: true, remainingAttempts: Math.max(0, remaining) };
     }
 
-    /**
-     * Record an attempt
-     */
-    public recordAttempt(operation: string, identifier: string): void {
-        const key = `${operation}:${identifier}`;
+    public recordAttempt(operation: string, identifier: string): RateLimitResult {
+        const config = CONFIGS[operation];
+        if (!config) return { allowed: true, remainingAttempts: Infinity };
+
         const now = Date.now();
-        const record = this.attempts.get(key);
+        let record = this.load(operation, identifier);
+
+        // Window expired — reset
+        if (record && (now - record.firstAttempt) > config.windowMs) {
+            record = null;
+        }
 
         if (!record) {
-            this.attempts.set(key, {
-                count: 1,
-                firstAttempt: now
-            });
+            record = { count: 1, firstAttempt: now };
         } else {
             record.count++;
         }
+
+        // Threshold reached — apply block with escalation for PIN
+        if (record.count >= config.maxAttempts) {
+            const escalation = operation === 'pin'
+                ? Math.pow(2, Math.floor(record.count / config.maxAttempts) - 1)
+                : 1;
+            record.blockedUntil = now + config.blockDurationMs * escalation;
+            this.save(operation, identifier, record);
+
+            const remainingMs = record.blockedUntil - now;
+            const minutes = Math.ceil(remainingMs / 60000);
+            return {
+                allowed: false,
+                blockedUntil: new Date(record.blockedUntil),
+                remainingMs,
+                message: `Too many attempts. Locked for ${minutes} minute${minutes !== 1 ? 's' : ''}.`
+            };
+        }
+
+        this.save(operation, identifier, record);
+        const remaining = config.maxAttempts - record.count;
+        return { allowed: true, remainingAttempts: remaining };
     }
 
-    /**
-     * Reset attempts for a specific identifier (e.g., after successful login)
-     */
     public reset(operation: string, identifier: string): void {
-        const key = `${operation}:${identifier}`;
-        this.attempts.delete(key);
+        this.remove(operation, identifier);
     }
 
-    /**
-     * Get remaining attempts
-     */
     public getRemainingAttempts(operation: string, identifier: string): number {
-        const key = `${operation}:${identifier}`;
-        const config = this.configs.get(operation);
-        const record = this.attempts.get(key);
-
+        const config = CONFIGS[operation];
         if (!config) return Infinity;
+        const record = this.load(operation, identifier);
         if (!record) return config.maxAttempts;
-
+        const now = Date.now();
+        if ((now - record.firstAttempt) > config.windowMs) return config.maxAttempts;
         return Math.max(0, config.maxAttempts - record.count);
     }
 
-    /**
-     * Clean up expired records
-     */
-    private cleanup(): void {
-        const now = Date.now();
-        const keysToDelete: string[] = [];
-
-        this.attempts.forEach((record, key) => {
-            const operation = key.split(':')[0];
-            const config = this.configs.get(operation);
-
-            if (!config) {
-                keysToDelete.push(key);
-                return;
-            }
-
-            // Remove if window expired and not blocked
-            if ((now - record.firstAttempt) > config.windowMs && (!record.blockedUntil || record.blockedUntil < now)) {
-                keysToDelete.push(key);
-            }
-        });
-
-        keysToDelete.forEach(key => this.attempts.delete(key));
+    public getBlockedUntil(operation: string, identifier: string): Date | null {
+        const record = this.load(operation, identifier);
+        if (!record?.blockedUntil) return null;
+        if (record.blockedUntil <= Date.now()) return null;
+        return new Date(record.blockedUntil);
     }
 
-    /**
-     * Get statistics for monitoring
-     */
-    public getStats(): { operation: string; identifier: string; attempts: number; blocked: boolean }[] {
+    /** Purge all expired rate limit records from localStorage */
+    public cleanup(): void {
         const now = Date.now();
-        const stats: { operation: string; identifier: string; attempts: number; blocked: boolean }[] = [];
+        const toDelete: string[] = [];
 
-        this.attempts.forEach((record, key) => {
-            const [operation, identifier] = key.split(':');
-            stats.push({
-                operation,
-                identifier,
-                attempts: record.count,
-                blocked: !!(record.blockedUntil && record.blockedUntil > now)
-            });
-        });
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key?.startsWith(STORAGE_PREFIX)) continue;
+            try {
+                const record: AttemptRecord = JSON.parse(localStorage.getItem(key)!);
+                const opName = key.replace(STORAGE_PREFIX, '').split(':')[0];
+                const config = CONFIGS[opName];
+                if (!config) { toDelete.push(key); continue; }
+                const expired = (now - record.firstAttempt) > config.windowMs;
+                const unblocked = !record.blockedUntil || record.blockedUntil < now;
+                if (expired && unblocked) toDelete.push(key);
+            } catch {
+                toDelete.push(key);
+            }
+        }
 
-        return stats;
+        toDelete.forEach(k => localStorage.removeItem(k));
     }
 }
 
-// Singleton instance
 export const rateLimiter = new RateLimiter();
+
+// Cleanup stale records on load and every 10 minutes
+rateLimiter.cleanup();
+setInterval(() => rateLimiter.cleanup(), 10 * 60 * 1000);

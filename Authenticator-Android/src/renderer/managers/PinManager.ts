@@ -1,4 +1,5 @@
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { rateLimiter } from '../../core/rateLimiter';
 
 export interface PinManagerHost {
     userId: string;
@@ -19,6 +20,7 @@ export class PinManager {
     private host: PinManagerHost;
     private pinBuffer: string = '';
     private tempPin: string = '';
+    private lockoutInterval: any = null;
 
     constructor(host: PinManagerHost) {
         this.host = host;
@@ -43,6 +45,15 @@ export class PinManager {
         if (biometricKey) biometricKey.classList.toggle('hidden', !biometricEnabled);
         if (biometricEnabled) {
             setTimeout(() => this.host.tryBiometricUnlock(), 400);
+        }
+
+        // Check if already locked out from a previous session
+        const userId = this.host.userId;
+        const existing = rateLimiter.getBlockedUntil('pin', userId);
+        if (existing) {
+            this.startLockoutCountdown(existing);
+        } else {
+            this.clearLockoutUI();
         }
     }
 
@@ -75,6 +86,18 @@ export class PinManager {
         this.updatePinDots(pinValue.length);
 
         if (pinValue.length === 4) {
+            // Check rate limit before attempting
+            const userId = this.host.userId;
+            const check = rateLimiter.isAllowed('pin', userId);
+            if (!check.allowed) {
+                Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
+                this.pinBuffer = '';
+                if (pinIn) pinIn.value = '';
+                this.updatePinDots(0);
+                this.startLockoutCountdown(check.blockedUntil);
+                return;
+            }
+
             try {
                 let isCorrect = false;
                 if (saved && saved.length === 4 && /^\d+$/.test(saved)) {
@@ -85,6 +108,10 @@ export class PinManager {
                 }
 
                 if (isCorrect) {
+                    // Success — reset rate limit
+                    rateLimiter.reset('pin', userId);
+                    this.clearLockoutUI();
+
                     progressDots.forEach((dot, index) => {
                         setTimeout(() => {
                             dot.classList.remove('filled');
@@ -102,9 +129,14 @@ export class PinManager {
                     this.host.showToast('Identity Verified', 'success');
                 } else {
                     Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {});
+
+                    // Record failed attempt
+                    const result = rateLimiter.recordAttempt('pin', userId);
+
                     const vessel = document.querySelector('.pin-input-vessel');
                     vessel?.classList.add('animate-shake');
                     progressDots.forEach(dot => { dot.classList.remove('filled'); dot.classList.add('error'); });
+
                     setTimeout(() => {
                         vessel?.classList.remove('animate-shake');
                         this.pinBuffer = '';
@@ -112,7 +144,19 @@ export class PinManager {
                         this.updatePinDots(0);
                         progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
                     }, 1000);
-                    this.host.showToast('Verification Failed', 'error');
+
+                    if (!result.allowed) {
+                        // Just got blocked
+                        this.startLockoutCountdown(result.blockedUntil);
+                        this.host.showToast(result.message, 'error');
+                    } else {
+                        const left = result.remainingAttempts;
+                        const msg = left <= 2
+                            ? `Wrong PIN — ${left} attempt${left !== 1 ? 's' : ''} left`
+                            : 'Wrong PIN';
+                        this.host.showToast(msg, 'error');
+                        this.updatePinWarning(left);
+                    }
                 }
             } catch (err) {
                 console.error('PIN validation error:', err);
@@ -123,6 +167,85 @@ export class PinManager {
                 progressDots.forEach(dot => dot.classList.remove('filled', 'error', 'success'));
             }
         }
+    }
+
+    // ─── Lockout UI ────────────────────────────────────────────────────────────
+
+    private startLockoutCountdown(until: Date) {
+        if (this.lockoutInterval) clearInterval(this.lockoutInterval);
+        this.setNumpadDisabled(true);
+        this.setForgotPinDisabled(true);
+
+        const tick = () => {
+            const remaining = until.getTime() - Date.now();
+            if (remaining <= 0) {
+                clearInterval(this.lockoutInterval);
+                this.lockoutInterval = null;
+                this.clearLockoutUI();
+                return;
+            }
+            const mins = Math.floor(remaining / 60000);
+            const secs = Math.floor((remaining % 60000) / 1000);
+            const label = mins > 0
+                ? `Locked — ${mins}m ${secs.toString().padStart(2, '0')}s remaining`
+                : `Locked — ${secs}s remaining`;
+            this.setPinSubtitle(label, true);
+        };
+
+        tick();
+        this.lockoutInterval = setInterval(tick, 1000);
+    }
+
+    private clearLockoutUI() {
+        if (this.lockoutInterval) {
+            clearInterval(this.lockoutInterval);
+            this.lockoutInterval = null;
+        }
+        this.setNumpadDisabled(false);
+        this.setForgotPinDisabled(false);
+        this.setPinSubtitle('Enter your PIN to continue', false);
+        this.removePinWarning();
+    }
+
+    private setForgotPinDisabled(disabled: boolean) {
+        const btn = document.getElementById('btn-forgot-pin') as HTMLButtonElement | null;
+        if (!btn) return;
+        btn.disabled = disabled;
+        btn.style.opacity = disabled ? '0.3' : '';
+        btn.style.pointerEvents = disabled ? 'none' : '';
+    }
+
+    private setNumpadDisabled(disabled: boolean) {
+        const numpad = document.getElementById('pin-numpad');
+        if (!numpad) return;
+        numpad.querySelectorAll('.pin-key').forEach(k => {
+            (k as HTMLButtonElement).disabled = disabled;
+            (k as HTMLElement).style.opacity = disabled ? '0.35' : '';
+            (k as HTMLElement).style.pointerEvents = disabled ? 'none' : '';
+        });
+    }
+
+    private setPinSubtitle(text: string, isWarning: boolean) {
+        const el = document.querySelector('.pin-subtitle') as HTMLElement | null;
+        if (!el) return;
+        el.textContent = text;
+        el.style.color = isWarning ? 'var(--error, #ff3b30)' : '';
+        el.style.fontWeight = isWarning ? '700' : '';
+    }
+
+    private updatePinWarning(attemptsLeft: number) {
+        let warning = document.getElementById('pin-rate-warning');
+        if (!warning) {
+            warning = document.createElement('p');
+            warning.id = 'pin-rate-warning';
+            warning.style.cssText = 'color: var(--error, #ff3b30); font-size: 13px; font-weight: 700; text-align: center; margin-top: 8px; letter-spacing: 0.02em;';
+            document.querySelector('.pin-footer-actions')?.before(warning);
+        }
+        warning.textContent = `${attemptsLeft} attempt${attemptsLeft !== 1 ? 's' : ''} remaining before lockout`;
+    }
+
+    private removePinWarning() {
+        document.getElementById('pin-rate-warning')?.remove();
     }
 
     public updatePinDots(filledCount: number, state?: 'error' | 'success') {
@@ -146,6 +269,12 @@ export class PinManager {
     public setupNumpad() {
         document.querySelectorAll('.pin-key[data-key]').forEach(key => {
             key.addEventListener('click', () => {
+                // Block input if currently locked out
+                const check = rateLimiter.isAllowed('pin', this.host.userId);
+                if (!check.allowed) {
+                    this.startLockoutCountdown(check.blockedUntil);
+                    return;
+                }
                 if (this.pinBuffer.length >= 4) return;
                 const digit = (key as HTMLElement).getAttribute('data-key')!;
                 this.pinBuffer += digit;
