@@ -1254,8 +1254,8 @@ export class UIManager {
             </div>
 
             ${this.vaultViewStyle !== 'secure' ? `
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-primary copy-btn" style="flex: 1; height: 44px; font-size: 14px;">
+            <div class="card-copy-row">
+                <button class="btn-primary copy-btn">
                     <i class="fa-solid fa-copy"></i>
                     <span class="btn-text">Secure Copy</span>
                 </button>

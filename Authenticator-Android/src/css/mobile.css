@@ -368,6 +368,13 @@ input, textarea {
             -6px -6px 14px var(--nm-shadow-light) !important;
     }
 
+    .copy-btn:hover {
+        transform: none !important;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light) !important;
+    }
+
     .copy-btn:active {
         box-shadow: var(--nm-shadow-in-sm) !important;
         transform: scale(0.97) !important;
@@ -2451,6 +2458,85 @@ body.keyboard-open .auth-overlay {
 
     /* Active press state on touch */
     .card-dropdown-item:active {
+        box-shadow: var(--nm-shadow-in-sm);
+        transform: scale(0.97);
+    }
+}
+
+/* ── 34. VAULT TAB — MOBILE NEUMORPHIC ENHANCEMENTS ─────────────────────────── */
+
+@media (max-width: 768px) {
+    /* Account card — no hover lift on touch, only press */
+    .account-card:hover {
+        transform: none;
+        box-shadow:
+            8px 8px 18px var(--nm-shadow-dark),
+            -8px -8px 18px var(--nm-shadow-light);
+    }
+
+    /* OTP box — deeper inset on mobile */
+    .otp-box {
+        border-radius: 16px;
+        padding: 12px 16px;
+    }
+
+    /* Timer linear vessel — neumorphic inset track */
+    .timer-linear-vessel {
+        box-shadow: var(--nm-shadow-in-sm);
+    }
+
+    /* Global timer vessel */
+    .global-timer-vessel {
+        border-radius: 18px;
+        padding: 12px 16px;
+        margin-bottom: 14px;
+        box-shadow: var(--nm-shadow-in-sm);
+    }
+
+    /* Empty state illustration vessel */
+    .empty-state-illustration {
+        width: 120px;
+        height: 120px;
+        box-shadow:
+            8px 8px 20px var(--nm-shadow-dark),
+            -8px -8px 20px var(--nm-shadow-light);
+    }
+
+    .empty-state-vessel h2 {
+        font-size: 24px;
+        letter-spacing: -0.8px;
+    }
+
+    .empty-state-vessel p {
+        font-size: 14px;
+        margin-bottom: 28px;
+    }
+
+    /* Copy row */
+    .card-copy-row {
+        gap: 8px;
+    }
+
+    /* Vault view segmented control */
+    .vault-view-toggle {
+        flex-shrink: 0;
+    }
+
+    .vault-view-toggle .segment {
+        width: 36px;
+        min-height: 36px;
+    }
+
+    /* Search empty state */
+    .search-empty-actions .user-button {
+        height: var(--mobile-btn-h);
+        border-radius: var(--radius-full);
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light);
+    }
+
+    .search-empty-actions .user-button:active {
         box-shadow: var(--nm-shadow-in-sm);
         transform: scale(0.97);
     }

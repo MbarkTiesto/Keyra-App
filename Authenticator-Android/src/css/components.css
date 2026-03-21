@@ -374,15 +374,15 @@ i.fa-regular {
 }
 
 .account-card:hover {
-    transform: translateY(-4px) scale(1.01);
+    transform: none;
     box-shadow:
-        15px 15px 30px var(--nm-shadow-dark),
-        -15px -15px 30px var(--nm-shadow-light);
+        10px 10px 22px var(--nm-shadow-dark),
+        -10px -10px 22px var(--nm-shadow-light);
 }
 
 .account-card:active {
-    transform: scale(0.98);
-    box-shadow: var(--nm-shadow-in);
+    transform: scale(0.985);
+    box-shadow: var(--nm-shadow-in-sm);
 }
 
 .account-header {
@@ -521,6 +521,34 @@ i.fa-regular {
 
 .card-dropdown-item.danger:active {
     transform: scale(0.96);
+}
+
+/* Card copy row + copy button */
+.card-copy-row {
+    display: flex;
+    gap: 10px;
+}
+
+.copy-btn {
+    flex: 1;
+    height: 46px !important;
+    font-size: 14px !important;
+    border-radius: var(--radius-full) !important;
+    box-shadow:
+        6px 6px 14px var(--nm-shadow-dark),
+        -6px -6px 14px var(--nm-shadow-light) !important;
+}
+
+.copy-btn:hover {
+    transform: none !important;
+    box-shadow:
+        8px 8px 18px var(--nm-shadow-dark),
+        -8px -8px 18px var(--nm-shadow-light) !important;
+}
+
+.copy-btn:active {
+    box-shadow: var(--nm-shadow-in-sm) !important;
+    transform: scale(0.97) !important;
 }
 
 .service-name {
@@ -860,8 +888,10 @@ i.fa-regular {
 }
 
 .btn-primary:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: var(--nm-shadow-out);
+    transform: none;
+    box-shadow:
+        10px 10px 22px var(--nm-shadow-dark),
+        -10px -10px 22px var(--nm-shadow-light);
     color: var(--accent-hover);
 }
 
@@ -894,10 +924,12 @@ i.fa-regular {
 }
 
 .btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--nm-shadow-out);
-    background: #ff3b30;
-    color: white;
+    transform: none;
+    box-shadow:
+        10px 10px 22px var(--nm-shadow-dark),
+        -10px -10px 22px var(--nm-shadow-light);
+    background: var(--bg-primary);
+    color: #ff3b30;
 }
 
 .btn-danger:active {
@@ -1964,8 +1996,9 @@ input:checked+.slider:before {
     background: var(--bg-primary);
     border-radius: var(--radius-full);
     border: none;
-    border-left: 4px solid var(--accent-primary);
-    box-shadow: var(--nm-shadow-out);
+    box-shadow:
+        var(--nm-shadow-out),
+        -4px 0 0 0 var(--accent-primary);
     font-size: 14px;
     font-weight: 800;
     color: var(--text-primary);
@@ -1990,20 +2023,43 @@ input:checked+.slider:before {
 }
 
 .neumorphic-toast.toast-success {
-    border-left-color: #28a745;
+    box-shadow:
+        var(--nm-shadow-out),
+        -4px 0 0 0 #28a745;
 }
 
 .neumorphic-toast.toast-error {
-    border-left-color: #ff3b30;
+    box-shadow:
+        var(--nm-shadow-out),
+        -4px 0 0 0 #ff3b30;
 }
 
 .neumorphic-toast.toast-info {
-    border-left-color: var(--accent-primary);
+    box-shadow:
+        var(--nm-shadow-out),
+        -4px 0 0 0 var(--accent-primary);
 }
 
 .neumorphic-toast:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: var(--nm-shadow-out);
+    transform: none;
+    box-shadow:
+        10px 10px 22px var(--nm-shadow-dark),
+        -10px -10px 22px var(--nm-shadow-light),
+        -4px 0 0 0 var(--accent-primary);
+}
+
+.neumorphic-toast.toast-success:hover {
+    box-shadow:
+        10px 10px 22px var(--nm-shadow-dark),
+        -10px -10px 22px var(--nm-shadow-light),
+        -4px 0 0 0 #28a745;
+}
+
+.neumorphic-toast.toast-error:hover {
+    box-shadow:
+        10px 10px 22px var(--nm-shadow-dark),
+        -10px -10px 22px var(--nm-shadow-light),
+        -4px 0 0 0 #ff3b30;
 }
 
 .neumorphic-toast.toast-icon {
@@ -2981,6 +3037,19 @@ body.vault-is-locked .main-app-content,
     font-size: 64px;
 }
 
+.empty-state-illustration {
+    width: 140px;
+    height: 140px;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-out);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    padding: 16px;
+}
+
 .nm-icon-large i {
     font-size: clamp(32px, 6vw, 52px);
     display: flex;
@@ -3057,8 +3126,11 @@ body.vault-is-locked .main-app-content,
 }
 
 .empty-state-vessel .btn-primary:hover {
-    box-shadow: var(--nm-raised-hover);
-    transform: translateY(-2px);
+    box-shadow:
+        10px 10px 22px var(--nm-shadow-dark),
+        -10px -10px 22px var(--nm-shadow-light);
+    transform: none;
+    color: var(--accent-hover);
 }
 
 .empty-state-vessel .btn-primary:active {
@@ -3260,7 +3332,8 @@ body.vault-is-locked .main-app-content,
 .timer-linear-vessel {
     flex: 1;
     height: 6px;
-    background: var(--bg-secondary);
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in-sm);
     border-radius: 99px;
     overflow: hidden;
 }
