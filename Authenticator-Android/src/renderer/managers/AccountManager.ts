@@ -237,7 +237,7 @@ export class AccountManager {
         // Full card tap to copy
         card.addEventListener('click', async (e) => {
             const target = e.target as HTMLElement;
-            if (target.closest('.card-actions, .copy-btn, .secure-view-btn')) return;
+            if (target.closest('.card-actions, .copy-btn, .secure-view-btn, .otp-code')) return;
             if (document.body.classList.contains('vault-is-locked')) return;
             if (this.host.vaultViewStyle === 'secure') return;
             const otp = await (window as any).api.generateTOTP(account.secret);

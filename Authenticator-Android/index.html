@@ -677,6 +677,77 @@
         <!-- Generic modal overlay (populated dynamically) -->
 <div id="modal-overlay" class="modal-overlay"></div>
 
+<!-- About Modal -->
+<div id="modal-about" class="modal-overlay">
+    <div class="modal about-modal">
+        <div class="about-close-btn" id="about-close-btn">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+
+        <!-- Logo vessel -->
+        <div class="about-logo-vessel">
+            <div class="about-logo-ring about-logo-ring-2"></div>
+            <div class="about-logo-ring about-logo-ring-1"></div>
+            <div class="about-logo-core">
+                <img src="/logo.png" class="app-logo-medium nm-logo">
+            </div>
+        </div>
+
+        <!-- Identity -->
+        <div class="about-identity">
+            <h1 class="about-app-name">Keyra</h1>
+            <div class="about-version-badge">
+                <span>v1.0.0</span>
+            </div>
+            <p class="about-tagline">YOUR VAULT IS SECURE</p>
+        </div>
+
+        <div class="about-divider"></div>
+
+        <!-- Info rows -->
+        <div class="about-info-grid">
+            <div class="about-info-row">
+                <div class="about-info-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="about-info-text">
+                    <span class="about-info-label">Security</span>
+                    <span class="about-info-value">AES-256 Encrypted Vault</span>
+                </div>
+            </div>
+            <div class="about-info-row">
+                <div class="about-info-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="about-info-text">
+                    <span class="about-info-label">Protocol</span>
+                    <span class="about-info-value">TOTP / RFC 6238</span>
+                </div>
+            </div>
+            <div class="about-info-row">
+                <div class="about-info-icon"><i class="fa-solid fa-cloud"></i></div>
+                <div class="about-info-text">
+                    <span class="about-info-label">Sync</span>
+                    <span class="about-info-value">End-to-End Encrypted</span>
+                </div>
+            </div>
+            <div class="about-info-row">
+                <div class="about-info-icon"><i class="fa-brands fa-android"></i></div>
+                <div class="about-info-text">
+                    <span class="about-info-label">Platform</span>
+                    <span class="about-info-value">Android · Capacitor</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-divider"></div>
+
+        <!-- Footer -->
+        <p class="about-footer">Crafted with care · All rights reserved</p>
+
+        <button class="about-dismiss-btn" id="about-dismiss-btn">
+            <i class="fa-solid fa-check"></i>
+            Got it
+        </button>
+    </div>
+</div>
+
 <!-- Logout confirmation modal -->
 <div id="modal-logout" class="modal-overlay">
     <div class="modal">

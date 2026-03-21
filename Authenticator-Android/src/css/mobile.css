@@ -458,11 +458,11 @@ input, textarea {
         font-size: 11.5px;
     }
 
-    /* OTP row: code + timer side by side */
+    /* OTP row: code centered, timer overlaid on the right */
     .otp-box {
         flex-direction: row;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         padding: 10px 14px;
         min-height: 46px;
         gap: 8px;
@@ -470,15 +470,19 @@ input, textarea {
         box-shadow:
             inset 5px 5px 10px var(--nm-shadow-dark),
             inset -5px -5px 10px var(--nm-shadow-light);
+        position: relative;
     }
 
     .otp-code {
         font-size: var(--mobile-otp-size);
         letter-spacing: 3px;
-        text-align: left;
+        text-align: center;
+        flex: 1;
     }
 
     .timer-vessel {
+        position: absolute;
+        right: 12px;
         flex-shrink: 0;
     }
 

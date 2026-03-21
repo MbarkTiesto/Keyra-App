@@ -327,6 +327,21 @@ export class NavigationManager {
         const mobileDropdown = document.getElementById('mobile-user-dropdown');
         mobileAvatarBtn?.addEventListener('click', (e) => { e.stopPropagation(); mobileDropdown?.classList.toggle('show'); });
 
+        // Logo → About modal
+        const openAbout = () => {
+            document.getElementById('modal-about')?.classList.add('show');
+        };
+        const closeAbout = () => {
+            document.getElementById('modal-about')?.classList.remove('show');
+        };
+        document.querySelector('.mobile-tab-brand')?.addEventListener('click', openAbout);
+        document.querySelector('.navbar-brand')?.addEventListener('click', openAbout);
+        document.getElementById('about-close-btn')?.addEventListener('click', closeAbout);
+        document.getElementById('about-dismiss-btn')?.addEventListener('click', closeAbout);
+        document.getElementById('modal-about')?.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeAbout();
+        });
+
         document.getElementById('mobile-lock-btn')?.addEventListener('click', () => this.host.lockVault());
         document.getElementById('mobile-lock-btn-settings')?.addEventListener('click', () => this.host.lockVault());
         document.getElementById('mobile-lock-btn-account')?.addEventListener('click', () => this.host.lockVault());
