@@ -921,11 +921,11 @@ body.keyboard-open .auth-overlay {
     }
 }
 
-/* ── 25. PIN NUMPAD ──────────────────────────────────────────────────────────── */
+/* ── 25. PIN NUMPAD & LOCK SCREEN ────────────────────────────────────────────── */
 
-/* ── Full-screen lock screen on mobile ── */
 @media (max-width: 768px) {
-    /* Override the card-style pin-vessel — go full screen */
+
+    /* ── Full-screen overlay ── */
     .pin-overlay {
         align-items: stretch !important;
         background: var(--bg-primary) !important;
@@ -933,6 +933,7 @@ body.keyboard-open .auth-overlay {
         -webkit-backdrop-filter: none !important;
     }
 
+    /* ── Main vessel: full screen, flex column, space-between ── */
     .pin-vessel {
         max-width: 100% !important;
         width: 100% !important;
@@ -943,28 +944,52 @@ body.keyboard-open .auth-overlay {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        justify-content: space-between !important;
-        padding-top: calc(env(safe-area-inset-top) + 32px) !important;
-        padding-bottom: calc(env(safe-area-inset-bottom) + 20px) !important;
+        justify-content: space-evenly !important;
+        padding-top: calc(env(safe-area-inset-top) + 28px) !important;
+        padding-bottom: calc(env(safe-area-inset-bottom) + 16px) !important;
         overflow: hidden !important;
+        background: var(--bg-primary) !important;
     }
 
-    /* Top section: avatar + title */
+    /* ── Avatar ── */
     .pin-brand {
         flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .pin-avatar-ring {
-        width: 72px !important;
-        height: 72px !important;
-        margin-bottom: 14px !important;
+        width: 80px !important;
+        height: 80px !important;
+        margin: 0 auto 0 !important;
+        padding: 4px !important;
+        /* Accent gradient ring */
+        background: linear-gradient(
+            135deg,
+            var(--accent-primary),
+            var(--accent-secondary, hsl(calc(var(--h) + 40), var(--s), 65%))
+        ) !important;
+        box-shadow:
+            0 0 0 3px var(--bg-primary),
+            0 8px 24px var(--aura-1) !important;
+        animation: pinRingPulse 3s ease-in-out infinite !important;
+    }
+
+    @keyframes pinRingPulse {
+        0%, 100% { box-shadow: 0 0 0 3px var(--bg-primary), 0 8px 24px var(--aura-1); }
+        50%       { box-shadow: 0 0 0 3px var(--bg-primary), 0 8px 32px var(--aura-1), 0 0 0 6px var(--accent-soft); }
     }
 
     .pin-avatar-inner {
         width: 100% !important;
         height: 100% !important;
+        border: none !important;
+        background: var(--bg-secondary) !important;
+        box-shadow: none !important;
     }
 
+    /* ── Header ── */
     .pin-header {
         margin-bottom: 0 !important;
         text-align: center;
@@ -972,36 +997,72 @@ body.keyboard-open .auth-overlay {
     }
 
     .pin-title {
-        font-size: 22px !important;
+        font-size: 26px !important;
+        font-weight: 900 !important;
+        letter-spacing: -0.8px !important;
         margin-bottom: 4px !important;
+        color: var(--text-primary) !important;
     }
 
     .pin-subtitle {
         font-size: 12px !important;
+        font-weight: 600 !important;
+        color: var(--text-tertiary) !important;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        opacity: 1 !important;
     }
 
-    /* Dots section */
+    /* ── Dots ── */
     .pin-input-vessel {
         flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .pin-indicators {
-        gap: 18px !important;
-        padding: 12px 0 !important;
+        gap: 20px !important;
+        padding: 8px 0 !important;
     }
 
     .pin-dot {
-        width: 16px !important;
-        height: 16px !important;
+        width: 14px !important;
+        height: 14px !important;
+        border-radius: 50% !important;
+        background: var(--bg-secondary) !important;
+        box-shadow:
+            inset 3px 3px 6px var(--nm-shadow-dark),
+            inset -3px -3px 6px var(--nm-shadow-light) !important;
+        transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
+    }
+
+    .pin-dot.filled {
+        background: var(--accent-primary) !important;
+        box-shadow: 0 0 10px var(--aura-1) !important;
+        transform: scale(1.15) !important;
+    }
+
+    .pin-dot.success {
+        background: #28a745 !important;
+        box-shadow: 0 0 12px rgba(40, 167, 69, 0.6) !important;
+        transform: scale(1.2) !important;
+    }
+
+    .pin-dot.error {
+        background: #ff3b30 !important;
+        box-shadow: 0 0 12px rgba(255, 59, 48, 0.5) !important;
     }
 
     .pin-helper {
         font-size: 10px !important;
         margin-bottom: 0 !important;
-        margin-top: 6px;
+        margin-top: 8px;
+        letter-spacing: 1.5px;
+        opacity: 0.45 !important;
     }
 
-    /* Hide the old text input — numpad handles input */
+    /* ── Hidden keyboard input ── */
     .pin-input-hidden {
         position: absolute !important;
         opacity: 0 !important;
@@ -1010,116 +1071,184 @@ body.keyboard-open .auth-overlay {
         height: 1px !important;
     }
 
-    /* Numpad grid — fills remaining space proportionally */
+    /* ── Numpad grid ── */
     .pin-numpad {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        width: 100%;
-        max-width: 320px;
-        padding: 0 20px;
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 12px !important;
+        width: 100% !important;
+        max-width: 300px !important;
+        padding: 0 !important;
         flex-shrink: 0;
     }
 
     .pin-key {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        /* Use aspect-ratio so keys are always square regardless of screen height */
-        aspect-ratio: 1 / 1;
-        max-height: 72px;
-        border-radius: 18px;
-        background: var(--bg-primary);
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        aspect-ratio: 1 / 1 !important;
+        max-height: 76px !important;
+        border-radius: 22px !important;
+        background: var(--bg-primary) !important;
         box-shadow:
-            5px 5px 12px var(--nm-shadow-dark),
-            -5px -5px 12px var(--nm-shadow-light);
-        border: none;
-        cursor: pointer;
-        transition: box-shadow 0.1s ease, transform 0.1s ease;
-        color: var(--text-primary);
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light) !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: box-shadow 0.1s ease, transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        color: var(--text-primary) !important;
+        -webkit-tap-highlight-color: transparent !important;
+        user-select: none !important;
+        position: relative;
+        overflow: hidden;
     }
 
     .pin-key span {
-        font-size: 24px;
-        font-weight: 700;
-        line-height: 1;
-        font-family: 'Outfit', sans-serif;
+        font-size: 26px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        font-family: 'Outfit', sans-serif !important;
+        position: relative;
+        z-index: 1;
     }
 
-    /* Remove any sub labels */
     .pin-key sub {
         display: none !important;
     }
 
+    /* Press state */
     .pin-key:active {
-        box-shadow: var(--nm-shadow-in-sm);
-        transform: scale(0.91);
+        box-shadow: var(--nm-shadow-in-sm) !important;
+        transform: scale(0.88) !important;
+    }
+
+    /* Tap ripple */
+    .pin-key::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: var(--accent-primary);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .pin-key:active::after {
+        opacity: 0.08;
     }
 
     /* Biometric key */
     .pin-key-biometric {
-        color: var(--accent-primary);
+        color: var(--accent-primary) !important;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light) !important;
     }
 
     .pin-key-biometric i {
-        font-size: 24px;
+        font-size: 26px !important;
     }
 
     .pin-key-biometric.hidden {
-        visibility: hidden;
-        pointer-events: none;
-        box-shadow: none;
-        background: transparent;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
     }
 
     /* Delete key */
     .pin-key-delete {
-        color: var(--text-secondary);
+        color: var(--text-secondary) !important;
     }
 
     .pin-key-delete i {
-        font-size: 20px;
+        font-size: 22px !important;
     }
 
-    /* Footer */
+    /* ── Footer ── */
     .pin-footer-actions {
         flex-shrink: 0;
         margin-top: 0 !important;
-        gap: 8px !important;
+        gap: 0 !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .forgot-pin-link {
         font-size: 12px !important;
-        opacity: 0.6;
+        color: var(--text-tertiary) !important;
+        opacity: 0.7;
+        padding: 10px 20px !important;
+        gap: 6px !important;
+    }
+
+    .forgot-pin-link:active {
+        opacity: 1;
     }
 }
 
-/* Ultra-short screens (e.g. landscape or very small phones) */
+/* ── Decorative background blob ── */
+@media (max-width: 768px) {
+    .pin-bg-blob {
+        position: absolute;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.6;
+    }
+
+    /* Ensure all pin children sit above the blob */
+    .pin-brand,
+    .pin-header,
+    .pin-input-vessel,
+    .pin-numpad,
+    .pin-footer-actions {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+/* ── Ultra-short screens (landscape / small phones) ── */
 @media (max-width: 768px) and (max-height: 680px) {
+    .pin-vessel {
+        justify-content: space-between !important;
+        padding-top: calc(env(safe-area-inset-top) + 12px) !important;
+        padding-bottom: calc(env(safe-area-inset-bottom) + 8px) !important;
+    }
+
     .pin-avatar-ring {
         width: 56px !important;
         height: 56px !important;
-        margin-bottom: 8px !important;
+    }
+
+    .pin-bg-blob {
+        display: none !important;
     }
 
     .pin-title {
-        font-size: 18px !important;
+        font-size: 20px !important;
     }
 
     .pin-numpad {
-        gap: 8px;
+        gap: 8px !important;
+        max-width: 270px !important;
     }
 
     .pin-key {
-        max-height: 58px;
-        border-radius: 14px;
+        max-height: 60px !important;
+        border-radius: 16px !important;
     }
 
     .pin-key span {
-        font-size: 20px;
+        font-size: 22px !important;
     }
 }
 
