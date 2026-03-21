@@ -1,0 +1,101 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   MOBILE / CAPACITOR ANDROID OVERRIDES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Safe area insets for notch/punch-hole devices */
+body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    height: 100dvh; /* dynamic viewport height - handles mobile browser chrome */
+    overflow: hidden;
+    /* Prevent text selection on long press */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Prevent callout on long press */
+    -webkit-touch-callout: none;
+    /* Prevent tap highlight */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow text selection in inputs */
+input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* Larger touch targets for mobile */
+.btn-primary,
+.user-button,
+.btn-danger,
+.btn-icon,
+.nav-tab,
+.dropdown-item,
+.card-dropdown-item {
+    min-height: 44px; /* Apple HIG minimum touch target */
+}
+
+/* Keyboard open: push content up */
+body.keyboard-open .main-content {
+    padding-bottom: 20px;
+}
+
+body.keyboard-open .auth-overlay {
+    align-items: flex-start !important;
+}
+
+/* Smoother scrolling on mobile */
+.main-content {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+/* Prevent double-tap zoom */
+* {
+    touch-action: manipulation;
+}
+
+/* Larger font for readability on small screens */
+@media (max-width: 390px) {
+    .otp-code {
+        font-size: 1.6rem;
+        letter-spacing: 2px;
+    }
+}
+
+/* Bottom sheet modals on mobile */
+@media (max-width: 540px) {
+    .modal {
+        max-width: 100%;
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        max-height: 90dvh;
+        transform: translateY(100%);
+        padding-bottom: calc(env(safe-area-inset-bottom) + 24px);
+    }
+
+    .modal-overlay.show .modal {
+        transform: translateY(0);
+    }
+}
+
+/* Navbar safe area */
+.navbar {
+    padding-top: env(safe-area-inset-top);
+    height: calc(clamp(64px, 10vh, 88px) + env(safe-area-inset-top));
+}
+
+/* Floating sync pill safe area */
+.cloud-sync-indicator {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+/* Toast container safe area */
+.toast-container {
+    bottom: calc(24px + env(safe-area-inset-bottom));
+}
