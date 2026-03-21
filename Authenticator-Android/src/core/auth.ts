@@ -26,7 +26,7 @@ export function getCurrentUser() {
         username: currentUser.username,
         email: currentUser.email,
         pendingEmail: currentUser.pendingEmail,
-        settings: currentUser["Web Settings"],
+        settings: currentUser["Android Settings"],
         autolock: currentUser.autolock,
         profilePicture: currentUser.profilePicture,
         devices: currentUser.devices
@@ -342,19 +342,28 @@ export async function updateUserSettings(settings: any): Promise<void> {
     const userIndex = users.findIndex(u => u.id === currentUser!.id);
     if (userIndex === -1) throw new Error("User missing from storage.");
 
-    // Always target Web Settings for updates from this platform
+    // Handle namespaced settings blocks
+    if (settings["Android Settings"]) {
+        users[userIndex]["Android Settings"] = settings["Android Settings"];
+        currentUser["Android Settings"] = settings["Android Settings"];
+    }
     if (settings["Web Settings"]) {
         users[userIndex]["Web Settings"] = settings["Web Settings"];
         currentUser["Web Settings"] = settings["Web Settings"];
-    } else {
-        // If it's a flat object, wrap it and avoid touching other platform blocks
-        delete settings["Desktop Settings"];
-        users[userIndex]["Web Settings"] = settings;
-        currentUser["Web Settings"] = settings;
+    }
+    if (settings["Desktop Settings"]) {
+        users[userIndex]["Desktop Settings"] = settings["Desktop Settings"];
+        currentUser["Desktop Settings"] = settings["Desktop Settings"];
+    }
+
+    // If it's a flat object (legacy / no namespace key), treat as Android Settings
+    const hasNamespace = settings["Android Settings"] || settings["Web Settings"] || settings["Desktop Settings"];
+    if (!hasNamespace) {
+        users[userIndex]["Android Settings"] = settings;
+        currentUser["Android Settings"] = settings;
     }
 
     await saveUsers(users);
-    currentUser.settings = currentUser["Web Settings"]; // Keep legacy field in session if needed
     await syncUserData(currentUser.username, users[userIndex]);
 }
 
@@ -373,7 +382,8 @@ export function getBackupData(): {
     const settings = {
         autolock: currentUser.autolock,
         "Desktop Settings": currentUser["Desktop Settings"],
-        "Web Settings": currentUser["Web Settings"]
+        "Web Settings": currentUser["Web Settings"],
+        "Android Settings": currentUser["Android Settings"]
     };
     
     // Encrypt the settings using the current key
@@ -521,6 +531,10 @@ export async function importVaultData(
                     if (settings["Web Settings"]) {
                         users[userIndex]["Web Settings"] = settings["Web Settings"];
                         currentUser["Web Settings"] = settings["Web Settings"];
+                    }
+                    if (settings["Android Settings"]) {
+                        users[userIndex]["Android Settings"] = settings["Android Settings"];
+                        currentUser["Android Settings"] = settings["Android Settings"];
                     }
                 } catch (err) {
                     console.error("Failed to decrypt settings:", err);
@@ -717,12 +731,12 @@ export async function pollForUpdates(): Promise<{ changed: boolean, settings?: a
         const vaultChanged = cloudData.encryptedVaultData &&
             cloudData.encryptedVaultData !== currentUser.encryptedVaultData;
 
-        const settingsChanged = cloudData["Web Settings"] &&
-            JSON.stringify(cloudData["Web Settings"]) !== JSON.stringify(currentUser["Web Settings"]);
+        const androidSettingsChanged = cloudData["Android Settings"] &&
+            JSON.stringify(cloudData["Android Settings"]) !== JSON.stringify(currentUser["Android Settings"]);
 
-        if (!vaultChanged && !settingsChanged) return { changed: false };
+        if (!vaultChanged && !androidSettingsChanged) return { changed: false };
 
-        // Merge in the updated cloud data
+        // Merge in the updated cloud data, preserving local encryption fields
         const users = await getUsers();
         const userIndex = users.findIndex(u => u.id === currentUser!.id);
         if (userIndex !== -1) {
@@ -739,7 +753,7 @@ export async function pollForUpdates(): Promise<{ changed: boolean, settings?: a
 
         return {
             changed: true,
-            settings: cloudData["Web Settings"] ?? undefined
+            settings: cloudData["Android Settings"] ?? undefined
         };
     } catch (e) {
         console.error('pollForUpdates failed:', e);

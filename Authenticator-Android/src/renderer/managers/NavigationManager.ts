@@ -3,10 +3,12 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 export interface NavigationManagerHost {
     userId: string;
     currentTheme: 'light' | 'dark';
+    themeMode: 'light' | 'dark' | 'auto';
     accounts: any[];
     getStorageKey(key: string): string;
     showToast(message: string, type: 'info' | 'success' | 'error'): void;
     setTheme(theme: 'light' | 'dark', silent?: boolean): void;
+    setThemeMode(mode: 'light' | 'dark' | 'auto', silent?: boolean): void;
     setLoading(show: boolean, title?: string, subtitle?: string): void;
     showModal(content: string): void;
     hideModal(): void;
@@ -295,7 +297,8 @@ export class NavigationManager {
         // Dropdown actions
         document.getElementById('lock-vault-btn')?.addEventListener('click', () => this.host.lockVault());
         document.getElementById('theme-toggle-btn')?.addEventListener('click', () => {
-            this.host.setTheme(this.host.currentTheme === 'light' ? 'dark' : 'light');
+            const next = this.host.currentTheme === 'light' ? 'dark' : 'light';
+            this.host.setThemeMode(next);
         });
         document.getElementById('btn-logout-trigger')?.addEventListener('click', () => {
             document.getElementById('modal-logout')?.classList.add('show');
@@ -311,7 +314,8 @@ export class NavigationManager {
         document.getElementById('mobile-lock-btn-account')?.addEventListener('click', () => this.host.lockVault());
 
         document.getElementById('mobile-theme-toggle-btn')?.addEventListener('click', () => {
-            this.host.setTheme(this.host.currentTheme === 'light' ? 'dark' : 'light');
+            const next = this.host.currentTheme === 'light' ? 'dark' : 'light';
+            this.host.setThemeMode(next);
             mobileDropdown?.classList.remove('show');
         });
         document.getElementById('mobile-logout-trigger')?.addEventListener('click', () => {

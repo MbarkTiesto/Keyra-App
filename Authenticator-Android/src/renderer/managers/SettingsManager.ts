@@ -4,7 +4,6 @@ export interface SettingsManagerHost {
     updateSegmentedUI(containerId: string, value: string): void;
     updateLastActivity(action: string): void;
     showToast(message: string, type: 'info' | 'success' | 'error'): void;
-    setTheme(theme: 'light' | 'dark', silent?: boolean): void;
     setThemeMode(mode: 'light' | 'dark' | 'auto', silent?: boolean): void;
     setAccentColor(accentColor: string, silent?: boolean): void;
     updateLockVaultVisibility(): void;
@@ -52,11 +51,10 @@ export class SettingsManager {
 
     public applySettings(settings: any, saveLocal: boolean = true) {
         if (!settings) return;
-        const s = settings.Settings || settings;
-        const ws = settings['Web Settings'] || settings;
+        // Support both namespaced and flat payloads
+        const s = settings['Android Settings'] || settings.Settings || settings;
 
         if (s.themeMode) this.host.setThemeMode(s.themeMode, true);
-        else if (s.theme) this.host.setTheme(s.theme, true);
         if (s.accentColor) this.host.setAccentColor(s.accentColor, true);
 
         // Delegate privacy state to PrivacyManager
@@ -69,21 +67,24 @@ export class SettingsManager {
             this.host.vaultViewStyle = s.vaultViewStyle;
         }
 
-        if (saveLocal || settings.vaultPin !== undefined || s.autolock !== undefined) {
-            if (s.theme) localStorage.setItem(this.host.getStorageKey('theme'), s.theme);
+        if (saveLocal) {
             if (s.accentColor) localStorage.setItem(this.host.getStorageKey('accent_color'), s.accentColor);
             if (s.vaultViewStyle) localStorage.setItem(this.host.getStorageKey('vault_view_style'), s.vaultViewStyle);
 
-            const finalAutolock = ws.autolock !== undefined ? ws.autolock : s.autolock;
-            if (finalAutolock !== undefined) localStorage.setItem(this.host.getStorageKey('autolock'), String(finalAutolock));
+            if (s.autolock !== undefined) {
+                localStorage.setItem(this.host.getStorageKey('autolock'), String(s.autolock));
+            }
 
-            const finalPin = settings.vaultPin !== undefined ? settings.vaultPin : s.vaultPin;
-            if (finalPin !== undefined) {
-                if (finalPin === null || finalPin === '') {
+            if (s.vaultPin !== undefined) {
+                if (s.vaultPin === null || s.vaultPin === '') {
                     localStorage.removeItem(this.host.getStorageKey('vault_pin'));
                 } else {
-                    localStorage.setItem(this.host.getStorageKey('vault_pin'), finalPin);
+                    localStorage.setItem(this.host.getStorageKey('vault_pin'), s.vaultPin);
                 }
+            }
+
+            if (s.biometricEnabled !== undefined) {
+                localStorage.setItem(this.host.getStorageKey('biometric_enabled'), String(s.biometricEnabled));
             }
         }
 
@@ -235,27 +236,19 @@ export class SettingsManager {
     public getSettingsObject(): any {
         const vPin = localStorage.getItem(this.host.getStorageKey('vault_pin'));
         const aLock = localStorage.getItem(this.host.getStorageKey('autolock')) || '0';
+        const accentColor = localStorage.getItem(this.host.getStorageKey('accent_color')) || 'royal-purple';
+
         return {
-            Settings: {
-                theme: this.host.currentTheme,
+            'Android Settings': {
                 themeMode: this.host.themeMode,
-                accentColor: localStorage.getItem(this.host.getStorageKey('accent_color')) || 'royal-purple',
-                privacyMode: this.host.privacyMode,
-                screenGuardian: this.host.screenGuardian,
-                oledMode: this.host.oledMode,
-                vaultViewStyle: this.host.vaultViewStyle,
-                vaultPin: vPin
-            },
-            'Web Settings': {
-                theme: this.host.currentTheme,
-                themeMode: this.host.themeMode,
-                accentColor: localStorage.getItem(this.host.getStorageKey('accent_color')) || 'royal-purple',
+                accentColor,
                 privacyMode: this.host.privacyMode,
                 screenGuardian: this.host.screenGuardian,
                 oledMode: this.host.oledMode,
                 vaultViewStyle: this.host.vaultViewStyle,
                 autolock: aLock,
-                vaultPin: vPin
+                vaultPin: vPin,
+                biometricEnabled: localStorage.getItem(this.host.getStorageKey('biometric_enabled')) === 'true'
             }
         };
     }

@@ -19,9 +19,9 @@ export class AuthManager {
 
     public async initFromCloud() {
         const user = await (window as any).api.getCurrentUser();
-        if (user) {
-            const settings = { ...(user.settings || {}), autolock: user.autolock };
-            this.host.applySettings(settings, false);
+        if (user?.settings) {
+            // user.settings is already the unwrapped "Android Settings" object
+            this.host.applySettings(user.settings, false);
         }
     }
 

@@ -93,13 +93,13 @@ export class SyncManager {
             this.setSyncing(true);
             rateLimiter.recordAttempt('sync', this.host.userId);
             const settings = this.host.getSettingsObject();
-            const webOnly = { 'Web Settings': settings['Web Settings'] };
-            const res = await (window as any).api.updateUserSettings(webOnly);
+            const androidOnly = { 'Android Settings': settings['Android Settings'] };
+            const res = await (window as any).api.updateUserSettings(androidOnly);
             if (res && res.success === false) {
-                console.warn('Cloud web sync reported failure:', res.message);
+                console.warn('Cloud android sync reported failure:', res.message);
             }
         } catch (error) {
-            console.error('Failed to push web settings:', error);
+            console.error('Failed to push android settings:', error);
             throw error;
         } finally {
             this.setSyncing(false);

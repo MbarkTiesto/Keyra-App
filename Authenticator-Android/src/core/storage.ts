@@ -30,7 +30,8 @@ export interface UserRecord {
     encryptedVaultData: string;
     settings?: UserSettings;
     "Desktop Settings"?: any;
-    "Web Settings"?: UserSettings;
+    "Web Settings"?: any;
+    "Android Settings"?: any;
     autolock: string;
     profilePicture?: string;
     devices?: DeviceRecord[];
