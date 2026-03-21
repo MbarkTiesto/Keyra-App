@@ -34,25 +34,9 @@ jobs:
           node scripts/build-html.cjs
           npm run build
 
-      - name: Add Android platform
-        working-directory: Authenticator-Android
-        run: |
-          if [ ! -d "android" ]; then
-            npx cap add android
-          fi
-
       - name: Sync Capacitor
         working-directory: Authenticator-Android
         run: npx cap sync android
-
-      - name: Patch AndroidManifest — permissions + edge-to-edge
-        working-directory: Authenticator-Android/android/app/src/main
-        run: |
-          # Add permissions before </manifest>
-          sed -i 's|</manifest>|    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.USE_BIOMETRIC" />\n    <uses-permission android:name="android.permission.USE_FINGERPRINT" />\n    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n</manifest>|' AndroidManifest.xml
-
-          # Make status bar transparent for edge-to-edge
-          sed -i 's|android:theme="@style/AppTheme"|android:theme="@style/AppTheme"\n            android:windowSoftInputMode="adjustResize"|' AndroidManifest.xml
 
       - name: Build debug APK
         working-directory: Authenticator-Android/android
