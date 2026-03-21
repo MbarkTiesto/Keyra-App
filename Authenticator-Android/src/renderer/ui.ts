@@ -347,6 +347,8 @@ export class UIManager {
     private updateLockVaultVisibility() {
         const lockBtn = document.getElementById('lock-vault-btn');
         const mobileLockBtn = document.getElementById('mobile-lock-btn');
+        const mobileLockBtnSettings = document.getElementById('mobile-lock-btn-settings');
+        const mobileLockBtnAccount = document.getElementById('mobile-lock-btn-account');
         const setupBtn = document.getElementById('setup-pin-btn');
         const changeBtn = document.getElementById('change-pin-btn');
         const removeBtn = document.getElementById('remove-pin-btn');
@@ -355,6 +357,8 @@ export class UIManager {
 
         if (lockBtn) lockBtn.classList.toggle('hidden', !hasPin);
         if (mobileLockBtn) mobileLockBtn.classList.toggle('hidden', !hasPin);
+        if (mobileLockBtnSettings) mobileLockBtnSettings.classList.toggle('hidden', !hasPin);
+        if (mobileLockBtnAccount) mobileLockBtnAccount.classList.toggle('hidden', !hasPin);
         if (setupBtn) setupBtn.style.display = hasPin ? 'none' : 'flex';
         if (changeBtn) changeBtn.style.display = hasPin ? 'flex' : 'none';
         if (removeBtn) removeBtn.style.display = hasPin ? 'flex' : 'none';
@@ -468,6 +472,8 @@ export class UIManager {
         });
 
         document.getElementById('mobile-lock-btn')?.addEventListener('click', () => this.lockVault());
+        document.getElementById('mobile-lock-btn-settings')?.addEventListener('click', () => this.lockVault());
+        document.getElementById('mobile-lock-btn-account')?.addEventListener('click', () => this.lockVault());
 
         document.getElementById('mobile-theme-toggle-btn')?.addEventListener('click', () => {
             const nextTheme = this.currentTheme === 'light' ? 'dark' : 'light';

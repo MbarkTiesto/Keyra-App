@@ -1141,83 +1141,192 @@ input, textarea {
 /* ── 11. SETTINGS & BENTO CARDS ────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-    /* Fix settings-container fixed positioning — stop above bottom nav */
+    /* ── Container: sits below mobile tab header, above bottom nav ── */
     .settings-container {
-        top: calc(var(--mobile-navbar-h) + env(safe-area-inset-top));
+        top: 0 !important;
         bottom: calc(var(--mobile-bottom-nav-h) + env(safe-area-inset-bottom));
-        padding: 16px 14px 24px;
+        padding: 0 14px 24px;
     }
 
+    /* ── Inline tab header for settings/account tabs ── */
+    #settings-view .section-header,
+    #account-view .section-header {
+        display: none;
+    }
+
+    /* ── Grid: single column, tighter gap ── */
     .settings-grid {
         grid-template-columns: 1fr;
         gap: 14px;
+        padding-top: 8px;
     }
 
+    /* ── Bento card: neumorphic raised, no hover lift ── */
     .bento-card {
         border-radius: var(--mobile-card-radius);
-        padding: 16px;
+        padding: 18px 16px;
+        gap: 14px;
         box-shadow:
-            8px 8px 18px var(--nm-shadow-dark),
-            -8px -8px 18px var(--nm-shadow-light);
-        /* Disable hover lift on touch */
+            8px 8px 20px var(--nm-shadow-dark),
+            -8px -8px 20px var(--nm-shadow-light);
         transition: box-shadow var(--transition-fast);
     }
 
     .bento-card:hover {
         transform: none;
+        box-shadow:
+            8px 8px 20px var(--nm-shadow-dark),
+            -8px -8px 20px var(--nm-shadow-light);
     }
 
     .bento-card:active {
         box-shadow: var(--nm-shadow-in-sm);
     }
 
+    /* ── Bento header: icon + title, neumorphic groove divider ── */
     .bento-header {
-        margin-bottom: 14px;
-        padding-bottom: 12px;
+        margin-bottom: 4px;
+        padding-bottom: 14px;
+        gap: 12px;
+        box-shadow: 0 3px 0 var(--nm-shadow-dark), 0 4px 0 var(--nm-shadow-light);
+    }
+
+    /* Icon vessel: raised square */
+    .bento-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        box-shadow:
+            5px 5px 12px var(--nm-shadow-dark),
+            -5px -5px 12px var(--nm-shadow-light);
+    }
+
+    .bento-icon i {
+        font-size: 20px;
     }
 
     .bento-title {
-        font-size: 15px;
+        font-size: 16px;
+        letter-spacing: -0.3px;
     }
 
     .bento-subtitle {
-        font-size: 11px;
+        font-size: 10px;
+        letter-spacing: 0.8px;
     }
 
+    /* ── Setting rows: inset neumorphic on mobile ── */
     .setting-row {
-        padding: 12px 0;
+        padding: 14px 14px;
+        margin-bottom: 10px;
+        border-radius: 16px;
+        box-shadow:
+            inset 4px 4px 8px var(--nm-shadow-dark),
+            inset -4px -4px 8px var(--nm-shadow-light);
         gap: 12px;
+    }
+
+    /* No hover slide on touch */
+    .setting-row:hover {
+        transform: none;
+        box-shadow:
+            inset 4px 4px 8px var(--nm-shadow-dark),
+            inset -4px -4px 8px var(--nm-shadow-light);
+    }
+
+    .setting-row:active {
+        box-shadow:
+            inset 6px 6px 14px var(--nm-shadow-dark),
+            inset -6px -6px 14px var(--nm-shadow-light);
+    }
+
+    /* Hide accent stripe on mobile — inset rows don't need it */
+    .setting-row::after {
+        display: none;
     }
 
     .setting-name {
         font-size: 14px;
+        font-weight: 700;
     }
 
     .setting-desc {
         font-size: 12px;
         margin-top: 3px;
+        line-height: 1.4;
     }
 
-    /* Segmented controls — taller touch targets */
+    /* ── Segmented controls ── */
     .segmented-control {
-        height: 44px;
+        height: 40px;
     }
 
     .segment {
-        font-size: 12px;
-        min-height: 44px;
+        font-size: 11px;
+        min-height: 40px;
+        padding: 0 10px;
     }
 
-    /* Switch — slightly larger */
+    /* ── Switch ── */
     .switch {
         --sw-w: 52px;
     }
 
-    /* Maintenance buttons */
+    /* ── Maintenance buttons: full neumorphic raised ── */
     .btn-maintenance {
         height: var(--mobile-btn-h) !important;
         border-radius: 16px !important;
         font-size: 14px !important;
+        padding-left: 16px !important;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light) !important;
+    }
+
+    .btn-maintenance:hover {
+        transform: none !important;
+        box-shadow:
+            6px 6px 14px var(--nm-shadow-dark),
+            -6px -6px 14px var(--nm-shadow-light) !important;
+    }
+
+    .btn-maintenance:active {
+        box-shadow: var(--nm-shadow-in-sm) !important;
+        transform: scale(0.97) !important;
+    }
+
+    .btn-maintenance .btn-maintenance-icon {
+        width: 34px;
+        height: 34px;
+        box-shadow:
+            inset 3px 3px 6px var(--nm-shadow-dark),
+            inset -3px -3px 6px var(--nm-shadow-light);
+    }
+
+    /* ── PIN action buttons in security row ── */
+    .setting-row #setup-pin-btn,
+    .setting-row #change-pin-btn,
+    .setting-row #remove-pin-btn {
+        height: 40px !important;
+        min-width: 90px !important;
+        font-size: 12px !important;
+        border-radius: var(--radius-full) !important;
+        box-shadow:
+            4px 4px 10px var(--nm-shadow-dark),
+            -4px -4px 10px var(--nm-shadow-light) !important;
+    }
+
+    .setting-row #setup-pin-btn:active,
+    .setting-row #change-pin-btn:active,
+    .setting-row #remove-pin-btn:active {
+        box-shadow: var(--nm-shadow-in-sm) !important;
+        transform: scale(0.95) !important;
+    }
+
+    /* ── About card: status badges ── */
+    .setting-row .badge {
+        font-size: 10px !important;
+        padding: 4px 10px !important;
     }
 }
 

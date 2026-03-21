@@ -1703,7 +1703,7 @@ input:checked+.slider:before {
 
 .bento-card {
     padding: clamp(24px, 4vw, 32px);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: box-shadow var(--transition-fast);
     background: var(--bg-primary);
     box-shadow: var(--nm-shadow-out);
     border-radius: var(--radius-lg);
@@ -1714,10 +1714,9 @@ input:checked+.slider:before {
 }
 
 .bento-card:hover {
-    transform: translateY(-4px);
     box-shadow:
-        10px 10px 20px var(--nm-shadow-dark),
-        -10px -10px 20px var(--nm-shadow-light);
+        12px 12px 28px var(--nm-shadow-dark),
+        -12px -12px 28px var(--nm-shadow-light);
 }
 
 .bento-header {
@@ -1726,8 +1725,8 @@ input:checked+.slider:before {
     gap: var(--space-md);
     margin-bottom: var(--space-sm);
     padding-bottom: var(--space-md);
-    border-bottom: 2px solid var(--bg-primary);
-    box-shadow: 0 2px 0 var(--nm-shadow-dark);
+    /* Neumorphic divider — inset groove, no CSS border */
+    box-shadow: 0 3px 0 var(--nm-shadow-dark), 0 4px 0 var(--nm-shadow-light);
 }
 
 .bento-icon {
@@ -1786,10 +1785,11 @@ input:checked+.slider:before {
     border-radius: var(--radius-md);
     margin-bottom: var(--space-md);
     border: none;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: box-shadow var(--transition-fast);
     cursor: pointer;
     position: relative;
     z-index: 1;
+    overflow: hidden;
 }
 
 /* Ensure the row containing the open dropdown is on top of other rows */
@@ -1798,32 +1798,32 @@ input:checked+.slider:before {
 }
 
 .setting-row:hover {
-    transform: translateX(6px);
     box-shadow: var(--nm-shadow-out);
 }
 
 .setting-row:active {
     box-shadow: var(--nm-shadow-in-sm);
-    transform: translateX(0) scale(0.995);
 }
 
+/* Neumorphic left accent stripe via pseudo — no CSS border */
 .setting-row::after {
     content: '';
     position: absolute;
     left: 0;
-    top: 50%;
-    transform: translateY(-50%) scaleY(0);
-    width: 4px;
+    top: 20%;
     height: 60%;
+    width: 3px;
+    border-radius: 0 var(--radius-full) var(--radius-full) 0;
     background: var(--accent-primary);
-    border-radius: 0 4px 4px 0;
+    box-shadow: 2px 0 8px var(--aura-1);
     opacity: 0;
-    transition: all 0.3s ease;
+    transform: scaleY(0);
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .setting-row:hover::after {
     opacity: 1;
-    transform: translateY(-50%) scaleY(1);
+    transform: scaleY(1);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -1832,25 +1832,27 @@ input:checked+.slider:before {
 
 /* Premium Maintenance Buttons */
 .btn-maintenance {
-    height: clamp(48px, 12vw, 60px) !important;
+    height: clamp(52px, 12vw, 60px) !important;
     width: 100%;
     justify-content: flex-start !important;
-    padding-left: clamp(16px, 4vw, 24px) !important;
+    padding-left: clamp(16px, 4vw, 20px) !important;
     background: var(--bg-primary) !important;
     color: var(--text-primary) !important;
-    box-shadow: var(--nm-shadow-out-sm) !important;
+    box-shadow:
+        6px 6px 14px var(--nm-shadow-dark),
+        -6px -6px 14px var(--nm-shadow-light) !important;
     border: none !important;
-    transition: all var(--transition-medium) !important;
+    border-radius: var(--radius-md) !important;
+    transition: box-shadow var(--transition-fast) !important;
 }
 
 .btn-maintenance:hover {
     box-shadow: var(--nm-shadow-out) !important;
-    transform: translateX(4px) !important;
 }
 
 .btn-maintenance:active {
     box-shadow: var(--nm-shadow-in-sm) !important;
-    transform: scale(0.98);
+    transform: scale(0.98) !important;
 }
 
 .btn-maintenance .btn-maintenance-icon {
@@ -1858,7 +1860,7 @@ input:checked+.slider:before {
     height: clamp(32px, 8vw, 38px);
     border-radius: 50%;
     background: var(--bg-primary);
-    box-shadow: var(--nm-shadow-out-sm);
+    box-shadow: var(--nm-shadow-in-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1868,7 +1870,9 @@ input:checked+.slider:before {
 }
 
 .btn-maintenance:active .btn-maintenance-icon {
-    box-shadow: var(--nm-shadow-in-sm) !important;
+    box-shadow:
+        3px 3px 8px var(--nm-shadow-dark),
+        -3px -3px 8px var(--nm-shadow-light) !important;
 }
 
 .btn-maintenance i {
