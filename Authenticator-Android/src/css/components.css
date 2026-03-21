@@ -3729,7 +3729,7 @@ body.vault-is-locked .main-app-content,
    ───────────────────────────────────────────────────────────────────────────── */
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   LOADING OVERLAY (OPERATIONS SCREEN)
+   LOADING OVERLAY — Pure Neumorphic
    ───────────────────────────────────────────────────────────────────────────── */
 
 #loading-overlay {
@@ -3762,57 +3762,131 @@ body.vault-is-locked .main-app-content,
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 28px;
-    padding: 48px 40px;
-    border-radius: 32px;
+    gap: 32px;
+    padding: 52px 44px;
+    border-radius: 40px;
     background: var(--bg-primary);
     box-shadow:
-        20px 20px 48px var(--nm-shadow-dark),
-        -20px -20px 48px var(--nm-shadow-light);
-    min-width: 260px;
+        24px 24px 56px var(--nm-shadow-dark),
+        -24px -24px 56px var(--nm-shadow-light);
+    min-width: 280px;
     position: relative;
-    overflow: hidden;
 }
 
-/* Accent aura behind the spinner */
-.loading-content::before {
+/* ── Concentric rings vessel ── */
+.loading-rings-vessel {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Shared ring base */
+.loading-ring {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--bg-primary);
+}
+
+/* Ring 3 — outermost raised, slow counter-clockwise orbit dot */
+.loading-ring-3 {
+    inset: 0;
+    box-shadow:
+        10px 10px 28px var(--nm-shadow-dark),
+        -10px -10px 28px var(--nm-shadow-light);
+    animation: loadingRing3 3.6s linear infinite;
+}
+
+/* Orbit dot on ring 3 */
+.loading-ring-3::after {
     content: '';
     position: absolute;
-    top: -40px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 200px;
-    height: 200px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
-    pointer-events: none;
-    animation: loadingAuraPulse 2.4s ease-in-out infinite;
+    background: var(--accent-primary);
+    box-shadow:
+        3px 3px 8px var(--nm-shadow-dark),
+        -3px -3px 8px var(--nm-shadow-light);
 }
 
-@keyframes loadingAuraPulse {
-    0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
-    50%       { opacity: 1;   transform: translateX(-50%) scale(1.15); }
+/* Ring 2 — middle inset, static */
+.loading-ring-2 {
+    inset: 22px;
+    box-shadow:
+        inset 6px 6px 16px var(--nm-shadow-dark),
+        inset -6px -6px 16px var(--nm-shadow-light);
 }
 
-/* ── Progress bar at bottom of card ── */
-.loading-content::after {
+/* Ring 1 — inner raised, fast clockwise orbit dot */
+.loading-ring-1 {
+    inset: 40px;
+    box-shadow:
+        6px 6px 16px var(--nm-shadow-dark),
+        -6px -6px 16px var(--nm-shadow-light);
+    animation: loadingRing1 1.8s linear infinite;
+}
+
+/* Orbit dot on ring 1 */
+.loading-ring-1::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    border-radius: 0 var(--radius-full) var(--radius-full) 0;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
     background: var(--accent-primary);
-    box-shadow: 0 0 8px var(--aura-1);
-    animation: loadingBar 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    box-shadow:
+        2px 2px 6px var(--nm-shadow-dark),
+        -2px -2px 6px var(--nm-shadow-light);
+    opacity: 0.7;
 }
 
-@keyframes loadingBar {
-    0%   { left: 0;    width: 0%; }
-    40%  { left: 0;    width: 60%; }
-    60%  { left: 40%;  width: 60%; }
-    100% { left: 100%; width: 0%; }
+/* Core — deepest inset circle holding the logo */
+.loading-ring-core {
+    position: relative;
+    z-index: 4;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    box-shadow:
+        inset 8px 8px 20px var(--nm-shadow-dark),
+        inset -8px -8px 20px var(--nm-shadow-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-logo {
+    width: 38px !important;
+    height: 38px !important;
+}
+
+@keyframes loadingRing3 {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(-360deg); }
+}
+
+@keyframes loadingRing1 {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ── Text group ── */
+.loading-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
 }
 
 .loading-title {
@@ -3830,75 +3904,40 @@ body.vault-is-locked .main-app-content,
     color: var(--accent-primary);
     text-transform: uppercase;
     letter-spacing: 2.5px;
-    animation: loadingSubShimmer 1.8s ease-in-out infinite;
+    margin: 0;
+    opacity: 0.8;
 }
 
-@keyframes loadingSubShimmer {
-    0%, 100% { opacity: 0.5; }
-    50%       { opacity: 1; }
-}
-
-/* ── Spinner vessel ── */
-.nm-spinner-vessel {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Outer neumorphic raised ring — rotates */
-.nm-spinner {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
+/* ── Neumorphic progress track ── */
+.loading-track {
+    width: 100%;
+    height: 8px;
+    border-radius: var(--radius-full);
     background: var(--bg-primary);
     box-shadow:
-        8px 8px 20px var(--nm-shadow-dark),
-        -8px -8px 20px var(--nm-shadow-light);
-    animation: nmSpinRing 2.2s linear infinite;
+        inset 4px 4px 8px var(--nm-shadow-dark),
+        inset -4px -4px 8px var(--nm-shadow-light);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Accent dot on the outer ring */
-.nm-spinner::after {
-    content: '';
+/* Raised thumb that sweeps across the track */
+.loading-thumb {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--accent-primary);
-    box-shadow: 0 0 12px var(--aura-1), 0 0 4px var(--accent-primary);
-}
-
-/* Inner neumorphic inset circle — static */
-.nm-spinner-inner {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
+    top: 1px;
+    height: 6px;
+    width: 40%;
+    border-radius: var(--radius-full);
     background: var(--bg-primary);
-    box-shadow: var(--nm-shadow-in);
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    box-shadow:
+        3px 3px 6px var(--nm-shadow-dark),
+        -3px -3px 6px var(--nm-shadow-light);
+    animation: loadingThumb 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-/* Lock icon inside inner circle */
-.nm-spinner-inner::after {
-    content: '\f023';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    font-size: 18px;
-    color: var(--accent-primary);
-    opacity: 0.7;
-}
-
-@keyframes nmSpinRing {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+@keyframes loadingThumb {
+    0%   { left: -40%; }
+    100% { left: 100%; }
 }
 
 /* Auth Specific Loader */
