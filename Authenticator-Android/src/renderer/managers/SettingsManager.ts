@@ -22,6 +22,8 @@ export interface SettingsManagerHost {
     privacyManager: { applyPrivacyMode(v: boolean, save?: boolean): void; applyScreenGuardian(v: boolean, save?: boolean): void; };
     vaultViewStyle: 'unified' | 'compact' | 'secure';
     currentTheme: 'light' | 'dark';
+    oledMode: boolean;
+    applyOledMode(v: boolean, silent?: boolean): void;
 }
 
 export class SettingsManager {
@@ -56,6 +58,8 @@ export class SettingsManager {
         // Delegate privacy state to PrivacyManager
         if (s.privacyMode !== undefined) this.host.privacyManager.applyPrivacyMode(!!s.privacyMode, saveLocal);
         if (s.screenGuardian !== undefined) this.host.privacyManager.applyScreenGuardian(!!s.screenGuardian, saveLocal);
+
+        if (s.oledMode !== undefined) this.host.applyOledMode(!!s.oledMode, true);
 
         if (s.vaultViewStyle && ['unified', 'compact', 'secure'].includes(s.vaultViewStyle)) {
             this.host.vaultViewStyle = s.vaultViewStyle;
@@ -165,6 +169,13 @@ export class SettingsManager {
             });
         });
 
+        // OLED mode toggle
+        document.getElementById('oled-mode-toggle')?.addEventListener('change', (e) => {
+            const enabled = (e.target as HTMLInputElement).checked;
+            this.host.applyOledMode(enabled);
+            this.host.showToast(enabled ? 'OLED mode on' : 'OLED mode off', 'info');
+        });
+
         // Biometric toggle
         document.getElementById('biometric-toggle')?.addEventListener('change', (e) => {
             const enabled = (e.target as HTMLInputElement).checked;
@@ -215,6 +226,7 @@ export class SettingsManager {
                 accentColor: localStorage.getItem(this.host.getStorageKey('accent_color')) || 'royal-purple',
                 privacyMode: this.host.privacyMode,
                 screenGuardian: this.host.screenGuardian,
+                oledMode: this.host.oledMode,
                 vaultViewStyle: this.host.vaultViewStyle,
                 vaultPin: vPin
             },
@@ -223,6 +235,7 @@ export class SettingsManager {
                 accentColor: localStorage.getItem(this.host.getStorageKey('accent_color')) || 'royal-purple',
                 privacyMode: this.host.privacyMode,
                 screenGuardian: this.host.screenGuardian,
+                oledMode: this.host.oledMode,
                 vaultViewStyle: this.host.vaultViewStyle,
                 autolock: aLock,
                 vaultPin: vPin

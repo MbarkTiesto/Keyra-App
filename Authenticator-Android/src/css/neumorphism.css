@@ -96,6 +96,28 @@ body.dark-theme {
     --nm-pressed: var(--nm-shadow-in);
 }
 
+/* OLED Mode — tighter shadows on pure black */
+body.dark-theme.oled-optimized {
+    --nm-shadow-light: rgba(255, 255, 255, 0.04);
+    --nm-shadow-dark: rgba(0, 0, 0, 0.95);
+
+    --nm-shadow-out:
+        6px 6px 16px var(--nm-shadow-dark),
+        -6px -6px 16px var(--nm-shadow-light);
+    --nm-shadow-in:
+        inset 5px 5px 12px var(--nm-shadow-dark),
+        inset -5px -5px 12px var(--nm-shadow-light);
+    --nm-shadow-out-sm:
+        4px 4px 10px var(--nm-shadow-dark),
+        -4px -4px 10px var(--nm-shadow-light);
+    --nm-shadow-in-sm:
+        inset 4px 4px 8px var(--nm-shadow-dark),
+        inset -4px -4px 8px var(--nm-shadow-light);
+
+    --nm-raised: var(--nm-shadow-out);
+    --nm-pressed: var(--nm-shadow-in);
+}
+
 /* Base Utility Classes */
 .nm-flat {
     background: var(--bg-primary);

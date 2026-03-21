@@ -23,6 +23,10 @@ export class UIManager {
     get screenGuardian(): boolean { return this.privacyManager?.screenGuardian ?? false; }
     set screenGuardian(v: boolean) { if (this.privacyManager) this.privacyManager.screenGuardian = v; }
 
+    // OLED mode — backed by ThemeManager
+    get oledMode(): boolean { return this.themeManager?.oledMode ?? false; }
+    set oledMode(v: boolean) { if (this.themeManager) this.themeManager.oledMode = v; }
+
     public themeManager!: ThemeManager;
     public settingsManager!: SettingsManager;
     public accountManager!: AccountManager;
@@ -80,6 +84,7 @@ export class UIManager {
         this.themeManager.setTheme(theme, silent);
     }
     public setAccentColor(accentColor: string, silent: boolean = false) { this.themeManager.setAccentColor(accentColor, silent); }
+    public applyOledMode(v: boolean, silent: boolean = false) { this.themeManager.applyOledMode(v, silent); }
 
     // ─── Navigation delegations ────────────────────────────────────────────────
 

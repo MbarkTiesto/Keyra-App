@@ -146,6 +146,18 @@ body.dark-theme {
     --aura-1: hsla(var(--dynamic-accent-hue, 258), 100%, 70%, 0.25);
 }
 
+/* ── OLED Mode ── */
+body.dark-theme.oled-optimized {
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-tertiary: #0f0f0f;
+}
+
+/* Hide OLED setting row in light mode */
+body:not(.dark-theme) .oled-setting-row {
+    display: none !important;
+}
+
 /* ── Performance Mode ── */
 body.performance-mode {
     --transition-fast: 0s !important;

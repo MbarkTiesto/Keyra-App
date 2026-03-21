@@ -10,6 +10,7 @@ export interface ThemeManagerHost {
 export class ThemeManager {
     private host: ThemeManagerHost;
     private currentTheme: 'light' | 'dark' = 'light';
+    public oledMode: boolean = false;
 
     // Stored so we can remove them on re-init
     private handleToggleClick: ((e: Event) => void) | null = null;
@@ -29,6 +30,9 @@ export class ThemeManager {
         this.loadAccentColor();
         this.setupAccentColorSelector();
         this.initializeTheme();
+        // Restore OLED mode after theme is applied
+        const savedOled = localStorage.getItem(this.host.getStorageKey('oled_mode')) === 'true';
+        this.applyOledMode(savedOled, true);
     }
 
     public setTheme(theme: 'light' | 'dark', silent: boolean = false) {
@@ -57,6 +61,9 @@ export class ThemeManager {
         if (mobileThemeText) mobileThemeText.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
 
         if (!silent) this.host.pushWebSettings();
+
+        // Re-evaluate OLED (only active in dark mode)
+        this.applyOledMode(this.oledMode, true);
 
         // Sync Android status bar color
         import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
@@ -96,6 +103,18 @@ export class ThemeManager {
             localStorage.setItem(this.host.getStorageKey('accent_color'), accentColor);
             if (!silent) this.host.pushWebSettings();
         }
+    }
+
+    public applyOledMode(enabled: boolean, silent: boolean = false) {
+        this.oledMode = enabled;
+        const active = enabled && this.currentTheme === 'dark';
+        document.body.classList.toggle('oled-optimized', active);
+
+        const toggle = document.getElementById('oled-mode-toggle') as HTMLInputElement | null;
+        if (toggle) toggle.checked = enabled;
+
+        localStorage.setItem(this.host.getStorageKey('oled_mode'), String(enabled));
+        if (!silent) this.host.pushWebSettings();
     }
 
     public loadAccentColor() {
