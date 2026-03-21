@@ -3,6 +3,12 @@ import { rateLimiter } from '../core/rateLimiter';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { BiometricAuth, BiometryType } from '@aparajita/capacitor-biometric-auth';
 
+/** Close every open card dropdown — called globally on click-outside, scroll, touchmove */
+function closeAllCardDropdowns() {
+    document.querySelectorAll<HTMLElement>('.card-dropdown.show').forEach(d => d.classList.remove('show'));
+    document.querySelectorAll<HTMLElement>('.btn-card-more.active').forEach(b => b.classList.remove('active'));
+}
+
 export class UIManager {
     private currentTheme: 'light' | 'dark' = 'light';
     private currentTab: 'vault' | 'settings' | 'account' = 'vault';
@@ -396,6 +402,21 @@ export class UIManager {
     }
 
     private setupEventListeners() {
+        // ── Global card-dropdown dismissal ──────────────────────────────────────
+        // Close on any click outside a card-actions area
+        document.addEventListener('click', (e) => {
+            if (!(e.target as HTMLElement).closest('.card-actions')) {
+                closeAllCardDropdowns();
+            }
+        });
+
+        // Close on scroll (covers both mouse wheel and touch scroll)
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            mainContent.addEventListener('scroll', () => closeAllCardDropdowns(), { passive: true });
+        }
+        document.addEventListener('touchmove', () => closeAllCardDropdowns(), { passive: true });
+
         // Tab Navigation
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
@@ -1248,20 +1269,12 @@ export class UIManager {
         moreBtn?.addEventListener('click', (e) => {
             e.stopPropagation();
             const isOpen = dropdown.classList.contains('show');
-            // Close all other dropdowns
-            document.querySelectorAll('.card-dropdown.show').forEach(d => d.classList.remove('show'));
-            document.querySelectorAll('.btn-card-more.active').forEach(b => b.classList.remove('active'));
+            closeAllCardDropdowns();
             if (!isOpen) {
                 dropdown.classList.add('show');
                 moreBtn.classList.add('active');
             }
         });
-
-        // Close dropdown on outside click
-        document.addEventListener('click', () => {
-            dropdown.classList.remove('show');
-            moreBtn.classList.remove('active');
-        }, { once: true });
 
         const codeElement = card.querySelector('.otp-code') as HTMLElement;
         codeElement?.addEventListener('click', async () => {

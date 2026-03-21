@@ -452,17 +452,22 @@ i.fa-regular {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    min-width: 140px;
+    min-width: 160px;
     background: var(--bg-primary);
     border-radius: var(--radius-md);
-    box-shadow: var(--nm-shadow-out);
+    box-shadow:
+        10px 10px 24px var(--nm-shadow-dark),
+        -10px -10px 24px var(--nm-shadow-light);
     padding: 6px;
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(8px) scale(0.95);
+    transform: translateY(6px) scale(0.94);
     transform-origin: top right;
-    transition: all var(--transition-fast);
+    transition:
+        opacity 0.18s ease,
+        transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+        visibility 0.18s ease;
 }
 
 .card-dropdown.show {
@@ -475,18 +480,19 @@ i.fa-regular {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 11px 14px;
     border-radius: var(--radius-sm);
     font-size: 13px;
     font-weight: 750;
     color: var(--text-secondary);
-    transition: all 0.2s ease;
+    transition: box-shadow 0.15s ease, color 0.15s ease, transform 0.12s ease;
     cursor: pointer;
+    min-height: 44px;
 }
 
 .card-dropdown-item i {
-    font-size: 13px;
-    width: 16px;
+    font-size: 14px;
+    width: 18px;
     text-align: center;
     flex-shrink: 0;
     line-height: 1;
@@ -498,10 +504,23 @@ i.fa-regular {
     color: var(--accent-primary);
 }
 
+.card-dropdown-item:active {
+    transform: scale(0.96);
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.card-dropdown-item.danger {
+    color: var(--text-secondary);
+}
+
 .card-dropdown-item.danger:hover {
     color: #ff3b30;
-    background: hsla(0, 100%, 50%, 0.05);
-    box-shadow: none;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.card-dropdown-item.danger:active {
+    transform: scale(0.96);
 }
 
 .service-name {

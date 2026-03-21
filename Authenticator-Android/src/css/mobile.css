@@ -2404,3 +2404,54 @@ body.keyboard-open .auth-overlay {
     color: var(--text-secondary);
     font-weight: 600;
 }
+
+/* ── 33. CARD DROPDOWN — MOBILE ENHANCEMENTS ─────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .card-dropdown {
+        min-width: 180px;
+        border-radius: 18px;
+        padding: 8px;
+        box-shadow:
+            12px 12px 28px var(--nm-shadow-dark),
+            -12px -12px 28px var(--nm-shadow-light);
+    }
+
+    .card-dropdown-item {
+        padding: 14px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 800;
+        min-height: 52px;
+        gap: 12px;
+    }
+
+    .card-dropdown-item i {
+        font-size: 16px;
+        width: 20px;
+    }
+
+    /* Divider between edit and delete */
+    .card-dropdown-item.danger {
+        margin-top: 4px;
+        position: relative;
+    }
+
+    .card-dropdown-item.danger::before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: 10px;
+        right: 10px;
+        height: 1px;
+        background: var(--nm-shadow-dark);
+        opacity: 0.15;
+        border-radius: 1px;
+    }
+
+    /* Active press state on touch */
+    .card-dropdown-item:active {
+        box-shadow: var(--nm-shadow-in-sm);
+        transform: scale(0.97);
+    }
+}
