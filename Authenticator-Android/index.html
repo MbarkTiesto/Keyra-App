@@ -417,53 +417,113 @@
                     <div><h1 class="section-title">My Account</h1><p class="section-subtitle">YOUR PROFILE AND SECURITY</p></div>
                 </div>
                 <div class="settings-grid">
+                    <!-- Vault Identity -->
                     <div class="account-card bento-card">
-                        <div class="bento-header"><div class="bento-icon"><i class="fa-solid fa-user"></i></div><div class="bento-title-vessel"><h3 class="bento-title">Vault Identity</h3><div class="bento-subtitle">Profile & Access Email</div></div></div>
+                        <div class="bento-header">
+                            <div class="bento-icon"><i class="fa-solid fa-user"></i></div>
+                            <div class="bento-title-vessel"><h3 class="bento-title">Vault Identity</h3><div class="bento-subtitle">Profile & Access Email</div></div>
+                        </div>
                         <div class="bento-content">
-                            <div style="display: flex; align-items: center; gap: var(--space-lg); margin-bottom: var(--space-lg); padding: var(--space-md); background: var(--bg-primary); border-radius: var(--radius-md); box-shadow: var(--nm-shadow-in-sm);">
-                                <div class="acc-avatar-vessel"><img id="acc-avatar-img" class="hidden"><span id="acc-initials">?</span></div>
-                                <div style="flex: 1;"><button class="btn-primary" id="btn-change-avatar" style="height: 44px; font-size: 14px; padding: 0 24px;"><i class="fa-solid fa-camera"></i><span>Change Photo</span></button><div class="modal-help-text" style="margin-top: 8px;">PNG, JPG or WebP. Max 2MB.</div></div>
+                            <!-- Avatar hero row -->
+                            <div class="acc-identity-hero">
+                                <div class="acc-avatar-ring">
+                                    <div class="acc-avatar-vessel"><img id="acc-avatar-img" class="hidden"><span id="acc-initials">?</span></div>
+                                </div>
+                                <div class="acc-identity-info">
+                                    <button class="btn-primary acc-change-photo-btn" id="btn-change-avatar">
+                                        <i class="fa-solid fa-camera"></i><span>Change Photo</span>
+                                    </button>
+                                    <p class="acc-photo-hint">PNG, JPG or WebP · Max 2MB</p>
+                                </div>
                             </div>
-                            <div class="setting-row"><div class="setting-info"><div class="setting-name">Vault Name</div><div class="setting-desc" id="acc-display-username">loading...</div></div></div>
-                            <div class="setting-row"><div class="setting-info"><div class="setting-name">Primary Email</div><div class="setting-desc" id="acc-display-email">loading...</div></div></div>
+                            <!-- Info rows -->
+                            <div class="setting-row">
+                                <div class="setting-info"><div class="setting-name">Vault Name</div><div class="setting-desc" id="acc-display-username">loading...</div></div>
+                                <i class="fa-solid fa-chevron-right acc-row-chevron"></i>
+                            </div>
+                            <div class="setting-row">
+                                <div class="setting-info"><div class="setting-name">Primary Email</div><div class="setting-desc" id="acc-display-email">loading...</div></div>
+                                <i class="fa-solid fa-chevron-right acc-row-chevron"></i>
+                            </div>
+                            <!-- Pending email change -->
                             <div id="pending-email-container" class="hidden">
-                                <div class="nm-divider" style="margin: 16px 0;"></div>
+                                <div class="nm-divider" style="margin: 12px 0;"></div>
                                 <div class="setting-row" style="margin-top: 0;">
                                     <div class="setting-info">
-                                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;"><div class="setting-name" style="margin-bottom: 0;">Pending Change</div><div class="badge nm-inset" style="color: #ff9500; font-weight: 800; font-size: 9px; padding: 4px 10px; border-radius: var(--radius-full);">not confirmed yet</div></div>
+                                        <div class="acc-pending-label-row">
+                                            <div class="setting-name">Pending Change</div>
+                                            <div class="acc-pending-badge">not confirmed yet</div>
+                                        </div>
                                         <div class="setting-desc" id="acc-display-pending-email">new@domain.com</div>
                                     </div>
-                                    <div style="display: flex; gap: 8px;"><button class="btn-icon" id="btn-remove-pending-email" title="Cancel Change" style="width: 32px; height: 32px; color: var(--text-secondary);"><i class="fa-solid fa-trash-can"></i></button></div>
+                                    <button class="btn-icon acc-remove-pending-btn" id="btn-remove-pending-email" title="Cancel Change">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
                                 </div>
-                                <button class="btn-primary" id="btn-verify-new-email" style="width: 100%; margin-top: 12px; height: 44px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-shield-halved"></i>Verify & Activate</button>
+                                <button class="btn-primary acc-verify-btn" id="btn-verify-new-email">
+                                    <i class="fa-solid fa-shield-halved"></i>Verify & Activate
+                                </button>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Display Name -->
                     <div class="account-card bento-card">
-                        <div class="bento-header"><div class="bento-icon"><i class="fa-solid fa-user-gear"></i></div><div class="bento-title-vessel"><h3 class="bento-title">Display Name</h3><div class="bento-subtitle">Personalize your vault profile</div></div></div>
+                        <div class="bento-header">
+                            <div class="bento-icon"><i class="fa-solid fa-user-gear"></i></div>
+                            <div class="bento-title-vessel"><h3 class="bento-title">Display Name</h3><div class="bento-subtitle">Personalize your vault profile</div></div>
+                        </div>
                         <div class="bento-content">
-                            <form id="form-change-name">
-                                <div class="form-group"><label class="form-label">New Full Name</label><input type="text" id="change-name-input" class="form-input" placeholder="Enter new name" required></div>
-                                <button type="submit" class="btn-primary" style="width: 100%; height: 50px; border-radius: var(--radius-md);">Update Name</button>
+                            <form id="form-change-name" class="acc-form">
+                                <div class="form-group">
+                                    <label class="form-label">New Full Name</label>
+                                    <input type="text" id="change-name-input" class="form-input" placeholder="Enter new name" required>
+                                </div>
+                                <button type="submit" class="btn-primary acc-form-submit">
+                                    <i class="fa-solid fa-check"></i><span>Update Name</span>
+                                </button>
                             </form>
                         </div>
                     </div>
+
+                    <!-- Change Email -->
                     <div class="account-card bento-card" id="card-change-email">
-                        <div class="bento-header"><div class="bento-icon"><i class="fa-solid fa-envelope"></i></div><div class="bento-title-vessel"><h3 class="bento-title">Change Email</h3><div class="bento-subtitle">FOR NOTIFICATIONS & RECOVERY</div></div></div>
+                        <div class="bento-header">
+                            <div class="bento-icon"><i class="fa-solid fa-envelope"></i></div>
+                            <div class="bento-title-vessel"><h3 class="bento-title">Change Email</h3><div class="bento-subtitle">For notifications & recovery</div></div>
+                        </div>
                         <div class="bento-content">
-                            <form id="form-change-email">
-                                <div class="form-group"><label class="form-label">New Email Address</label><input type="email" id="change-email-input" class="form-input" placeholder="new@domain.com" required></div>
-                                <button type="submit" class="btn-primary" style="width: 100%; height: 50px; border-radius: var(--radius-md);">Change Email</button>
+                            <form id="form-change-email" class="acc-form">
+                                <div class="form-group">
+                                    <label class="form-label">New Email Address</label>
+                                    <input type="email" id="change-email-input" class="form-input" placeholder="new@domain.com" required>
+                                </div>
+                                <button type="submit" class="btn-primary acc-form-submit">
+                                    <i class="fa-solid fa-paper-plane"></i><span>Change Email</span>
+                                </button>
                             </form>
                         </div>
                     </div>
+
+                    <!-- Master Password -->
                     <div class="account-card bento-card">
-                        <div class="bento-header"><div class="bento-icon"><i class="fa-solid fa-key"></i></div><div class="bento-title-vessel"><h3 class="bento-title">Master Password</h3><div class="bento-subtitle">SECURITY ZONE</div></div></div>
+                        <div class="bento-header">
+                            <div class="bento-icon"><i class="fa-solid fa-key"></i></div>
+                            <div class="bento-title-vessel"><h3 class="bento-title">Master Password</h3><div class="bento-subtitle">Security zone</div></div>
+                        </div>
                         <div class="bento-content">
-                            <form id="form-change-password">
-                                <div class="form-group"><label class="form-label">New Master Password</label><input type="password" id="change-pass-input" class="form-input" placeholder="Min 8 characters" required></div>
-                                <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" id="change-pass-confirm" class="form-input" placeholder="Repeat password" required></div>
-                                <button type="submit" class="btn-primary" style="width: 100%; height: 50px; border-radius: var(--radius-md);">Update Master Key</button>
+                            <form id="form-change-password" class="acc-form">
+                                <div class="form-group">
+                                    <label class="form-label">New Master Password</label>
+                                    <input type="password" id="change-pass-input" class="form-input" placeholder="Min 8 characters" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Confirm New Password</label>
+                                    <input type="password" id="change-pass-confirm" class="form-input" placeholder="Repeat password" required>
+                                </div>
+                                <button type="submit" class="btn-primary acc-form-submit acc-form-submit--danger">
+                                    <i class="fa-solid fa-lock"></i><span>Update Master Key</span>
+                                </button>
                             </form>
                         </div>
                     </div>

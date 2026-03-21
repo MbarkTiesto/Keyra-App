@@ -253,6 +253,141 @@ i.fa-regular {
     transform: translate(-50%, -50%);
 }
 
+/* ── Account tab — identity hero ── */
+.acc-identity-hero {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in-sm);
+    margin-bottom: var(--space-md);
+}
+
+/* Gradient ring around avatar */
+.acc-avatar-ring {
+    flex-shrink: 0;
+    padding: 3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary, hsl(calc(var(--h) + 40), var(--s), 65%)));
+    box-shadow: 0 4px 16px var(--aura-1);
+}
+
+.acc-identity-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.acc-change-photo-btn {
+    height: 44px;
+    font-size: 14px;
+    padding: 0 20px;
+    border-radius: var(--radius-full) !important;
+    box-shadow:
+        5px 5px 12px var(--nm-shadow-dark),
+        -5px -5px 12px var(--nm-shadow-light) !important;
+}
+
+.acc-photo-hint {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Chevron on info rows */
+.acc-row-chevron {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    flex-shrink: 0;
+    opacity: 0.5;
+}
+
+/* Pending email badge */
+.acc-pending-label-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.acc-pending-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #ff9500;
+    background: var(--bg-primary);
+    box-shadow: var(--nm-shadow-in-sm);
+}
+
+.acc-remove-pending-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    color: var(--text-secondary);
+    box-shadow:
+        4px 4px 10px var(--nm-shadow-dark),
+        -4px -4px 10px var(--nm-shadow-light);
+}
+
+.acc-verify-btn {
+    width: 100%;
+    margin-top: 12px;
+    height: 48px;
+    border-radius: var(--radius-full) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+/* ── Account forms ── */
+.acc-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.acc-form-submit {
+    width: 100%;
+    height: 50px;
+    border-radius: var(--radius-full) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 15px;
+    margin-top: 4px;
+    box-shadow:
+        6px 6px 14px var(--nm-shadow-dark),
+        -6px -6px 14px var(--nm-shadow-light) !important;
+}
+
+.acc-form-submit:hover {
+    transform: none !important;
+    box-shadow:
+        6px 6px 14px var(--nm-shadow-dark),
+        -6px -6px 14px var(--nm-shadow-light) !important;
+}
+
+.acc-form-submit:active {
+    box-shadow: var(--nm-shadow-in-sm) !important;
+    transform: scale(0.97) !important;
+}
+
+/* Danger variant — master password */
+.acc-form-submit--danger {
+    color: #ff3b30 !important;
+}
+
 /* User Account Dropdown - Premium Glass */
 .dropdown-container {
     position: relative;
