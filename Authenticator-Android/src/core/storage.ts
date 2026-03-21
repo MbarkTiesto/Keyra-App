@@ -65,7 +65,11 @@ async function retryFetch(url: string, options: RequestInit, maxRetries: number 
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            const response = await fetch(url, options);
+            // Add a 10s timeout per attempt so cold Netlify functions don't hang forever
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const response = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(timeoutId);
             
             // If response is ok or client error (4xx), don't retry
             if (response.ok || (response.status >= 400 && response.status < 500)) {
@@ -133,7 +137,7 @@ async function callSync(action: 'get' | 'put' | 'move', path: string, data?: any
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action, path, data })
-        });
+        }, action === 'get' ? 2 : 3); // fewer retries for reads
         return await response.json();
     } catch (e) {
         console.error("Cloud action failed after retries:", e);

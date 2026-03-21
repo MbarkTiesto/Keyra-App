@@ -88,16 +88,30 @@ export async function verifyEmail(email: string, code: string): Promise<{ succes
 }
 
 export async function login(username: string, password: string): Promise<{ success: boolean, message: string }> {
+    // Always fetch the individual user file first — it's the most up-to-date
+    // source for auth-critical fields (hash, salt, encryptedVaultData).
+    // users.json can be stale due to race conditions / debounced writes.
+    const individualData = await getUserData(username);
+
     const users = await getUsers();
-    let user = users.find(u => u.username === username);
-    if (!user) {
-        const cloudData = await getUserData(username);
-        if (cloudData) {
-            user = cloudData;
-            users.push(user!);
-            await saveUsers(users);
-        }
+    const localUser = users.find(u => u.username === username);
+
+    // Build the canonical user record: individual file wins for auth fields
+    let user: UserRecord | undefined;
+    if (individualData) {
+        user = {
+            ...(localUser || {}),
+            ...individualData,
+            // individual file is authoritative for these
+            hash: individualData.hash,
+            salt: individualData.salt,
+            encryptedVaultData: individualData.encryptedVaultData,
+            isActivated: individualData.isActivated,
+        } as UserRecord;
+    } else if (localUser) {
+        user = localUser;
     }
+
     if (!user) return { success: false, message: "Invalid credentials." };
     if (!user.isActivated) return { success: false, message: "Please verify your email first." };
     if (!verifyPassword(password, user.hash, user.salt)) {
@@ -107,19 +121,17 @@ export async function login(username: string, password: string): Promise<{ succe
         const key = deriveKey(password, user.salt);
         const decryptedJson = decryptVault(user.encryptedVaultData, key);
         JSON.parse(decryptedJson);
-        const cloudData = await getUserData(username);
-        if (cloudData) {
-            const mergedUser: UserRecord = {
-                ...user, ...cloudData,
-                hash: user.hash, salt: user.salt,
-                encryptedVaultData: cloudData.encryptedVaultData || user.encryptedVaultData
-            };
-            const userIndex = users.findIndex(u => u.username === username);
-            if (userIndex >= 0) { users[userIndex] = mergedUser; await saveUsers(users); }
-            currentUser = mergedUser;
+
+        // Merge into local users list and persist
+        const userIndex = users.findIndex(u => u.username === username);
+        if (userIndex >= 0) {
+            users[userIndex] = user;
         } else {
-            currentUser = user;
+            users.push(user);
         }
+        await saveUsers(users);
+
+        currentUser = user;
         currentKey = key;
         localStorage.setItem('active_session_user', currentUser.username);
         localStorage.setItem('active_session_key', key.toString('base64'));
@@ -163,22 +175,29 @@ export async function checkSession(): Promise<{ success: boolean, message: strin
             }
         }
         try {
+            // individual file is authoritative — fetch it first
+            const individualData = await getUserData(savedUser);
             const users = await getUsers();
-            let user = users.find(u => u.username === savedUser);
+            const localUser = users.find(u => u.username === savedUser);
+
+            let user: UserRecord | undefined;
+            if (individualData) {
+                user = {
+                    ...(localUser || {}),
+                    ...individualData,
+                    hash: individualData.hash,
+                    salt: individualData.salt,
+                    encryptedVaultData: individualData.encryptedVaultData,
+                    isActivated: individualData.isActivated,
+                } as UserRecord;
+            } else if (localUser) {
+                user = localUser;
+            }
+
             if (user) {
-                const cloudData = await getUserData(savedUser);
-                if (cloudData) {
-                    const mergedUser: UserRecord = {
-                        ...user, ...cloudData,
-                        hash: user.hash, salt: user.salt,
-                        encryptedVaultData: cloudData.encryptedVaultData || user.encryptedVaultData
-                    };
-                    const userIndex = users.findIndex(u => u.username === savedUser);
-                    if (userIndex >= 0) { users[userIndex] = mergedUser; await saveUsers(users); }
-                    currentUser = mergedUser;
-                } else {
-                    currentUser = user;
-                }
+                const userIndex = users.findIndex(u => u.username === savedUser);
+                if (userIndex >= 0) { users[userIndex] = user; await saveUsers(users); }
+                currentUser = user;
                 currentKey = Buffer.from(savedKey, 'base64');
                 localStorage.setItem('active_session_timestamp', Date.now().toString());
                 const deviceId = getCurrentDeviceId();
