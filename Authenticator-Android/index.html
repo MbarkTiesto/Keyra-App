@@ -543,28 +543,30 @@
                 <div class="bento-title-vessel"><h3 class="bento-title">Vault Identity</h3><div class="bento-subtitle">Profile & Access Email</div></div>
             </div>
             <div class="bento-content">
+
+                <!-- Avatar + name hero -->
                 <div class="acc-identity-hero">
-                    <div class="acc-avatar-ring">
-                        <div class="acc-avatar-vessel"><img id="acc-avatar-img" class="hidden"><span id="acc-initials">?</span></div>
+                    <!-- Avatar vessel -->
+                    <div class="acc-avatar-outer">
+                        <div class="acc-avatar-vessel">
+                            <img id="acc-avatar-img" class="hidden">
+                            <span id="acc-initials">?</span>
+                        </div>
                     </div>
-                    <div class="acc-identity-info">
-                        <button class="btn-primary acc-change-photo-btn" id="btn-change-avatar">
-                            <i class="fa-solid fa-camera"></i><span>Change Photo</span>
-                        </button>
-                        <p class="acc-photo-hint">PNG, JPG or WebP · Max 2MB</p>
+                    <!-- Name + email -->
+                    <div class="acc-hero-info">
+                        <div class="acc-hero-name" id="acc-display-username">loading...</div>
+                        <div class="acc-hero-email" id="acc-display-email">loading...</div>
                     </div>
+                    <!-- Change photo button -->
+                    <button class="acc-avatar-change-btn" id="btn-change-avatar" title="Change photo">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
                 </div>
-                <div class="setting-row">
-                    <div class="setting-info"><div class="setting-name">Vault Name</div><div class="setting-desc" id="acc-display-username">loading...</div></div>
-                    <i class="fa-solid fa-chevron-right acc-row-chevron"></i>
-                </div>
-                <div class="setting-row">
-                    <div class="setting-info"><div class="setting-name">Primary Email</div><div class="setting-desc" id="acc-display-email">loading...</div></div>
-                    <i class="fa-solid fa-chevron-right acc-row-chevron"></i>
-                </div>
+
                 <!-- Pending email change -->
                 <div id="pending-email-container" class="hidden">
-                    <div class="nm-divider" style="margin: 12px 0;"></div>
+                    <div class="nm-divider" style="margin: 4px 0 12px;"></div>
                     <div class="setting-row" style="margin-top: 0;">
                         <div class="setting-info">
                             <div class="acc-pending-label-row">
@@ -581,6 +583,7 @@
                         <i class="fa-solid fa-shield-halved"></i>Verify & Activate
                     </button>
                 </div>
+
             </div>
         </div>
 

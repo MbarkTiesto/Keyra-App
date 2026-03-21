@@ -253,51 +253,128 @@ i.fa-regular {
 .acc-identity-hero {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-md);
+    gap: 16px;
+    padding: 16px;
     border-radius: var(--radius-md);
     background: var(--bg-primary);
     box-shadow: var(--nm-shadow-in-sm);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
+    position: relative;
 }
 
-/* Gradient ring around avatar */
-.acc-avatar-ring {
+/* Avatar outer vessel — raised circle */
+.acc-avatar-outer {
     flex-shrink: 0;
-    padding: 3px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary, hsl(calc(var(--h) + 40), var(--s), 65%)));
-    box-shadow: 0 4px 16px var(--aura-1);
+    background: var(--bg-primary);
+    box-shadow:
+        6px 6px 14px var(--nm-shadow-dark),
+        -6px -6px 14px var(--nm-shadow-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.acc-identity-info {
+.acc-avatar-vessel {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    box-shadow:
+        inset 3px 3px 7px var(--nm-shadow-dark),
+        inset -3px -3px 7px var(--nm-shadow-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.acc-avatar-vessel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.acc-avatar-vessel span {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--accent-primary);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Name + email column */
+.acc-hero-info {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
 }
 
-.acc-change-photo-btn {
-    height: 44px;
-    font-size: 14px;
-    padding: 0 20px;
-    border-radius: var(--radius-full) !important;
-    box-shadow:
-        5px 5px 12px var(--nm-shadow-dark),
-        -5px -5px 12px var(--nm-shadow-light) !important;
+.acc-hero-name {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.acc-photo-hint {
-    font-size: 11px;
-    color: var(--text-tertiary);
+.acc-hero-email {
+    font-size: 12px;
     font-weight: 600;
-    margin: 0;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+/* Camera button — small neumorphic square, top-right of hero */
+.acc-avatar-change-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: var(--bg-primary);
+    box-shadow:
+        4px 4px 10px var(--nm-shadow-dark),
+        -4px -4px 10px var(--nm-shadow-light);
+    border: none;
+    color: var(--accent-primary);
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+.acc-avatar-change-btn:active {
+    box-shadow: var(--nm-shadow-in-sm);
+    transform: scale(0.91);
+}
+
 
 /* Chevron on info rows */
 .acc-row-chevron {
     font-size: 12px;
     color: var(--text-tertiary);
+    flex-shrink: 0;
+    opacity: 0.5;
+}
+
+
+
     flex-shrink: 0;
     opacity: 0.5;
 }
