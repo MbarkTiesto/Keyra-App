@@ -172,6 +172,11 @@ export async function setupAuthUI() {
                 err.style.opacity = '1';
                 void (err as HTMLElement).offsetWidth; // Trigger reflow
                 err.classList.add('animate-shake');
+
+                // Show debug modal if diagnostic info is available
+                if ((result as any).debug) {
+                    showLoginDebugModal(result.message, (result as any).debug);
+                }
             }
         } catch (error: any) {
             rateLimiter.recordAttempt('login', user);
@@ -323,5 +328,54 @@ export async function setupAuthUI() {
         codeLabel.textContent = code;
         toast.classList.remove('hidden');
         setTimeout(() => toast.classList.add('hidden'), 8000);
+    }
+
+    function showLoginDebugModal(errorMessage: string, debug: string) {
+        const ui = (window as any).ui;
+        if (!ui) return;
+
+        const escaped = debug
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        ui.showModal(`
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-icon-vessel danger">
+                        <i class="fa-solid fa-bug"></i>
+                    </div>
+                    <div class="modal-title-vessel">
+                        <h2 class="danger">Login Failed</h2>
+                        <p>${errorMessage}</p>
+                    </div>
+                </div>
+                <div class="modal-divider"></div>
+                <div class="modal-body">
+                    <p style="font-size:12px; color:var(--text-secondary); margin-bottom:8px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase;">Diagnostic Log</p>
+                    <pre style="
+                        background: var(--bg-secondary);
+                        box-shadow: var(--nm-pressed);
+                        border-radius: var(--radius-md);
+                        padding: 14px;
+                        font-size: 11px;
+                        line-height: 1.7;
+                        color: var(--text-primary);
+                        white-space: pre-wrap;
+                        word-break: break-all;
+                        font-family: 'JetBrains Mono', monospace;
+                        max-height: 320px;
+                        overflow-y: auto;
+                    ">${escaped}</pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="debug-modal-close">
+                    <i class="fa-solid fa-xmark"></i>
+                    Close
+                </button>
+            </div>
+        `);
+        document.getElementById('debug-modal-close')?.addEventListener('click', () => ui.hideModal());
     }
 }

@@ -87,60 +87,112 @@ export async function verifyEmail(email: string, code: string): Promise<{ succes
     return { success: false, message: "Invalid activation code." };
 }
 
-export async function login(username: string, password: string): Promise<{ success: boolean, message: string }> {
-    // Always fetch the individual user file first — it's the most up-to-date
-    // source for auth-critical fields (hash, salt, encryptedVaultData).
-    // users.json can be stale due to race conditions / debounced writes.
-    const individualData = await getUserData(username);
+export async function login(username: string, password: string): Promise<{ success: boolean, message: string, debug?: string }> {
+    const steps: string[] = [];
 
-    const users = await getUsers();
-    const localUser = users.find(u => u.username === username);
-
-    // Build the canonical user record: individual file wins for auth fields
-    let user: UserRecord | undefined;
-    if (individualData) {
-        user = {
-            ...(localUser || {}),
-            ...individualData,
-            // individual file is authoritative for these
-            hash: individualData.hash,
-            salt: individualData.salt,
-            encryptedVaultData: individualData.encryptedVaultData,
-            isActivated: individualData.isActivated,
-        } as UserRecord;
-    } else if (localUser) {
-        user = localUser;
-    }
-
-    if (!user) return { success: false, message: "Invalid credentials." };
-    if (!user.isActivated) return { success: false, message: "Please verify your email first." };
-    if (!verifyPassword(password, user.hash, user.salt)) {
-        return { success: false, message: "Invalid credentials." };
-    }
     try {
-        const key = deriveKey(password, user.salt);
-        const decryptedJson = decryptVault(user.encryptedVaultData, key);
-        JSON.parse(decryptedJson);
-
-        // Merge into local users list and persist
-        const userIndex = users.findIndex(u => u.username === username);
-        if (userIndex >= 0) {
-            users[userIndex] = user;
-        } else {
-            users.push(user);
+        // Step 1: fetch individual user file (authoritative source)
+        steps.push('1. Fetching user data from cloud...');
+        let individualData: any = null;
+        try {
+            individualData = await getUserData(username);
+            steps.push(individualData
+                ? `   ✓ Individual file found (has hash: ${!!individualData.hash}, has salt: ${!!individualData.salt}, activated: ${individualData.isActivated})`
+                : '   ✗ Individual file not found (null)');
+        } catch (e: any) {
+            steps.push(`   ✗ Individual file fetch threw: ${e?.message}`);
         }
-        await saveUsers(users);
 
-        currentUser = user;
-        currentKey = key;
-        localStorage.setItem('active_session_user', currentUser.username);
-        localStorage.setItem('active_session_key', key.toString('base64'));
-        localStorage.setItem('active_session_timestamp', Date.now().toString());
-        registerCurrentDevice().catch(() => {});
-        return { success: true, message: "Login successful." };
-    } catch (err) {
-        console.error("Login Decryption Error:", err);
-        return { success: false, message: "Data corrupted." };
+        // Step 2: fetch users list
+        steps.push('2. Fetching users list from cloud...');
+        let users: UserRecord[] = [];
+        try {
+            users = await getUsers();
+            const localUser = users.find(u => u.username === username);
+            steps.push(localUser
+                ? `   ✓ Found in users.json (has hash: ${!!localUser.hash}, has salt: ${!!localUser.salt})`
+                : `   ✗ Not found in users.json (total users: ${users.length})`);
+        } catch (e: any) {
+            steps.push(`   ✗ getUsers threw: ${e?.message}`);
+        }
+
+        const localUser = users.find(u => u.username === username);
+
+        // Step 3: build canonical user record
+        steps.push('3. Building user record...');
+        let user: UserRecord | undefined;
+        if (individualData) {
+            user = {
+                ...(localUser || {}),
+                ...individualData,
+                hash: individualData.hash,
+                salt: individualData.salt,
+                encryptedVaultData: individualData.encryptedVaultData,
+                isActivated: individualData.isActivated,
+            } as UserRecord;
+            steps.push('   ✓ Using individual file as base');
+        } else if (localUser) {
+            user = localUser;
+            steps.push('   ✓ Using users.json entry as fallback');
+        }
+
+        if (!user) {
+            steps.push('   ✗ No user record found anywhere');
+            return { success: false, message: "Invalid credentials.", debug: steps.join('\n') };
+        }
+
+        steps.push(`   hash length: ${user.hash?.length ?? 'N/A'}, salt length: ${user.salt?.length ?? 'N/A'}`);
+
+        // Step 4: activation check
+        steps.push('4. Checking activation...');
+        if (!user.isActivated) {
+            steps.push('   ✗ Account not activated');
+            return { success: false, message: "Please verify your email first.", debug: steps.join('\n') };
+        }
+        steps.push('   ✓ Account is activated');
+
+        // Step 5: password verification
+        steps.push('5. Verifying password (pbkdf2Sync)...');
+        let passwordOk = false;
+        try {
+            passwordOk = verifyPassword(password, user.hash, user.salt);
+            steps.push(passwordOk ? '   ✓ Password matches' : '   ✗ Password does NOT match');
+        } catch (e: any) {
+            steps.push(`   ✗ verifyPassword threw: ${e?.message}`);
+        }
+
+        if (!passwordOk) {
+            return { success: false, message: "Invalid credentials.", debug: steps.join('\n') };
+        }
+
+        // Step 6: vault decryption
+        steps.push('6. Decrypting vault...');
+        try {
+            const key = deriveKey(password, user.salt);
+            const decryptedJson = decryptVault(user.encryptedVaultData, key);
+            JSON.parse(decryptedJson);
+            steps.push('   ✓ Vault decrypted and parsed OK');
+
+            // Merge into local users list and persist
+            const userIndex = users.findIndex(u => u.username === username);
+            if (userIndex >= 0) { users[userIndex] = user!; } else { users.push(user!); }
+            await saveUsers(users);
+
+            currentUser = user!;
+            currentKey = key;
+            localStorage.setItem('active_session_user', currentUser.username);
+            localStorage.setItem('active_session_key', key.toString('base64'));
+            localStorage.setItem('active_session_timestamp', Date.now().toString());
+            registerCurrentDevice().catch(() => {});
+            return { success: true, message: "Login successful." };
+        } catch (err: any) {
+            steps.push(`   ✗ Vault decryption threw: ${err?.message}`);
+            return { success: false, message: "Data corrupted.", debug: steps.join('\n') };
+        }
+
+    } catch (outerErr: any) {
+        steps.push(`OUTER ERROR: ${outerErr?.message}`);
+        return { success: false, message: "Login failed.", debug: steps.join('\n') };
     }
 }
 
