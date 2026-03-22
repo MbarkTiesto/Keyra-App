@@ -1317,6 +1317,25 @@ button {
     color: var(--accent-primary);
 }
 
+.coming-soon-card {
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.coming-soon-badge {
+    margin-left: auto;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    box-shadow: var(--nm-pressed);
+}
+
 /* Footer */
 .footer {
     padding: var(--space-xl) var(--space-2xl);
