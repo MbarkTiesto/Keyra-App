@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--
+        Android 7 (API 25) WebView has an outdated trust store and may not trust
+        Let's Encrypt ISRG Root X1 (used by Netlify) after DST Root CA X3 expired.
+        Including user CAs and explicitly trusting the domain fixes "Failed to fetch".
+    -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
