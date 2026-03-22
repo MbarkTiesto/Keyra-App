@@ -339,15 +339,55 @@
         </div>
     </div>
 
-    <!-- Mobile dropdown -->
-    <div class="dropdown-menu mobile-dropdown" id="mobile-user-dropdown">
-        <div class="dropdown-header">
-            <div class="dropdown-user-name" id="mobile-dropdown-user-name">User</div>
-            <div class="dropdown-user-email" id="mobile-dropdown-user-email">user@keyra.app</div>
+    <!-- Mobile user menu — bottom sheet -->
+    <div class="mobile-user-sheet" id="mobile-user-dropdown">
+        <div class="mobile-user-sheet-backdrop" id="mobile-sheet-backdrop"></div>
+        <div class="mobile-user-sheet-panel">
+            <!-- Drag handle -->
+            <div class="sheet-handle"></div>
+
+            <!-- User identity -->
+            <div class="sheet-identity">
+                <div class="sheet-avatar" id="sheet-avatar">
+                    <img id="sheet-avatar-img" class="hidden">
+                    <span id="sheet-avatar-initials">?</span>
+                </div>
+                <div class="sheet-user-info">
+                    <div class="sheet-user-name" id="mobile-dropdown-user-name">User</div>
+                    <div class="sheet-user-email" id="mobile-dropdown-user-email">user@keyra.app</div>
+                </div>
+            </div>
+
+            <div class="sheet-divider"></div>
+
+            <!-- Actions -->
+            <div class="sheet-actions">
+                <button class="sheet-action-btn" id="mobile-theme-toggle-btn">
+                    <div class="sheet-action-icon">
+                        <i id="mobile-theme-icon" class="fa-solid fa-moon"></i>
+                    </div>
+                    <span id="mobile-theme-text">Dark Mode</span>
+                    <i class="fa-solid fa-chevron-right sheet-action-chevron"></i>
+                </button>
+                <button class="sheet-action-btn" id="mobile-about-trigger">
+                    <div class="sheet-action-icon">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+                    <span>About Keyra</span>
+                    <i class="fa-solid fa-chevron-right sheet-action-chevron"></i>
+                </button>
+            </div>
+
+            <div class="sheet-divider"></div>
+
+            <!-- Sign out -->
+            <button class="sheet-action-btn sheet-action-danger" id="mobile-logout-trigger">
+                <div class="sheet-action-icon danger">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+                <span>Sign Out</span>
+            </button>
         </div>
-        <div class="dropdown-item" id="mobile-theme-toggle-btn"><i id="mobile-theme-icon" class="fa-solid fa-moon"></i><span id="mobile-theme-text">Dark Mode</span></div>
-        <div class="nm-divider"></div>
-        <div class="dropdown-item" id="mobile-logout-trigger"><i class="fa-solid fa-right-from-bracket" style="color:#ff3b30;"></i><span style="color:#ff3b30;font-weight:600;">Sign Out</span></div>
     </div>
 
     <div class="section-header">

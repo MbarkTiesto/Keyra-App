@@ -53,6 +53,7 @@ export class AccountManager {
             if (user) {
                 this.syncAvatar('navbar-avatar-img', 'navbar-avatar-initials', user);
                 this.syncAvatar('mobile-avatar-img', 'mobile-avatar-initials', user);
+                this.syncAvatar('sheet-avatar-img', 'sheet-avatar-initials', user);
             }
 
             await this.refreshAccounts();

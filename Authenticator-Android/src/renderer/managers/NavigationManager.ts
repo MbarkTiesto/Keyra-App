@@ -390,8 +390,18 @@ export class NavigationManager {
 
         // Mobile header actions
         const mobileAvatarBtn = document.getElementById('mobile-avatar-btn');
-        const mobileDropdown = document.getElementById('mobile-user-dropdown');
-        mobileAvatarBtn?.addEventListener('click', (e) => { e.stopPropagation(); mobileDropdown?.classList.toggle('show'); });
+        const mobileSheet = document.getElementById('mobile-user-dropdown');
+
+        const openSheet = (e?: Event) => {
+            e?.stopPropagation();
+            mobileSheet?.classList.add('show');
+        };
+        const closeSheet = () => {
+            mobileSheet?.classList.remove('show');
+        };
+
+        mobileAvatarBtn?.addEventListener('click', openSheet);
+        document.getElementById('mobile-sheet-backdrop')?.addEventListener('click', closeSheet);
 
         // Logo → About modal
         const pushSearchBehind = () => {
@@ -419,6 +429,12 @@ export class NavigationManager {
             if (e.target === e.currentTarget) closeAbout();
         });
 
+        // Sheet "About" trigger
+        document.getElementById('mobile-about-trigger')?.addEventListener('click', () => {
+            closeSheet();
+            setTimeout(() => openAbout(), 50);
+        });
+
         document.getElementById('mobile-lock-btn')?.addEventListener('click', () => this.host.lockVault());
         document.getElementById('mobile-lock-btn-settings')?.addEventListener('click', () => this.host.lockVault());
         document.getElementById('mobile-lock-btn-account')?.addEventListener('click', () => this.host.lockVault());
@@ -426,10 +442,10 @@ export class NavigationManager {
         document.getElementById('mobile-theme-toggle-btn')?.addEventListener('click', () => {
             const next = this.host.currentTheme === 'light' ? 'dark' : 'light';
             this.host.setThemeMode(next);
-            mobileDropdown?.classList.remove('show');
+            closeSheet();
         });
         document.getElementById('mobile-logout-trigger')?.addEventListener('click', () => {
-            mobileDropdown?.classList.remove('show');
+            closeSheet();
             pushSearchBehind();
             document.getElementById('modal-logout')?.classList.add('show');
         });

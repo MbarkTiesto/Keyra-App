@@ -83,6 +83,21 @@ export class AuthManager {
             }
         }
 
+        // Sheet avatar (bottom sheet profile menu)
+        const sheetAvatarImg = document.getElementById('sheet-avatar-img') as HTMLImageElement;
+        const sheetAvatarInitials = document.getElementById('sheet-avatar-initials');
+        if (sheetAvatarImg && sheetAvatarInitials) {
+            if (user.profilePicture) {
+                sheetAvatarImg.src = user.profilePicture;
+                sheetAvatarImg.classList.remove('hidden');
+                sheetAvatarInitials.classList.add('hidden');
+            } else {
+                sheetAvatarImg.classList.add('hidden');
+                sheetAvatarInitials.classList.remove('hidden');
+                sheetAvatarInitials.textContent = user.username.charAt(0).toUpperCase();
+            }
+        }
+
         // Pending email
         if (user.pendingEmail) {
             pendingContainer?.classList.remove('hidden');
