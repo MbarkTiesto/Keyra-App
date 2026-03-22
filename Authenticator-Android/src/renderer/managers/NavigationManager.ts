@@ -394,11 +394,22 @@ export class NavigationManager {
         mobileAvatarBtn?.addEventListener('click', (e) => { e.stopPropagation(); mobileDropdown?.classList.toggle('show'); });
 
         // Logo → About modal
+        const pushSearchBehind = () => {
+            const so = document.getElementById('search-overlay');
+            if (so) so.style.zIndex = '1';
+        };
+        const restoreSearch = () => {
+            const so = document.getElementById('search-overlay');
+            if (so) so.style.zIndex = '';
+        };
+
         const openAbout = () => {
+            pushSearchBehind();
             document.getElementById('modal-about')?.classList.add('show');
         };
         const closeAbout = () => {
             document.getElementById('modal-about')?.classList.remove('show');
+            restoreSearch();
         };
         document.querySelector('.mobile-tab-brand')?.addEventListener('click', openAbout);
         document.querySelector('.navbar-brand')?.addEventListener('click', openAbout);
@@ -419,6 +430,7 @@ export class NavigationManager {
         });
         document.getElementById('mobile-logout-trigger')?.addEventListener('click', () => {
             mobileDropdown?.classList.remove('show');
+            pushSearchBehind();
             document.getElementById('modal-logout')?.classList.add('show');
         });
 
@@ -429,6 +441,7 @@ export class NavigationManager {
         });
         document.getElementById('btn-cancel-logout')?.addEventListener('click', () => {
             document.getElementById('modal-logout')?.classList.remove('show');
+            restoreSearch();
         });
 
         // Add account buttons

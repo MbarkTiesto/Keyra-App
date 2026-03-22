@@ -368,12 +368,6 @@ i.fa-regular {
     opacity: 0.5;
 }
 
-
-
-    flex-shrink: 0;
-    opacity: 0.5;
-}
-
 /* Pending email badge */
 .acc-pending-label-row {
     display: flex;
@@ -4773,7 +4767,6 @@ body.vault-is-locked .main-app-content,
     border: 2px solid var(--bg-primary);
 }
 
-.device-icon-vessel {
 .device-rename-btn {
     width: 22px;
     height: 22px;
@@ -4809,7 +4802,7 @@ body.vault-is-locked .main-app-content,
    ───────────────────────────────────────────────────────────────────────────── */
 
 #modal-about {
-    z-index: 3000;
+    z-index: 9500;
     align-items: flex-end;
     justify-content: center;
     padding: 0;
