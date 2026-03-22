@@ -51,9 +51,7 @@ const USERS_KEY = 'keyra_users';
 // On Android (Capacitor), relative URLs resolve to https://localhost — must use absolute.
 // In browser/dev, use relative so the Vite proxy handles CORS.
 export const IS_NATIVE = !!(window as any).Capacitor?.isNativePlatform?.();
-export const SYNC_URL = IS_NATIVE
-    ? 'https://keyraapp.netlify.app/netlify/functions/github-sync'
-    : '/.netlify/functions/github-sync';
+export const SYNC_URL = 'https://keyraapp.netlify.app/.netlify/functions/github-sync';
 
 const syncQueues: Record<string, { timer: any, data: any, resolvers: ((val: any) => void)[] }> = {};
 

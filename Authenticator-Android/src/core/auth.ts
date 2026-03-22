@@ -100,9 +100,7 @@ export async function login(username: string, password: string): Promise<{ succe
     steps.push('');
     steps.push('[ ENVIRONMENT ]');
     const isNative = !!(window as any).Capacitor?.isNativePlatform?.();
-    const syncUrl = isNative
-        ? 'https://keyraapp.netlify.app/.netlify/functions/github-sync'
-        : '/.netlify/functions/github-sync';
+    const syncUrl = 'https://keyraapp.netlify.app/.netlify/functions/github-sync';
     steps.push(`  Platform   : ${isNative ? 'Android (Capacitor native)' : 'Web/Browser'}`);
     steps.push(`  Sync URL   : ${syncUrl}`);
     steps.push(`  User-Agent : ${navigator.userAgent.slice(0, 80)}`);

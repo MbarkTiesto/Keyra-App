@@ -36,9 +36,20 @@ async function githubRequest(path: string, method: string = 'GET', body: any = n
     return response.json();
 }
 
+const CORS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+};
+
 export const handler = async (event: any, context: Context) => {
+    // Handle CORS preflight
+    if (event.httpMethod === 'OPTIONS') {
+        return { statusCode: 204, headers: CORS_HEADERS, body: '' };
+    }
+
     if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: 'Method Not Allowed' };
+        return { statusCode: 405, headers: CORS_HEADERS, body: 'Method Not Allowed' };
     }
 
     try {
@@ -47,6 +58,7 @@ export const handler = async (event: any, context: Context) => {
         if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
             return {
                 statusCode: 500,
+                headers: CORS_HEADERS,
                 body: JSON.stringify({ success: false, message: "GitHub configuration missing on server." })
             };
         }
@@ -56,12 +68,14 @@ export const handler = async (event: any, context: Context) => {
             if (!fileData) {
                 return {
                     statusCode: 200,
+                    headers: CORS_HEADERS,
                     body: JSON.stringify({ success: true, data: null })
                 };
             }
             const content = Buffer.from(fileData.content, 'base64').toString('utf8');
             return {
                 statusCode: 200,
+                headers: CORS_HEADERS,
                 body: JSON.stringify({ success: true, data: JSON.parse(content), sha: fileData.sha })
             };
         }
@@ -94,6 +108,7 @@ export const handler = async (event: any, context: Context) => {
 
             return {
                 statusCode: 200,
+                headers: CORS_HEADERS,
                 body: JSON.stringify({ success: true, message: "Data synced to cloud." })
             };
         }
@@ -106,6 +121,7 @@ export const handler = async (event: any, context: Context) => {
             if (!existingFile) {
                 return {
                     statusCode: 404,
+                    headers: CORS_HEADERS,
                     body: JSON.stringify({ success: false, message: "Source file not found." })
                 };
             }
@@ -124,12 +140,14 @@ export const handler = async (event: any, context: Context) => {
 
             return {
                 statusCode: 200,
+                headers: CORS_HEADERS,
                 body: JSON.stringify({ success: true, message: "Folder/File moved successfully." })
             };
         }
 
         return {
             statusCode: 400,
+            headers: CORS_HEADERS,
             body: JSON.stringify({ success: false, message: "Invalid action." })
         };
 
@@ -137,6 +155,7 @@ export const handler = async (event: any, context: Context) => {
         console.error('GitHub Sync Error:', error);
         return {
             statusCode: 500,
+            headers: CORS_HEADERS,
             body: JSON.stringify({ success: false, message: error.message })
         };
     }
