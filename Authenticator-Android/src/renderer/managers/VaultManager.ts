@@ -246,13 +246,41 @@ export class VaultManager {
                     const confirmed = confirm('Warning: Backup file integrity check failed. The file may be corrupted or tampered with. Continue anyway?');
                     if (!confirmed) return;
                 }
+
+                // Show loading state
+                const btn = document.getElementById('confirm-import') as HTMLButtonElement;
+                const cancelBtn = document.getElementById('cancel-import') as HTMLButtonElement;
+                const passInput = document.getElementById('import-pass') as HTMLInputElement;
+                btn.disabled = true;
+                cancelBtn.disabled = true;
+                passInput.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Decrypting...</span>';
+
                 const res = await (window as any).api.performVaultImport(salt, encryptedVaultData, pass, encryptedSettings, autolock, desktopSettings, webSettings);
+
                 if (res.success) {
                     this.host.hideModal();
                     this.host.showToast('Vault successfully restored!', 'success');
                     await this.host.refreshAccounts();
+                    // Apply restored settings to UI
+                    if (res.restoredSettings) {
+                        const androidSettings = res.restoredSettings['Android Settings'] || res.restoredSettings;
+                        (window as any).ui?.settingsManager?.applySettings(androidSettings, true);
+                        // Apply autolock to localStorage explicitly
+                        if (androidSettings.autolock !== undefined) {
+                            const storageKey = (window as any).ui?.getStorageKey?.('autolock');
+                            if (storageKey) localStorage.setItem(storageKey, String(androidSettings.autolock));
+                        }
+                    }
                 } else {
-                    this.host.showToast(res.message, 'error');
+                    // Re-enable for retry
+                    btn.disabled = false;
+                    cancelBtn.disabled = false;
+                    passInput.disabled = false;
+                    passInput.value = '';
+                    passInput.focus();
+                    btn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> <span>Restore Vault</span>';
+                    this.host.showToast(res.message || 'Incorrect password. Try again.', 'error');
                 }
             });
         }
@@ -420,7 +448,7 @@ export class VaultManager {
 
     private async exportEncrypted() {
         const res = await (window as any).api.exportVault();
-        if (!res.success && res.message) throw new Error(res.message);
+        if (!res.success) throw new Error(res.message || 'Export failed');
     }
 
     private async exportQRCodesPDF(accounts: any[]) {

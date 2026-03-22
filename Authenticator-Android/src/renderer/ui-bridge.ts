@@ -106,17 +106,22 @@ export const bridge = {
 
     exportVault: async () => {
         try {
-            const data = await auth.getBackupData();
-            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const data = auth.getBackupData();
+            const json = JSON.stringify(data);
+            const filename = `Keyra_Vault_Backup_${Date.now()}.keyra`;
+            const blob = new Blob([json], { type: 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Keyra_Vault_Backup.keyra';
+            a.download = filename;
+            a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+            document.body.appendChild(a);
             a.click();
-            URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
             return { success: true };
-        } catch (e) {
-            return { success: false, message: "Export failed." };
+        } catch (e: any) {
+            return { success: false, message: e?.message || "Export failed." };
         }
     },
 
@@ -124,28 +129,40 @@ export const bridge = {
         return new Promise((resolve) => {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.keyra';
-            input.onchange = async (e: any) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event: any) => {
-                        try {
-                            const data = JSON.parse(event.target.result);
-                            if (!data.salt || !data.encryptedVaultData) {
-                                resolve({ success: false, message: "Invalid backup format." });
-                            } else {
-                                resolve({ success: true, data });
-                            }
-                        } catch (err) {
-                            resolve({ success: false, message: "Parse error." });
+            input.accept = '.keyra,application/json,application/octet-stream';
+            input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+            document.body.appendChild(input);
+
+            let resolved = false;
+            const cleanup = () => { try { document.body.removeChild(input); } catch {} };
+
+            input.onchange = (e: any) => {
+                resolved = true;
+                cleanup();
+                const file = e.target.files?.[0];
+                if (!file) { resolve({ success: false }); return; }
+                const reader = new FileReader();
+                reader.onload = (event: any) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (!data.salt || !data.encryptedVaultData) {
+                            resolve({ success: false, message: "Invalid backup format." });
+                        } else {
+                            resolve({ success: true, data });
                         }
-                    };
-                    reader.readAsText(file);
-                } else {
-                    resolve({ success: false });
-                }
+                    } catch {
+                        resolve({ success: false, message: "Could not parse backup file." });
+                    }
+                };
+                reader.readAsText(file);
             };
+
+            // Detect picker dismissed without selection
+            window.addEventListener('focus', function onFocus() {
+                window.removeEventListener('focus', onFocus);
+                setTimeout(() => { if (!resolved) { cleanup(); resolve({ success: false }); } }, 500);
+            }, { once: true });
+
             input.click();
         });
     },
