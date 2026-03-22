@@ -157,6 +157,12 @@ export class UIManager {
         if (!overlay) return;
         overlay.innerHTML = `<div class="modal animate-fade-in">${content}</div>`;
         overlay.classList.add('show');
+        // Push search overlay behind modal
+        const searchOverlay = document.getElementById('search-overlay');
+        if (searchOverlay) searchOverlay.style.zIndex = '1';
+        // Block backdrop-click dismiss for 300ms so the opening tap doesn't immediately close it
+        overlay.dataset.justOpened = '1';
+        setTimeout(() => { delete overlay.dataset.justOpened; }, 300);
         setTimeout(() => {
             const first = overlay.querySelector('input:not([type="hidden"]), button:not(.auth-close-btn)') as HTMLElement;
             if (first) first.focus();
@@ -167,6 +173,9 @@ export class UIManager {
         const overlay = document.getElementById('modal-overlay');
         if (overlay) {
             overlay.classList.remove('show');
+            // Restore search overlay z-index
+            const searchOverlay = document.getElementById('search-overlay');
+            if (searchOverlay) searchOverlay.style.zIndex = '';
             setTimeout(() => overlay.innerHTML = '', 300);
         }
     }

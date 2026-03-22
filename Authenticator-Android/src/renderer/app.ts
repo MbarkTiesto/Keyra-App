@@ -87,13 +87,13 @@ async function initCapacitor() {
 
     // Handle Android back button
     App.addListener('backButton', ({ canGoBack }) => {
-        if ((window as any).__isSearchOverlayOpen?.()) {
-            (window as any).__closeSearchOverlay?.();
-            return;
-        }
         const modalOverlay = document.getElementById('modal-overlay');
         if (modalOverlay?.classList.contains('show')) {
             (window as any).ui?.hideModal();
+            return;
+        }
+        if ((window as any).__isSearchOverlayOpen?.()) {
+            (window as any).__closeSearchOverlay?.();
             return;
         }
         if (!canGoBack) {

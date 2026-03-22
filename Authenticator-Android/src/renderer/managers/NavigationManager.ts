@@ -14,6 +14,9 @@ export interface NavigationManagerHost {
     hideModal(): void;
     lockVault(): void;
     showAddModal(): void;
+    showEditModal(account: any): void;
+    showDeleteConfirm(account: any): void;
+    showOtpModal(account: any): void;
     showForgotPinConfirm(): void;
     handleUnlock(): void;
     updateLockVaultVisibility(): void;
@@ -110,7 +113,11 @@ export class NavigationManager {
 
         if (!overlay || !overlayInput || !resultsContainer) return;
 
+        // Track current query so we can re-render after modal closes
+        let currentQuery = '';
+
         const renderResults = (query: string) => {
+            currentQuery = query;
             resultsContainer.innerHTML = '';
             const q = query.toLowerCase().trim();
             if (!q) {
@@ -137,38 +144,89 @@ export class NavigationManager {
                 const card = document.createElement('div');
                 card.className = 'search-result-card';
                 card.innerHTML = `
-                    <div class="search-result-icon"><i class="${this.host.getIcon(account.issuer)}"></i></div>
-                    <div class="search-result-info">
-                        <div class="search-result-name">${account.issuer || 'Unknown'}</div>
-                        <div class="search-result-account">${account.account || ''}</div>
+                    <div class="search-result-top">
+                        <div class="search-result-icon"><i class="${this.host.getIcon(account.issuer)}"></i></div>
+                        <div class="search-result-info">
+                            <div class="search-result-name">${account.issuer || 'Unknown'}</div>
+                            <div class="search-result-account">${account.account || ''}</div>
+                        </div>
                     </div>
-                    <button class="search-result-copy" title="Copy OTP">
-                        <i class="fa-solid fa-copy"></i>
-                    </button>
+                    <div class="search-result-actions">
+                        <button class="search-result-action-btn search-result-copy" title="Copy OTP">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Copy</span>
+                        </button>
+                        <button class="search-result-action-btn search-result-view" title="View Code">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>View</span>
+                        </button>
+                        <button class="search-result-action-btn search-result-edit" title="Edit">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Edit</span>
+                        </button>
+                        <button class="search-result-action-btn search-result-delete danger" title="Delete">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>Delete</span>
+                        </button>
+                    </div>
                 `;
+
+                // Copy
                 const copyBtn = card.querySelector('.search-result-copy') as HTMLButtonElement;
-                const doCopy = async (e: Event) => {
+                copyBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
+                    e.preventDefault();
                     try {
                         const otp = await (window as any).api.generateTOTP(account.secret);
                         await navigator.clipboard.writeText(otp);
-                        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i><span>Copied!</span>';
+                        copyBtn.classList.add('success');
                         this.host.showToast(`${account.issuer} code copied`, 'success');
                         Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
-                        setTimeout(() => { copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>'; }, 1500);
-                    } catch {
-                        this.host.showToast('Failed to copy code', 'error');
+                        setTimeout(() => {
+                            copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i><span>Copy</span>';
+                            copyBtn.classList.remove('success');
+                        }, 1500);
+                    } catch { this.host.showToast('Failed to copy code', 'error'); }
+                });
+
+                // View — modal opens on top, overlay stays open
+                card.querySelector('.search-result-view')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (document.body.classList.contains('vault-is-locked')) {
+                        this.host.showToast('Vault Locked — Enter PIN to Access', 'error'); return;
                     }
-                };
-                card.addEventListener('click', doCopy);
-                copyBtn.addEventListener('click', doCopy);
+                    setTimeout(() => this.host.showOtpModal(account), 50);
+                });
+
+                // Edit — modal opens on top, overlay stays open
+                card.querySelector('.search-result-edit')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (document.body.classList.contains('vault-is-locked')) {
+                        this.host.showToast('Vault Locked — Enter PIN to Access', 'error'); return;
+                    }
+                    setTimeout(() => this.host.showEditModal(account), 50);
+                });
+
+                // Delete — modal opens on top, overlay stays open
+                card.querySelector('.search-result-delete')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (document.body.classList.contains('vault-is-locked')) {
+                        this.host.showToast('Vault Locked — Enter PIN to Access', 'error'); return;
+                    }
+                    setTimeout(() => this.host.showDeleteConfirm(account), 50);
+                });
+
                 resultsContainer.appendChild(card);
             });
         };
 
         const openOverlay = () => {
             overlay.classList.remove('hidden');
-            overlay.getBoundingClientRect(); // force reflow for transition
+            overlay.getBoundingClientRect();
             overlay.classList.add('open');
             setTimeout(() => overlayInput.focus(), 100);
             renderResults(overlayInput.value);
@@ -176,16 +234,25 @@ export class NavigationManager {
 
         const closeOverlay = () => {
             overlay.classList.remove('open');
-            setTimeout(() => overlay.classList.add('hidden'), 350);
-            overlayInput.value = '';
-            if (clearBtn) clearBtn.classList.add('hidden');
-            resultsContainer.innerHTML = '';
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                overlayInput.value = '';
+                currentQuery = '';
+                if (clearBtn) clearBtn.classList.add('hidden');
+                resultsContainer.innerHTML = '';
+            }, 350);
         };
 
+        // Mobile search icon button in toolbar
+        document.getElementById('mobile-search-btn')?.addEventListener('click', () => openOverlay());
+
+        // Fallback: hidden input click (desktop)
         searchInput?.addEventListener('focus', (e) => { e.preventDefault(); searchInput.blur(); openOverlay(); });
         searchInput?.closest('.search-vessel')?.addEventListener('click', () => openOverlay());
 
+        // Only re-render when user actually types — ignore spurious input events
         overlayInput.addEventListener('input', () => {
+            if (!overlay.classList.contains('open')) return;
             const q = overlayInput.value;
             if (clearBtn) clearBtn.classList.toggle('hidden', q.length === 0);
             renderResults(q);
@@ -205,7 +272,6 @@ export class NavigationManager {
 
         document.getElementById('search-empty-clear-btn')?.addEventListener('click', () => openOverlay());
 
-        // Expose for app.ts Android back button
         (window as any).__closeSearchOverlay = closeOverlay;
         (window as any).__isSearchOverlayOpen = () => overlay.classList.contains('open');
     }
@@ -388,6 +454,7 @@ export class NavigationManager {
         // Modal overlay dismiss
         const modalOverlay = document.getElementById('modal-overlay');
         modalOverlay?.addEventListener('click', (e) => {
+            if (modalOverlay.dataset.justOpened) return;
             if (e.target === e.currentTarget) this.host.hideModal();
         });
 

@@ -211,7 +211,7 @@ body:has(.settings-container:not(.hidden)) .main-content {
     align-items: center;
     justify-content: center;
     padding: clamp(var(--space-sm), 5vw, var(--space-xl));
-    z-index: 2000;
+    z-index: 9500;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -227,7 +227,7 @@ body:has(.settings-container:not(.hidden)) .main-content {
 
 .auth-overlay {
     background: var(--bg-primary) !important;
-    z-index: 2500 !important;
+    z-index: 9600 !important;
     display: flex !important;
     justify-content: center !important;
     align-items: flex-start !important;

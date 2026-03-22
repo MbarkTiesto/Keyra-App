@@ -339,33 +339,20 @@ input, textarea {
             -4px -4px 8px var(--nm-shadow-light);
     }
 
-    /* Search input — inset inside the tray */
-    .search-vessel {
-        flex: 1;
-        min-width: 0;
-        transition: none;
-    }
-
-    .search-vessel .search-input {
-        height: 40px;
-        font-size: 14px;
-        border-radius: var(--radius-full);
-        box-shadow: var(--nm-shadow-in-sm);
-        padding-left: 44px;
-    }
-
-    .search-vessel .search-icon {
-        left: 14px;
-        font-size: 14px;
-    }
-
-    .search-vessel.search-focused .search-input {
-        box-shadow: var(--nm-shadow-in);
-    }
-
+    /* Search vessel — hidden on mobile (overlay handles search) */
+    .search-vessel,
+    .search-vessel .search-input,
+    .search-vessel .search-icon,
+    .search-vessel.search-focused .search-input,
     .search-vessel.search-focused .search-icon {
-        color: var(--accent-primary);
-        opacity: 1;
+        display: none !important;
+    }
+
+    /* Mobile search icon button inside the tray */
+    #mobile-search-btn {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
     }
 
     /* Add button — neumorphic raised square inside the tray */
@@ -481,29 +468,6 @@ input, textarea {
     .btn-card-more {
         width: 34px;
         height: 34px;
-    }
-}
-
-/* ── 7. SEARCH BAR ─────────────────────────────────────────────────────────── */
-
-@media (max-width: 768px) {
-    .search-vessel {
-        transition: box-shadow 0.25s ease;
-    }
-
-    .search-vessel .search-input {
-        height: 48px;
-        font-size: 15px;
-        border-radius: var(--radius-full);
-    }
-
-    .search-vessel.search-focused .search-input {
-        box-shadow: var(--nm-shadow-in);
-    }
-
-    .search-vessel.search-focused .search-icon {
-        color: var(--accent-primary);
-        opacity: 1;
     }
 }
 
@@ -2116,7 +2080,7 @@ body.keyboard-open .auth-overlay {
     position: fixed;
     inset: 0;
     background: var(--bg-primary);
-    z-index: 500;
+    z-index: 9000;
     display: flex;
     flex-direction: column;
     transform: translateY(100%);
@@ -2228,25 +2192,26 @@ body.keyboard-open .auth-overlay {
     gap: 10px;
 }
 
-/* Compact result card inside overlay */
+/* Result card — column layout */
 .search-result-card {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    border-radius: 18px;
+    flex-direction: column;
+    gap: 0;
+    padding: 14px 16px 16px;
+    border-radius: 20px;
     background: var(--bg-primary);
     box-shadow:
         6px 6px 14px var(--nm-shadow-dark),
         -6px -6px 14px var(--nm-shadow-light);
-    cursor: pointer;
-    transition: box-shadow 0.12s ease, transform 0.12s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
-.search-result-card:active {
-    box-shadow: var(--nm-shadow-in-sm);
-    transform: scale(0.98);
+/* Top row: icon + info */
+.search-result-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
 }
 
 .search-result-icon {
@@ -2289,8 +2254,14 @@ body.keyboard-open .auth-overlay {
     margin-top: 2px;
 }
 
-.search-result-copy {
-    width: 40px;
+/* Action buttons row */
+.search-result-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.search-result-action-btn {
+    flex: 1;
     height: 40px;
     border-radius: 12px;
     background: var(--bg-primary);
@@ -2298,19 +2269,47 @@ body.keyboard-open .auth-overlay {
         4px 4px 10px var(--nm-shadow-dark),
         -4px -4px 10px var(--nm-shadow-light);
     border: none;
-    color: var(--accent-primary);
-    font-size: 16px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    font-family: inherit;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    transition: box-shadow 0.12s ease, transform 0.12s ease;
+    gap: 5px;
+    transition: box-shadow 0.12s ease, transform 0.12s ease, color 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
 }
 
-.search-result-copy:active {
+.search-result-action-btn i {
+    font-size: 13px;
+}
+
+.search-result-action-btn:active {
     box-shadow: var(--nm-shadow-in-sm);
-    transform: scale(0.9);
+    transform: scale(0.93);
+}
+
+/* Copy button — accent color */
+.search-result-action-btn.search-result-copy {
+    color: var(--accent-primary);
+}
+
+/* View button */
+.search-result-action-btn.search-result-view {
+    color: var(--text-secondary);
+}
+
+/* Delete button */
+.search-result-action-btn.danger {
+    color: #ff3b30;
+}
+
+/* Copied feedback */
+.search-result-action-btn.success {
+    color: #34c759;
 }
 
 .search-overlay-empty {
@@ -2333,14 +2332,6 @@ body.keyboard-open .auth-overlay {
     font-size: 15px;
     font-weight: 600;
     opacity: 0.5;
-}
-
-/* On mobile, intercept the search input tap to open overlay */
-@media (max-width: 768px) {
-    .search-vessel .search-input {
-        cursor: pointer;
-        caret-color: transparent;
-    }
 }
 
 /* ── 27. OTP SECURE VIEW MODAL ───────────────────────────────────────────────── */
