@@ -116,12 +116,15 @@ export async function login(username: string, password: string): Promise<{ succe
     let cloudReachable = false;
     try {
         const t0 = Date.now();
+        const pingController = new AbortController();
+        const pingTimeout = setTimeout(() => pingController.abort(), 8000);
         const pingRes = await fetch(syncUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'get', path: 'ping-test-nonexistent.json' }),
-            signal: AbortSignal.timeout(8000)
+            signal: pingController.signal
         });
+        clearTimeout(pingTimeout);
         const elapsed = Date.now() - t0;
         cloudReachable = true;
         steps.push(`  ✓ Netlify function reachable (HTTP ${pingRes.status}, ${elapsed}ms)`);
