@@ -1015,7 +1015,58 @@ input, textarea {
         transform: scale(0.97) !important;
     }
 
-    /* ── OTP modal ── */
+    /* ── Modal numpad (setup/change PIN) — smaller than lock screen numpad ── */
+    .pin-modal-numpad {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
+        width: 100% !important;
+        max-width: 280px !important;
+        margin: 0 auto !important;
+    }
+
+    .pin-modal-numpad .pin-key {
+        aspect-ratio: 1 / 1 !important;
+        max-height: 64px !important;
+        border-radius: 18px !important;
+        background: var(--bg-primary) !important;
+        box-shadow:
+            5px 5px 12px var(--nm-shadow-dark),
+            -5px -5px 12px var(--nm-shadow-light) !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: box-shadow 0.1s ease, transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        -webkit-tap-highlight-color: transparent !important;
+        user-select: none !important;
+    }
+
+    .pin-modal-numpad .pin-key span {
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        color: var(--text-primary) !important;
+        font-family: 'Outfit', sans-serif !important;
+    }
+
+    .pin-modal-numpad .pin-key i {
+        font-size: 18px !important;
+        color: var(--text-secondary) !important;
+    }
+
+    .pin-modal-numpad .pin-key:active {
+        box-shadow: var(--nm-shadow-in-sm) !important;
+        transform: scale(0.88) !important;
+    }
+
+    .pin-modal-numpad .pin-key--empty {
+        background: transparent !important;
+        box-shadow: none !important;
+        pointer-events: none !important;
+    }
+
+
     .otp-modal-header {
         display: flex;
         align-items: center;
@@ -1316,6 +1367,38 @@ input, textarea {
         line-height: 1.4;
     }
 
+    /* Wrap variant — controls go below label */
+    .setting-row--wrap {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .setting-row--wrap .setting-info {
+        width: 100%;
+    }
+
+    .setting-row--wrap .segmented-control,
+    .setting-row--wrap .setting-actions {
+        width: 100%;
+    }
+
+    .setting-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .setting-actions .user-button {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+    }
+
+    /* About meta values */
+    .setting-meta {
+        font-size: 12px;
+    }
+
     /* ── Segmented controls ── */
     .segmented-control {
         height: 40px;
@@ -1334,13 +1417,11 @@ input, textarea {
 
     /* ── Maintenance buttons: full neumorphic raised ── */
     .btn-maintenance {
-        height: var(--mobile-btn-h) !important;
+        min-height: var(--mobile-btn-h) !important;
+        height: auto !important;
         border-radius: 16px !important;
-        font-size: 14px !important;
-        padding-left: 16px !important;
-        box-shadow:
-            6px 6px 14px var(--nm-shadow-dark),
-            -6px -6px 14px var(--nm-shadow-light) !important;
+        padding: 12px 16px !important;
+        gap: 12px !important;
     }
 
     .btn-maintenance:hover {
@@ -1356,31 +1437,19 @@ input, textarea {
     }
 
     .btn-maintenance .btn-maintenance-icon {
-        width: 34px;
-        height: 34px;
+        width: 38px;
+        height: 38px;
         box-shadow:
             inset 3px 3px 6px var(--nm-shadow-dark),
             inset -3px -3px 6px var(--nm-shadow-light);
     }
 
-    /* ── PIN action buttons in security row ── */
-    .setting-row #setup-pin-btn,
-    .setting-row #change-pin-btn,
-    .setting-row #remove-pin-btn {
-        height: 40px !important;
-        min-width: 90px !important;
-        font-size: 12px !important;
-        border-radius: var(--radius-full) !important;
-        box-shadow:
-            4px 4px 10px var(--nm-shadow-dark),
-            -4px -4px 10px var(--nm-shadow-light) !important;
+    .btn-maintenance .btn-maintenance-label {
+        font-size: 14px !important;
     }
 
-    .setting-row #setup-pin-btn:active,
-    .setting-row #change-pin-btn:active,
-    .setting-row #remove-pin-btn:active {
-        box-shadow: var(--nm-shadow-in-sm) !important;
-        transform: scale(0.95) !important;
+    .btn-maintenance .btn-maintenance-desc {
+        font-size: 11px !important;
     }
 
     /* ── About card: status badges ── */

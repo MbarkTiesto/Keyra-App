@@ -1333,9 +1333,65 @@ input:checked+.slider:before {
     font-size: 13px;
     font-weight: 600;
     opacity: 0.6;
-    margin-top: 6px;
-    /* Increased spacing between title and desc */
+    margin-top: 4px;
     line-height: 1.4;
+}
+
+.setting-info {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+.setting-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Row variant that wraps controls below the label on small screens */
+.setting-row--wrap {
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* PIN / action buttons group */
+.setting-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.setting-actions .user-button {
+    min-width: 96px;
+    justify-content: center;
+}
+
+/* About card meta values */
+.setting-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.setting-meta--success {
+    color: var(--success);
+}
+
+/* Maintenance buttons container */
+.maintenance-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
 }
 
 /* Masked OTP state */
@@ -1877,6 +1933,10 @@ input:checked+.slider:before {
     box-shadow: 0 3px 0 var(--nm-shadow-dark), 0 4px 0 var(--nm-shadow-light);
 }
 
+.bento-title-vessel {
+    text-align: left;
+}
+
 .bento-icon {
     width: 48px;
     height: 48px;
@@ -1980,10 +2040,13 @@ input:checked+.slider:before {
 
 /* Premium Maintenance Buttons */
 .btn-maintenance {
-    height: clamp(52px, 12vw, 60px) !important;
+    height: auto !important;
+    min-height: clamp(56px, 12vw, 64px) !important;
     width: 100%;
     justify-content: flex-start !important;
-    padding-left: clamp(16px, 4vw, 20px) !important;
+    align-items: center !important;
+    padding: 12px clamp(16px, 4vw, 20px) !important;
+    gap: 14px !important;
     background: var(--bg-primary) !important;
     color: var(--text-primary) !important;
     box-shadow:
@@ -2004,8 +2067,8 @@ input:checked+.slider:before {
 }
 
 .btn-maintenance .btn-maintenance-icon {
-    width: clamp(32px, 8vw, 38px);
-    height: clamp(32px, 8vw, 38px);
+    width: clamp(36px, 8vw, 42px);
+    height: clamp(36px, 8vw, 42px);
     border-radius: 50%;
     background: var(--bg-primary);
     box-shadow: var(--nm-shadow-in-sm);
@@ -2013,7 +2076,6 @@ input:checked+.slider:before {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-right: 12px;
     transition: box-shadow var(--transition-fast);
 }
 
@@ -2023,15 +2085,34 @@ input:checked+.slider:before {
         -3px -3px 8px var(--nm-shadow-light) !important;
 }
 
-.btn-maintenance i {
-    width: clamp(16px, 4vw, 20px) !important;
-    height: clamp(16px, 4vw, 20px) !important;
+.btn-maintenance .btn-maintenance-icon i {
+    font-size: clamp(15px, 4vw, 18px) !important;
     color: var(--accent-primary);
+    width: auto !important;
+    height: auto !important;
 }
 
-.btn-maintenance span {
+.btn-maintenance .btn-maintenance-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 0;
+}
+
+.btn-maintenance .btn-maintenance-label {
     font-size: clamp(13px, 3.5vw, 15px);
     font-weight: 750;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.btn-maintenance .btn-maintenance-desc {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    opacity: 0.65;
+    line-height: 1.2;
 }
 
 

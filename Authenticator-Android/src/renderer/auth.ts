@@ -172,11 +172,6 @@ export async function setupAuthUI() {
                 err.style.opacity = '1';
                 void (err as HTMLElement).offsetWidth; // Trigger reflow
                 err.classList.add('animate-shake');
-
-                // Show debug modal if diagnostic info is available
-                if ((result as any).debug) {
-                    showLoginDebugModal(result.message, (result as any).debug);
-                }
             }
         } catch (error: any) {
             rateLimiter.recordAttempt('login', user);
@@ -328,73 +323,5 @@ export async function setupAuthUI() {
         codeLabel.textContent = code;
         toast.classList.remove('hidden');
         setTimeout(() => toast.classList.add('hidden'), 8000);
-    }
-
-    function showLoginDebugModal(errorMessage: string, debug: string) {
-        const escaped = debug
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-
-        // Remove any existing debug modal
-        document.getElementById('login-debug-modal')?.remove();
-
-        const modal = document.createElement('div');
-        modal.id = 'login-debug-modal';
-        modal.style.cssText = `
-            position: fixed; inset: 0; z-index: 99999;
-            background: rgba(0,0,0,0.7);
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px; box-sizing: border-box;
-        `;
-        modal.innerHTML = `
-            <div style="
-                background: var(--bg-primary, #e0e5ec);
-                border-radius: 20px;
-                padding: 24px;
-                width: 100%; max-width: 480px;
-                max-height: 80vh;
-                overflow-y: auto;
-                box-shadow: 8px 8px 16px rgba(0,0,0,0.3), -4px -4px 12px rgba(255,255,255,0.1);
-            ">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-                    <div style="
-                        width:44px; height:44px; border-radius:12px; flex-shrink:0;
-                        background: var(--bg-primary, #e0e5ec);
-                        box-shadow: 4px 4px 8px rgba(0,0,0,0.2), -2px -2px 6px rgba(255,255,255,0.1);
-                        display:flex; align-items:center; justify-content:center;
-                        color: #ff3b30; font-size:20px;
-                    "><i class="fa-solid fa-bug"></i></div>
-                    <div>
-                        <div style="font-weight:800; font-size:16px; color:var(--text-primary,#333);">Login Failed</div>
-                        <div style="font-size:13px; color:var(--text-secondary,#666); margin-top:2px;">${errorMessage}</div>
-                    </div>
-                </div>
-                <div style="font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-secondary,#666); margin-bottom:8px;">Diagnostic Log</div>
-                <pre style="
-                    background: var(--bg-secondary, #d1d9e6);
-                    border-radius: 12px;
-                    padding: 12px;
-                    font-size: 11px;
-                    line-height: 1.7;
-                    color: var(--text-primary, #333);
-                    white-space: pre-wrap;
-                    word-break: break-all;
-                    font-family: 'JetBrains Mono', monospace;
-                    max-height: 260px;
-                    overflow-y: auto;
-                    margin: 0 0 16px 0;
-                ">${escaped}</pre>
-                <button id="login-debug-close" style="
-                    width:100%; padding:14px; border:none; border-radius:12px; cursor:pointer;
-                    background: var(--accent-primary, #7c3aed);
-                    color: #fff; font-weight:800; font-size:15px;
-                    box-shadow: 4px 4px 8px rgba(0,0,0,0.2);
-                ">Close</button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        document.getElementById('login-debug-close')?.addEventListener('click', () => modal.remove());
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
     }
 }

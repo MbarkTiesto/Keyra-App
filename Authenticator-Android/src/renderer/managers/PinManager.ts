@@ -104,7 +104,7 @@ export class PinManager {
                 if (saved && saved.length === 4 && /^\d+$/.test(saved)) {
                     isCorrect = (pinValue === saved);
                 } else if (saved) {
-                    const decrypted = (window as any).api.decryptPIN(saved);
+                    const decrypted = await (window as any).api.decryptPIN(saved);
                     isCorrect = (pinValue === decrypted);
                 }
 
@@ -296,7 +296,65 @@ export class PinManager {
         });
     }
 
-    // ─── PIN Setup ─────────────────────────────────────────────────────────────
+    private numpadHTML() {
+        return `
+            <div class="pin-numpad pin-modal-numpad">
+                <button class="pin-key" data-key="1"><span>1</span></button>
+                <button class="pin-key" data-key="2"><span>2</span></button>
+                <button class="pin-key" data-key="3"><span>3</span></button>
+                <button class="pin-key" data-key="4"><span>4</span></button>
+                <button class="pin-key" data-key="5"><span>5</span></button>
+                <button class="pin-key" data-key="6"><span>6</span></button>
+                <button class="pin-key" data-key="7"><span>7</span></button>
+                <button class="pin-key" data-key="8"><span>8</span></button>
+                <button class="pin-key" data-key="9"><span>9</span></button>
+                <div class="pin-key pin-key--empty"></div>
+                <button class="pin-key" data-key="0"><span>0</span></button>
+                <button class="pin-key pin-key-delete" id="pin-modal-delete">
+                    <i class="fa-solid fa-delete-left"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    private setupModalNumpad(
+        inputId: string,
+        onUpdate: (val: string) => void
+    ) {
+        let buf = '';
+        const dots = document.querySelectorAll('.pin-input-vessel .pin-dot');
+
+        const refresh = () => {
+            dots.forEach((d, i) => {
+                d.classList.remove('filled', 'error', 'success');
+                if (i < buf.length) d.classList.add('filled');
+            });
+            onUpdate(buf);
+        };
+
+        document.querySelectorAll('.pin-modal-numpad .pin-key[data-key]').forEach(key => {
+            key.addEventListener('click', () => {
+                if (buf.length >= 4) return;
+                buf += (key as HTMLElement).getAttribute('data-key')!;
+                Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+                // sync hidden input too (for keyboard fallback)
+                const inp = document.getElementById(inputId) as HTMLInputElement;
+                if (inp) inp.value = buf;
+                refresh();
+            });
+        });
+
+        document.getElementById('pin-modal-delete')?.addEventListener('click', () => {
+            if (buf.length === 0) return;
+            buf = buf.slice(0, -1);
+            Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+            const inp = document.getElementById(inputId) as HTMLInputElement;
+            if (inp) inp.value = buf;
+            refresh();
+        });
+
+        return { getPin: () => buf, reset: () => { buf = ''; refresh(); } };
+    }
 
     public showPinSetup() {
         this.tempPin = '';
@@ -304,53 +362,54 @@ export class PinManager {
     }
 
     private showPinSetupStep1() {
-        const content = `
-            <div class="pin-steps-modal">
-                <div class="pin-progress-container">
-                    <div class="pin-step active" data-step="1">
-                        <div class="pin-step-number">1</div>
-                        <div class="pin-step-label">Create PIN</div>
-                    </div>
-                    <div class="pin-step-line"></div>
-                    <div class="pin-step" data-step="2">
-                        <div class="pin-step-number">2</div>
-                        <div class="pin-step-label">Confirm PIN</div>
-                    </div>
-                </div>
-                <div class="pin-step-content">
-                    <div class="pin-header">
-                        <div class="pin-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                        <div>
-                            <h2 class="pin-title">Set Master PIN</h2>
-                            <p class="pin-subtitle">ESTABLISH 4-DIGIT VAULT KEY</p>
+            const content = `
+                <div class="pin-steps-modal">
+                    <div class="pin-progress-container">
+                        <div class="pin-step active" data-step="1">
+                            <div class="pin-step-number">1</div>
+                            <div class="pin-step-label">Create PIN</div>
+                        </div>
+                        <div class="pin-step-line"></div>
+                        <div class="pin-step" data-step="2">
+                            <div class="pin-step-number">2</div>
+                            <div class="pin-step-label">Confirm PIN</div>
                         </div>
                     </div>
-                    <div class="pin-input-container">
-                        <div class="pin-input-vessel">
-                            <div class="pin-indicators">
-                                <div class="pin-dot" data-digit="1"></div>
-                                <div class="pin-dot" data-digit="2"></div>
-                                <div class="pin-dot" data-digit="3"></div>
-                                <div class="pin-dot" data-digit="4"></div>
+                    <div class="pin-step-content">
+                        <div class="pin-header">
+                            <div class="pin-brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                            <div>
+                                <h2 class="pin-title">Set Master PIN</h2>
+                                <p class="pin-subtitle">ESTABLISH 4-DIGIT VAULT KEY</p>
                             </div>
-                            <input type="password" id="pin-step1" maxlength="4" class="pin-input-hidden" autocomplete="off">
                         </div>
-                        <div class="pin-helper">Choose New PIN</div>
+                        <div class="pin-input-container">
+                            <div class="pin-input-vessel">
+                                <div class="pin-indicators">
+                                    <div class="pin-dot" data-digit="1"></div>
+                                    <div class="pin-dot" data-digit="2"></div>
+                                    <div class="pin-dot" data-digit="3"></div>
+                                    <div class="pin-dot" data-digit="4"></div>
+                                </div>
+                                <input type="password" id="pin-step1" maxlength="4" class="pin-input-hidden" autocomplete="off">
+                            </div>
+                            <div class="pin-helper">Choose a 4-digit PIN</div>
+                        </div>
+                        ${this.numpadHTML()}
+                        <div class="pin-actions">
+                            <button class="btn-primary pin-continue-btn" id="pin-step1-continue" disabled>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                Next
+                            </button>
+                            <button class="user-button pin-cancel-btn" id="pin-step1-cancel">Cancel</button>
+                        </div>
                     </div>
-                    <div class="pin-actions">
-                        <button class="btn-primary pin-continue-btn" id="pin-step1-continue" disabled>
-                            <i class="fa-solid fa-arrow-right"></i>
-                            Next Phase
-                        </button>
-                        <button class="user-button pin-cancel-btn" id="pin-step1-cancel">Cancel</button>
-                    </div>
-                    <p class="modal-help-text" style="text-align: center;">Keep this code safe. It is required to unlock your identities.</p>
                 </div>
-            </div>
-        `;
-        this.host.showModal(content);
-        this.setupPinStep1Events();
-    }
+            `;
+            this.host.showModal(content);
+            this.setupPinStep1Events();
+        }
+
 
     private showPinSetupStep2() {
         const content = `
@@ -384,19 +443,19 @@ export class PinManager {
                             </div>
                             <input type="password" id="pin-step2" maxlength="4" class="pin-input-hidden" autocomplete="off">
                         </div>
-                        <div class="pin-helper">Confirm New PIN</div>
+                        <div class="pin-helper">Re-enter your PIN</div>
                     </div>
+                    ${this.numpadHTML()}
                     <div class="pin-actions">
                         <button class="btn-primary pin-continue-btn" id="pin-step2-continue" disabled>
                             <i class="fa-solid fa-shield-halved"></i>
-                            Activate Vault
+                            Activate
                         </button>
                         <button class="user-button pin-back-btn" id="pin-step2-back">
                             <i class="fa-solid fa-arrow-left"></i>
                             Back
                         </button>
                     </div>
-                    <p class="modal-help-text" style="text-align: center;">Passwords must match exactly to synchronize security.</p>
                 </div>
             </div>
         `;
@@ -405,21 +464,26 @@ export class PinManager {
     }
 
     private setupPinStep1Events() {
-        const pinField = document.getElementById('pin-step1') as HTMLInputElement;
-        const continueBtn = document.getElementById('pin-step1-continue');
-        const dots = document.querySelectorAll('.pin-input-vessel .pin-dot');
+        const continueBtn = document.getElementById('pin-step1-continue') as HTMLButtonElement;
 
+        const numpad = this.setupModalNumpad('pin-step1', (val) => {
+            continueBtn.disabled = val.length !== 4;
+        });
+
+        // keyboard fallback
+        const pinField = document.getElementById('pin-step1') as HTMLInputElement;
         pinField?.addEventListener('input', (e) => {
-            const val = (e.target as HTMLInputElement).value;
-            const numeric = val.replace(/[^0-9]/g, '');
-            if (val !== numeric) (e.target as HTMLInputElement).value = numeric;
-            dots.forEach((dot, idx) => dot.classList.toggle('filled', idx < numeric.length));
-            if (continueBtn) (continueBtn as HTMLButtonElement).disabled = numeric.length !== 4;
+            const val = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, '').slice(0, 4);
+            (e.target as HTMLInputElement).value = val;
+            const dots = document.querySelectorAll('.pin-input-vessel .pin-dot');
+            dots.forEach((dot, idx) => dot.classList.toggle('filled', idx < val.length));
+            continueBtn.disabled = val.length !== 4;
         });
 
         continueBtn?.addEventListener('click', () => {
-            if (pinField && pinField.value.length === 4) {
-                this.tempPin = pinField.value;
+            const pin = (document.getElementById('pin-step1') as HTMLInputElement)?.value;
+            if (pin?.length === 4) {
+                this.tempPin = pin;
                 this.showPinSetupStep2();
             }
         });
@@ -428,22 +492,27 @@ export class PinManager {
     }
 
     private setupPinStep2Events() {
-        const pinField = document.getElementById('pin-step2') as HTMLInputElement;
-        const continueBtn = document.getElementById('pin-step2-continue');
-        const dots = document.querySelectorAll('.pin-input-vessel .pin-dot');
+        const continueBtn = document.getElementById('pin-step2-continue') as HTMLButtonElement;
 
-        pinField?.addEventListener('input', (e) => {
-            const val = (e.target as HTMLInputElement).value;
-            const numeric = val.replace(/[^0-9]/g, '');
-            if (val !== numeric) (e.target as HTMLInputElement).value = numeric;
-            dots.forEach((dot, idx) => dot.classList.toggle('filled', idx < numeric.length));
-            if (continueBtn) (continueBtn as HTMLButtonElement).disabled = numeric.length !== 4;
+        const numpad = this.setupModalNumpad('pin-step2', (val) => {
+            continueBtn.disabled = val.length !== 4;
         });
 
-        continueBtn?.addEventListener('click', () => {
-            if (pinField && pinField.value.length === 4) {
-                if (pinField.value === this.tempPin) {
-                    const encrypted = (window as any).api.encryptPIN(this.tempPin);
+        // keyboard fallback
+        const pinField = document.getElementById('pin-step2') as HTMLInputElement;
+        pinField?.addEventListener('input', (e) => {
+            const val = (e.target as HTMLInputElement).value.replace(/[^0-9]/g, '').slice(0, 4);
+            (e.target as HTMLInputElement).value = val;
+            const dots = document.querySelectorAll('.pin-input-vessel .pin-dot');
+            dots.forEach((dot, idx) => dot.classList.toggle('filled', idx < val.length));
+            continueBtn.disabled = val.length !== 4;
+        });
+
+        continueBtn?.addEventListener('click', async () => {
+            const pin = (document.getElementById('pin-step2') as HTMLInputElement)?.value;
+            if (pin?.length === 4) {
+                if (pin === this.tempPin) {
+                    const encrypted = await (window as any).api.encryptPIN(this.tempPin);
                     localStorage.setItem(this.host.getStorageKey('vault_pin'), encrypted);
                     this.host.pushWebSettings();
                     this.host.updateLockVaultVisibility();
@@ -453,9 +522,14 @@ export class PinManager {
                     this.host.hideModal();
                 } else {
                     this.host.showToast('PIN codes do not match. Please try again.', 'error');
-                    pinField.value = '';
-                    dots.forEach(dot => dot.classList.remove('filled'));
-                    if (continueBtn) (continueBtn as HTMLButtonElement).disabled = true;
+                    const pinField = document.getElementById('pin-step2') as HTMLInputElement;
+                    if (pinField) pinField.value = '';
+                    document.querySelectorAll('.pin-input-vessel .pin-dot').forEach(d => d.classList.remove('filled'));
+                    continueBtn.disabled = true;
+                    // shake dots
+                    const vessel = document.querySelector('.pin-input-vessel');
+                    vessel?.classList.add('animate-shake');
+                    setTimeout(() => vessel?.classList.remove('animate-shake'), 600);
                 }
             }
         });
@@ -625,7 +699,7 @@ export class PinManager {
         const pin = localStorage.getItem(this.host.getStorageKey('vault_pin'));
         if (pin && pin.length === 4 && /^\d+$/.test(pin)) {
             try {
-                const encrypted = (window as any).api.encryptPIN(pin);
+                const encrypted = await (window as any).api.encryptPIN(pin);
                 localStorage.setItem(this.host.getStorageKey('vault_pin'), encrypted);
                 await this.host.pushWebSettings();
             } catch (err) {
