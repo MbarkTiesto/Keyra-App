@@ -521,6 +521,9 @@ export class NavigationManager {
         this.host.setupNumpad();
         this.setupSearchOverlay();
 
+        // Swipe navigation
+        this.setupSwipeNavigation();
+
         // Accent + theme init
         this.host.themeManager.loadAccentColor();
         this.host.themeManager.setupAccentColorSelector();
@@ -544,5 +547,74 @@ export class NavigationManager {
         document.getElementById('theme-segmented')?.addEventListener('click', () => {
             setTimeout(() => this.host.updateLastActivity('Changed theme'), 100);
         });
+    }
+
+    // ─── Swipe Navigation ──────────────────────────────────────────────────────
+
+    private setupSwipeNavigation() {
+        const TABS: Array<'vault' | 'settings' | 'account'> = ['vault', 'settings', 'account'];
+        const MIN_X = 40;
+        const MAX_Y = 100;
+
+        let startX = 0;
+        let startY = 0;
+        let startTime = 0;
+        let swiped = false;
+
+        const onStart = (clientX: number, clientY: number) => {
+            startX = clientX;
+            startY = clientY;
+            startTime = Date.now();
+            swiped = false;
+        };
+
+        const onEnd = (clientX: number, clientY: number, target: EventTarget | null) => {
+            if (swiped) return;
+
+            // Ignore if any overlay/modal is open
+            if (document.querySelector('.modal-overlay.show, .privacy-blur-overlay:not(.hidden)')) return;
+            // Ignore touches on the bottom nav
+            const nav = document.getElementById('bottom-nav');
+            if (nav && target instanceof Node && nav.contains(target)) return;
+
+            const dx = clientX - startX;
+            const dy = Math.abs(clientY - startY);
+            const adx = Math.abs(dx);
+            const dt = Date.now() - startTime;
+
+            if (dt > 600 || adx < MIN_X || dy > MAX_Y || dy > adx) return;
+
+            swiped = true;
+
+            const idx = TABS.indexOf(this.currentTab);
+            const next = dx < 0
+                ? TABS[Math.min(idx + 1, TABS.length - 1)]
+                : TABS[Math.max(idx - 1, 0)];
+
+            if (next === this.currentTab) return;
+
+            Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+            this.switchTab(next);
+        };
+
+        // Touch events
+        window.addEventListener('touchstart', (e) => {
+            onStart(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+
+        window.addEventListener('touchend', (e) => {
+            onEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e.target);
+        }, { passive: true });
+
+        // Pointer events as fallback (covers mouse drag on desktop preview)
+        window.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'touch') return; // handled by touch events
+            onStart(e.clientX, e.clientY);
+        }, { passive: true });
+
+        window.addEventListener('pointerup', (e) => {
+            if (e.pointerType === 'touch') return;
+            onEnd(e.clientX, e.clientY, e.target);
+        }, { passive: true });
     }
 }
