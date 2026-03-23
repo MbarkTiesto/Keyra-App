@@ -138,6 +138,174 @@ input, textarea {
         color: var(--accent-primary);
     }
 
+    /* ── Vault floating header panel ── */
+    .vault-header-panel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 12px 0 16px;
+        padding: 12px 14px 12px 16px;
+        border-radius: 22px;
+        background: var(--bg-primary);
+        box-shadow:
+            8px 8px 20px var(--nm-shadow-dark),
+            -8px -8px 20px var(--nm-shadow-light);
+        flex-shrink: 0;
+    }
+
+    /* Brand side */
+    .vault-header-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+
+    /* Logo inset vessel */
+    .vault-header-logo-vessel {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+        background: var(--bg-primary);
+        box-shadow:
+            inset 3px 3px 7px var(--nm-shadow-dark),
+            inset -3px -3px 7px var(--nm-shadow-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .vault-header-logo-vessel img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+    }
+
+    .vault-header-brand-text {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .vault-header-title {
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: -0.8px;
+        color: var(--text-primary);
+        line-height: 1;
+    }
+
+    .vault-header-sub {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--accent-primary);
+        opacity: 0.8;
+        line-height: 1;
+    }
+
+    /* Actions side */
+    .vault-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Generic action button */
+    .vault-header-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+        background: var(--bg-primary);
+        box-shadow:
+            5px 5px 11px var(--nm-shadow-dark),
+            -5px -5px 11px var(--nm-shadow-light);
+        border: none;
+        color: var(--text-secondary);
+        font-size: 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: box-shadow 0.12s ease, transform 0.12s ease;
+        -webkit-tap-highlight-color: transparent;
+        flex-shrink: 0;
+    }
+
+    .vault-header-btn:active {
+        box-shadow:
+            inset 3px 3px 7px var(--nm-shadow-dark),
+            inset -3px -3px 7px var(--nm-shadow-light);
+        transform: scale(0.91);
+    }
+
+    .vault-header-btn.hidden {
+        display: none !important;
+    }
+
+    /* Accent variant — lock button */
+    .vault-header-btn--accent {
+        color: var(--accent-primary);
+    }
+
+    /* Sync spin */
+    .vault-header-btn.sync-btn i {
+        color: var(--accent-primary);
+        animation: syncSpin 0.9s linear infinite;
+    }
+
+    .vault-header-btn.sync-btn {
+        box-shadow:
+            inset 4px 4px 8px var(--nm-shadow-dark),
+            inset -4px -4px 8px var(--nm-shadow-light);
+    }
+
+    /* Avatar button — raised outer ring + inset inner */
+    .vault-header-avatar-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        flex-shrink: 0;
+    }
+
+    .vault-header-avatar-ring {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--bg-primary);
+        box-shadow:
+            5px 5px 11px var(--nm-shadow-dark),
+            -5px -5px 11px var(--nm-shadow-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: box-shadow 0.12s ease, transform 0.12s ease;
+    }
+
+    .vault-header-avatar-btn:active .vault-header-avatar-ring {
+        box-shadow:
+            inset 3px 3px 7px var(--nm-shadow-dark),
+            inset -3px -3px 7px var(--nm-shadow-light);
+        transform: scale(0.91);
+    }
+
+    .vault-header-avatar-ring .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 13px;
+        font-weight: 800;
+        box-shadow:
+            inset 2px 2px 5px var(--nm-shadow-dark),
+            inset -2px -2px 5px var(--nm-shadow-light);
+        border: none;
+    }
+
     /* Avatar button */
     .mobile-avatar-btn {
         padding: 0;
@@ -394,14 +562,14 @@ input, textarea {
         display: flex;
         position: fixed;
         bottom: calc(env(safe-area-inset-bottom) + 12px);
-        left: 20px;
-        right: 20px;
+        left: calc(env(safe-area-inset-left) + 14px);
+        right: calc(env(safe-area-inset-right) + 14px);
         height: 58px;
         background: var(--bg-primary);
         box-shadow:
             8px 8px 20px var(--nm-shadow-dark),
             -8px -8px 20px var(--nm-shadow-light);
-        border-radius: 20px;
+        border-radius: 22px;
         z-index: 200;
         align-items: center;
         padding: 5px 8px;
@@ -1997,8 +2165,8 @@ input, textarea {
 .toast-container {
     position: fixed;
     bottom: calc(var(--mobile-bottom-nav-h, 58px) + env(safe-area-inset-bottom) + 18px);
-    left: 14px;
-    right: 14px;
+    left: calc(env(safe-area-inset-left) + 14px);
+    right: calc(env(safe-area-inset-right) + 14px);
     top: auto;
     transform: none;
     z-index: 99999;
@@ -2013,8 +2181,8 @@ input, textarea {
     .toast-container {
         bottom: calc(var(--mobile-bottom-nav-h, 58px) + env(safe-area-inset-bottom) + 18px);
         top: auto;
-        left: 14px;
-        right: 14px;
+        left: calc(env(safe-area-inset-left) + 14px);
+        right: calc(env(safe-area-inset-right) + 14px);
         transform: none;
     }
 

@@ -430,7 +430,7 @@ export class NavigationManager {
             document.getElementById('modal-about')?.classList.remove('show');
             restoreSearch();
         };
-        document.querySelector('.mobile-tab-brand')?.addEventListener('click', openAbout);
+        document.querySelector('.vault-header-brand')?.addEventListener('click', openAbout);
         document.querySelector('.navbar-brand')?.addEventListener('click', openAbout);
         document.getElementById('about-close-btn')?.addEventListener('click', closeAbout);
         document.getElementById('about-dismiss-btn')?.addEventListener('click', closeAbout);
