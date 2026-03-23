@@ -674,42 +674,43 @@
             </button>
         </div>
     </div>
-    <div class="section-header" style="margin-bottom: var(--space-xl);">
-        <div><h1 class="section-title">My Account</h1><p class="section-subtitle">YOUR PROFILE AND SECURITY</p></div>
+
+    <!-- ── Floating Profile Panel ── -->
+    <div class="acc-profile-panel">
+        <!-- Avatar -->
+        <div class="acc-profile-avatar-ring">
+            <div class="acc-profile-avatar-vessel">
+                <img id="acc-avatar-img" class="hidden">
+                <span id="acc-initials">?</span>
+            </div>
+            <!-- Camera button overlaid on avatar -->
+            <button class="acc-profile-camera-btn" id="btn-change-avatar" title="Change photo">
+                <i class="fa-solid fa-camera"></i>
+            </button>
+        </div>
+        <!-- Identity -->
+        <div class="acc-profile-identity">
+            <div class="acc-profile-name" id="acc-display-username">loading...</div>
+            <div class="acc-profile-email" id="acc-display-email">loading...</div>
+        </div>
+        <!-- Vault badge -->
+        <div class="acc-profile-badge">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Secured Vault</span>
+        </div>
     </div>
+
     <div class="settings-grid">
 
-        <!-- Vault Identity -->
-        <div class="account-card bento-card">
+        <!-- Vault Identity (pending email only now) -->
+        <div class="account-card bento-card" id="card-vault-identity">
             <div class="bento-header">
                 <div class="bento-icon"><i class="fa-solid fa-user"></i></div>
                 <div class="bento-title-vessel"><h3 class="bento-title">Vault Identity</h3><div class="bento-subtitle">Profile & Access Email</div></div>
             </div>
             <div class="bento-content">
-
-                <!-- Avatar + name hero -->
-                <div class="acc-identity-hero">
-                    <!-- Avatar vessel -->
-                    <div class="acc-avatar-outer">
-                        <div class="acc-avatar-vessel">
-                            <img id="acc-avatar-img" class="hidden">
-                            <span id="acc-initials">?</span>
-                        </div>
-                    </div>
-                    <!-- Name + email -->
-                    <div class="acc-hero-info">
-                        <div class="acc-hero-name" id="acc-display-username">loading...</div>
-                        <div class="acc-hero-email" id="acc-display-email">loading...</div>
-                    </div>
-                    <!-- Change photo button -->
-                    <button class="acc-avatar-change-btn" id="btn-change-avatar" title="Change photo">
-                        <i class="fa-solid fa-camera"></i>
-                    </button>
-                </div>
-
                 <!-- Pending email change -->
                 <div id="pending-email-container" class="hidden">
-                    <div class="nm-divider" style="margin: 4px 0 12px;"></div>
                     <div class="setting-row" style="margin-top: 0;">
                         <div class="setting-info">
                             <div class="acc-pending-label-row">
@@ -726,7 +727,11 @@
                         <i class="fa-solid fa-shield-halved"></i>Verify & Activate
                     </button>
                 </div>
-
+                <!-- Empty state when no pending change -->
+                <div id="no-pending-email-msg" class="acc-no-pending">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Email verified and active</span>
+                </div>
             </div>
         </div>
 

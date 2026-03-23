@@ -134,8 +134,10 @@ export class AuthManager {
         }
 
         // Pending email
+        const noPendingMsg = document.getElementById('no-pending-email-msg');
         if (user.pendingEmail) {
             pendingContainer?.classList.remove('hidden');
+            if (noPendingMsg) noPendingMsg.classList.add('hidden');
             if (pendingEmailDisplay) pendingEmailDisplay.textContent = user.pendingEmail;
             if (emailCard) {
                 emailCard.style.opacity = '0.5';
@@ -144,6 +146,7 @@ export class AuthManager {
             }
         } else {
             pendingContainer?.classList.add('hidden');
+            if (noPendingMsg) noPendingMsg.classList.remove('hidden');
             if (emailCard) {
                 emailCard.style.opacity = '1';
                 emailCard.style.pointerEvents = 'auto';

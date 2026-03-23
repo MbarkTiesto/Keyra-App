@@ -3633,36 +3633,29 @@ body.keyboard-open .auth-overlay {
 /* ── 35. ACCOUNT TAB — MOBILE NEUMORPHIC ENHANCEMENTS ───────────────────────── */
 
 @media (max-width: 768px) {
-    /* ── Avatar hero ── */
-    .acc-identity-hero {
-        padding: 16px;
-        border-radius: 20px;
-        gap: 14px;
-        margin-bottom: 14px;
+    /* Floating profile panel — full width on mobile */
+    .acc-profile-panel {
+        margin: 0 0 20px 0;
+        padding: 28px 20px 20px;
+        border-radius: 24px;
     }
 
-    /* Gradient ring — slightly larger on mobile */
-    .acc-avatar-ring {
-        padding: 3px;
+    .acc-profile-avatar-ring {
+        width: 90px;
+        height: 90px;
     }
 
-    .acc-avatar-vessel {
-        width: 68px;
-        height: 68px;
+    .acc-profile-avatar-vessel {
+        width: 72px;
+        height: 72px;
     }
 
-    .acc-avatar-vessel span {
+    .acc-profile-avatar-vessel span {
         font-size: 24px;
     }
 
-    .acc-change-photo-btn {
-        height: 40px !important;
-        font-size: 13px !important;
-        padding: 0 16px !important;
-    }
-
-    .acc-photo-hint {
-        font-size: 10px;
+    .acc-profile-name {
+        font-size: 18px;
     }
 
     /* ── Info rows ── */
