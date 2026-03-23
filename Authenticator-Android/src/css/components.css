@@ -2460,111 +2460,116 @@ input:checked+.slider:before {
     pointer-events: none;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     align-items: center;
 }
 
 .neumorphic-toast {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 24px;
+    gap: 0;
+    padding: 0;
     background: var(--bg-primary);
-    border-radius: var(--radius-full);
+    border-radius: 24px;
     border: none;
     box-shadow:
-        var(--nm-shadow-out),
-        -4px 0 0 0 var(--accent-primary);
+        10px 10px 24px var(--nm-shadow-dark),
+        -10px -10px 24px var(--nm-shadow-light);
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-primary);
-    max-width: min(420px, 90vw);
-    margin: 0 auto;
-    letter-spacing: -0.2px;
-    transition: all 0.3s ease;
-    animation: toastSlideUp 0.35s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+    max-width: min(400px, 90vw);
+    min-width: 260px;
+    letter-spacing: -0.1px;
+    overflow: hidden;
+    position: relative;
+    animation: toastSlideDown 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
     pointer-events: auto;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-@keyframes toastSlideUp {
+@keyframes toastSlideDown {
     from {
         opacity: 0;
-        transform: translateY(20px) scale(0.92);
+        transform: translateY(-18px) scale(0.93);
     }
-
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
 }
 
-.neumorphic-toast.toast-success {
-    box-shadow:
-        var(--nm-shadow-out),
-        -4px 0 0 0 #28a745;
-}
-
-.neumorphic-toast.toast-error {
-    box-shadow:
-        var(--nm-shadow-out),
-        -4px 0 0 0 #ff3b30;
-}
-
-.neumorphic-toast.toast-info {
-    box-shadow:
-        var(--nm-shadow-out),
-        -4px 0 0 0 var(--accent-primary);
-}
-
-.neumorphic-toast:hover {
-    transform: none;
-    box-shadow:
-        10px 10px 22px var(--nm-shadow-dark),
-        -10px -10px 22px var(--nm-shadow-light),
-        -4px 0 0 0 var(--accent-primary);
-}
-
-.neumorphic-toast.toast-success:hover {
-    box-shadow:
-        10px 10px 22px var(--nm-shadow-dark),
-        -10px -10px 22px var(--nm-shadow-light),
-        -4px 0 0 0 #28a745;
-}
-
-.neumorphic-toast.toast-error:hover {
-    box-shadow:
-        10px 10px 22px var(--nm-shadow-dark),
-        -10px -10px 22px var(--nm-shadow-light),
-        -4px 0 0 0 #ff3b30;
-}
-
-.neumorphic-toast.toast-icon {
-    font-size: 18px;
+/* Icon vessel — coloured left panel */
+.toast-icon-vessel {
+    width: 52px;
+    min-width: 52px;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    border-radius: 24px 0 0 24px;
     flex-shrink: 0;
-    line-height: 1;
 }
 
-.neumorphic-toast.toast-success .toast-icon {
-    color: #28a745;
+.toast-success .toast-icon-vessel {
+    background: rgba(52, 199, 89, 0.14);
+    color: #34c759;
 }
 
-.neumorphic-toast.toast-error .toast-icon {
+.toast-error .toast-icon-vessel {
+    background: rgba(255, 59, 48, 0.14);
     color: #ff3b30;
 }
 
-.neumorphic-toast.toast-info .toast-icon {
+.toast-info .toast-icon-vessel {
+    background: var(--accent-soft);
     color: var(--accent-primary);
 }
 
-.neumorphic-toast.toast-message {
+/* Message text */
+.toast-message {
     flex: 1;
+    padding: 13px 16px 22px 14px;
     line-height: 1.4;
+    color: var(--text-primary);
+}
+
+/* Progress bar at bottom */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 52px;
+    right: 0;
+    height: 3px;
+    background: var(--nm-shadow-dark);
+    opacity: 0.25;
+    border-radius: 0 0 22px 0;
+    overflow: hidden;
+}
+
+.toast-progress-bar {
+    height: 100%;
+    width: 100%;
+    border-radius: inherit;
+    animation: toastDrain 4s linear forwards;
+}
+
+.toast-success .toast-progress-bar { background: #34c759; }
+.toast-error   .toast-progress-bar { background: #ff3b30; }
+.toast-info    .toast-progress-bar { background: var(--accent-primary); }
+
+@keyframes toastDrain {
+    from { width: 100%; }
+    to   { width: 0%; }
 }
 
 .neumorphic-toast.hiding {
     opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    transition: all 0.3s ease;
+    transform: translateY(-12px) scale(0.94);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
