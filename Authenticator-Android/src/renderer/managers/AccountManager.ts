@@ -913,7 +913,7 @@ export class AccountManager {
             'lastpass': 'fa-solid fa-key', 'uber': 'fa-brands fa-uber',
             'airbnb': 'fa-brands fa-airbnb', 'notion': 'fa-solid fa-file-lines',
             'zoom': 'fa-solid fa-video', 'trello': 'fa-brands fa-trello',
-            'figma': 'fa-brands fa-figma', 'adobe': 'fa-brands fa-adobe',
+            'figma': 'fa-brands fa-figma', 'adobe': 'fa-solid fa-pen-nib',
             'epic': 'fa-solid fa-gamepad', 'canva': 'fa-solid fa-pen-ruler',
             'asana': 'fa-solid fa-check-square', 'clickup': 'fa-solid fa-layer-group',
             'lyft': 'fa-brands fa-lyft',
