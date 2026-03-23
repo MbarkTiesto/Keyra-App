@@ -1,12 +1,9 @@
 // Current app version — bump this on each release
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.1.0';
 
 // URL to your hosted version.json
 // Host this file at https://keyraauth.netlify.app/version.json to enable OTA update checks
 const VERSION_URL = 'https://keyraauth.netlify.app/version.json';
-
-// Only run update checks on the real Android app — skip in browser/dev to avoid CORS noise
-const IS_NATIVE = !!(window as any).Capacitor?.isNativePlatform?.();
 
 export interface VersionManifest {
     version: string;
@@ -100,7 +97,6 @@ export class UpdateManager {
     }
 
     private async fetchManifest(): Promise<VersionManifest | null> {
-        if (!IS_NATIVE) return null; // skip in browser/dev — avoids CORS errors
         try {
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 8000);
