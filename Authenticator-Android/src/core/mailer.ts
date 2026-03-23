@@ -1,15 +1,21 @@
+import { IS_NATIVE } from './storage';
+
 export interface MailOptions {
     to: string;
     subject: string;
     code: string;
 }
 
+const MAILER_URL = IS_NATIVE
+    ? 'https://keyraapp.netlify.app/.netlify/functions/send-activation'
+    : '/.netlify/functions/send-activation';
+
 /**
  * Sends an activation email via Netlify Function (Server-side SMTP).
  */
 export async function sendActivationEmail(options: MailOptions): Promise<{ success: boolean; message: string }> {
     try {
-        const response = await fetch('/.netlify/functions/send-activation', {
+        const response = await fetch(MAILER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(options)
