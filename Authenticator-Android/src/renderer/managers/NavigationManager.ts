@@ -547,6 +547,18 @@ export class NavigationManager {
         this.host.setupNumpad();
         this.setupSearchOverlay();
 
+        // Swipe-to-dismiss for static modals (about, logout)
+        this.attachStaticModalSwipe('modal-about', closeAbout);
+
+        const modalLogoutEl = document.getElementById('modal-logout');
+        if (modalLogoutEl) {
+            const closeLogout = () => {
+                modalLogoutEl.classList.remove('show');
+                restoreSearch();
+            };
+            this.attachStaticModalSwipe('modal-logout', closeLogout);
+        }
+
         // Swipe navigation
         this.setupSwipeNavigation();
 
@@ -577,6 +589,64 @@ export class NavigationManager {
 
     // ─── Swipe Navigation ──────────────────────────────────────────────────────
 
+    private attachStaticModalSwipe(overlayId: string, dismiss: () => void) {
+        const overlay = document.getElementById(overlayId);
+        if (!overlay) return;
+        const modal = overlay.querySelector('.modal, .about-modal') as HTMLElement | null;
+        if (!modal) return;
+
+        let startY = 0;
+        let currentY = 0;
+        let startTime = 0;
+        let dragging = false;
+
+        modal.addEventListener('touchstart', (e) => {
+            const scrollable = (e.target as HTMLElement)?.closest('.modal-content, .modal-body, textarea, input, select');
+            if (scrollable) return;
+            // Only allow drag from the top header zone
+            const modalTop = modal.getBoundingClientRect().top;
+            if (e.touches[0].clientY - modalTop > 72) return;
+            startY = e.touches[0].clientY;
+            currentY = startY;
+            startTime = Date.now();
+            dragging = true;
+            modal.style.transition = 'none';
+        }, { passive: true });
+
+        modal.addEventListener('touchmove', (e) => {
+            if (!dragging) return;
+            const dy = Math.max(0, e.touches[0].clientY - startY);
+            currentY = e.touches[0].clientY;
+            modal.style.transform = `translateY(${dy}px)`;
+            const progress = Math.min(dy / (modal.offsetHeight * 0.5), 1);
+            overlay.style.background = `hsla(var(--h), 20%, 5%, ${0.72 * (1 - progress * 0.6)})`;
+        }, { passive: true });
+
+        const onEnd = () => {
+            if (!dragging) return;
+            dragging = false;
+            const dy = Math.max(0, currentY - startY);
+            const dt = Math.max(Date.now() - startTime, 1);
+            const velocity = dy / dt;
+            modal.style.transition = '';
+            if (dy > modal.offsetHeight * 0.38 || velocity > 0.55) {
+                overlay.style.background = '';
+                modal.style.transform = 'translateY(100%)';
+                Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+                setTimeout(() => {
+                    modal.style.transform = '';
+                    dismiss();
+                }, 380);
+            } else {
+                modal.style.transform = '';
+                overlay.style.background = '';
+            }
+        };
+
+        modal.addEventListener('touchend', onEnd, { passive: true });
+        modal.addEventListener('touchcancel', onEnd, { passive: true });
+    }
+
     private setupSwipeNavigation() {
         const TABS: Array<'vault' | 'settings' | 'account'> = ['vault', 'settings', 'account'];
         const MIN_X = 40;
@@ -586,12 +656,14 @@ export class NavigationManager {
         let startY = 0;
         let startTime = 0;
         let swiped = false;
+        let startTarget: EventTarget | null = null;
 
-        const onStart = (clientX: number, clientY: number) => {
+        const onStart = (clientX: number, clientY: number, target: EventTarget | null) => {
             startX = clientX;
             startY = clientY;
             startTime = Date.now();
             swiped = false;
+            startTarget = target;
         };
 
         const onEnd = (clientX: number, clientY: number, target: EventTarget | null) => {
@@ -602,6 +674,8 @@ export class NavigationManager {
             // Ignore touches on the bottom nav
             const nav = document.getElementById('bottom-nav');
             if (nav && target instanceof Node && nav.contains(target)) return;
+            // Ignore swipes that started inside a horizontal scroll container (e.g. Focus view switcher)
+            if (startTarget instanceof Node && (startTarget as HTMLElement).closest?.('.fv-switcher, [data-no-swipe-nav]')) return;
 
             const dx = clientX - startX;
             const dy = Math.abs(clientY - startY);
@@ -625,7 +699,7 @@ export class NavigationManager {
 
         // Touch events
         window.addEventListener('touchstart', (e) => {
-            onStart(e.touches[0].clientX, e.touches[0].clientY);
+            onStart(e.touches[0].clientX, e.touches[0].clientY, e.target);
         }, { passive: true });
 
         window.addEventListener('touchend', (e) => {
@@ -634,8 +708,8 @@ export class NavigationManager {
 
         // Pointer events as fallback (covers mouse drag on desktop preview)
         window.addEventListener('pointerdown', (e) => {
-            if (e.pointerType === 'touch') return; // handled by touch events
-            onStart(e.clientX, e.clientY);
+            if (e.pointerType === 'touch') return;
+            onStart(e.clientX, e.clientY, e.target);
         }, { passive: true });
 
         window.addEventListener('pointerup', (e) => {

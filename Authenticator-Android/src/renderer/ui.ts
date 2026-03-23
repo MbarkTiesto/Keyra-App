@@ -155,7 +155,7 @@ export class UIManager {
     public showModal(content: string) {
         const overlay = document.getElementById('modal-overlay');
         if (!overlay) return;
-        overlay.innerHTML = `<div class="modal animate-fade-in">${content}</div>`;
+        overlay.innerHTML = `<div class="modal">${content}</div>`;
         overlay.classList.add('show');
         // Push search overlay behind modal
         const searchOverlay = document.getElementById('search-overlay');
@@ -167,6 +167,73 @@ export class UIManager {
             const first = overlay.querySelector('input:not([type="hidden"]), button:not(.auth-close-btn)') as HTMLElement;
             if (first) first.focus();
         }, 50);
+
+        // Swipe-down-to-dismiss
+        const modal = overlay.querySelector('.modal') as HTMLElement | null;
+        if (modal) this._attachSwipeDismiss(modal, overlay, () => this.hideModal());
+    }
+
+    private _attachSwipeDismiss(modal: HTMLElement, overlay: HTMLElement, dismiss: () => void) {
+        let startY = 0;
+        let currentY = 0;
+        let startTime = 0;
+        let dragging = false;
+        // Only allow drag from the top header zone (handle + modal-header area)
+        const HEADER_ZONE = 72;
+
+        const onStart = (y: number, target: EventTarget | null) => {
+            const scrollable = (target as HTMLElement)?.closest('.modal-content, .modal-body, textarea, input, select');
+            if (scrollable) return;
+            // Reject touches that start below the header zone
+            const modalTop = modal.getBoundingClientRect().top;
+            if (y - modalTop > HEADER_ZONE) return;
+            startY = y;
+            currentY = y;
+            startTime = Date.now();
+            dragging = true;
+            modal.style.transition = 'none';
+        };
+
+        const onMove = (y: number) => {
+            if (!dragging) return;
+            const dy = Math.max(0, y - startY);
+            currentY = y;
+            modal.style.transform = `translateY(${dy}px)`;
+            const progress = Math.min(dy / (modal.offsetHeight * 0.5), 1);
+            overlay.style.background = `hsla(var(--h), 20%, 5%, ${0.72 * (1 - progress * 0.6)})`;
+        };
+
+        const onEnd = () => {
+            if (!dragging) return;
+            dragging = false;
+
+            const dy = Math.max(0, currentY - startY);
+            const dt = Math.max(Date.now() - startTime, 1);
+            const velocity = dy / dt;
+            const threshold = modal.offsetHeight * 0.38;
+
+            // Restore transition
+            modal.style.transition = '';
+
+            if (dy > threshold || velocity > 0.55) {
+                // Animate slide-down then dismiss
+                overlay.style.background = '';
+                modal.style.transform = 'translateY(100%)';
+                import('@capacitor/haptics').then(({ Haptics, ImpactStyle }) => {
+                    Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+                }).catch(() => {});
+                setTimeout(() => dismiss(), 380);
+            } else {
+                // Snap back to resting position
+                modal.style.transform = '';
+                overlay.style.background = '';
+            }
+        };
+
+        modal.addEventListener('touchstart', (e) => onStart(e.touches[0].clientY, e.target), { passive: true });
+        modal.addEventListener('touchmove',  (e) => onMove(e.touches[0].clientY), { passive: true });
+        modal.addEventListener('touchend',   () => onEnd(), { passive: true });
+        modal.addEventListener('touchcancel',() => onEnd(), { passive: true });
     }
 
     public hideModal() {
