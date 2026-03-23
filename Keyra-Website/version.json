@@ -3,9 +3,17 @@
     "version": "1.1.0",
     "releaseDate": "2026-03-23",
     "changelog": [
-      "Initial release"
+      "Splash screen and auth pages now follow device system theme (dark/light)",
+      "Vault header panel: sticky, collapsible toolbar with frosted glass effect",
+      "Bottom navigation with glassy active tab indicator",
+      "Swipe-down-to-dismiss modals with haptic feedback",
+      "Focus view horizontal scroll no longer conflicts with tab swipe navigation",
+      "User account panel ghost shadow fix",
+      "Resend verification code with 30s cooldown",
+      "Email verification CORS fix",
+      "Update manager improvements"
     ],
-    "downloadUrl": "https://keyraauth.netlify.app/keyra-1.0.0.apk",
+    "downloadUrl": "https://github.com/MbarkT3STO/Keyra-App/releases/download/v1.1.0/Keyra-Authenticator-v1.1.0.apk",
     "critical": false
   }
 }
