@@ -438,6 +438,15 @@ export class NavigationManager {
             if (e.target === e.currentTarget) closeAbout();
         });
 
+        document.getElementById('about-website-row')?.addEventListener('click', async () => {
+            try {
+                const { Browser } = await import('@capacitor/browser');
+                await Browser.open({ url: 'https://keyraauth.netlify.app/' });
+            } catch {
+                window.open('https://keyraauth.netlify.app/', '_blank');
+            }
+        });
+
         // Sheet "About" trigger
         document.getElementById('mobile-about-trigger')?.addEventListener('click', () => {
             closeSheet();

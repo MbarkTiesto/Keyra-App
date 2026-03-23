@@ -5066,6 +5066,25 @@ body.vault-is-locked .main-app-content,
         -6px -6px 14px var(--nm-shadow-light);
 }
 
+.about-info-row--link {
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.about-info-row--link:active {
+    box-shadow: var(--nm-shadow-in-sm);
+    transform: scale(0.98);
+}
+
+.about-info-link-icon {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    opacity: 0.45;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
 .about-info-icon {
     width: 42px;
     height: 42px;
