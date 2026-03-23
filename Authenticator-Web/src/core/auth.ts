@@ -264,7 +264,20 @@ export async function checkSession(): Promise<{ success: boolean, message: strin
                     currentUser = user;
                 }
                 
-                currentKey = Buffer.from(savedKey, 'base64');
+                const restoredKey = Buffer.from(savedKey, 'base64');
+
+                // Validate that the stored key can still decrypt the vault.
+                // If the password was changed on another device the cloud vault will
+                // have been re-encrypted with a new key, making the saved key stale.
+                try {
+                    decryptVault(currentUser.encryptedVaultData, restoredKey);
+                } catch {
+                    // Key is stale — force re-authentication
+                    logout();
+                    return { success: false, message: "Your password was changed on another device. Please log in again." };
+                }
+
+                currentKey = restoredKey;
                 
                 // Update session timestamp on successful resume
                 localStorage.setItem('active_session_timestamp', Date.now().toString());
@@ -297,7 +310,9 @@ export async function getActiveAccounts(): Promise<AuthenticatorAccount[]> {
         return JSON.parse(jsonStr) as AuthenticatorAccount[];
     } catch (err) {
         console.error("getActiveAccounts failed:", err);
-        return [];
+        // Re-throw decryption errors so callers can handle stale-key scenarios
+        // (e.g. password changed on another device) rather than silently returning [].
+        throw err;
     }
 }
 
@@ -545,7 +560,7 @@ export async function importVaultData(
     }
 }
 
-export async function changePassword(newPassword: string): Promise<{ success: boolean, message: string }> {
+export async function changePassword(newPassword: string, encryptedPin?: string): Promise<{ success: boolean, message: string, newEncryptedPin?: string }> {
     if (!currentUser || !currentKey) throw new Error("No active user session.");
     if (newPassword.length < 8) return { success: false, message: "Password must be at least 8 characters." };
 
@@ -563,6 +578,17 @@ export async function changePassword(newPassword: string): Promise<{ success: bo
 
         // 3. Re-encrypt vault with new key
         const newEncryptedVault = encryptVault(JSON.stringify(accounts), newKey);
+
+        // 3b. Re-encrypt PIN with new key if one was provided (old key still in currentKey here)
+        let newEncryptedPin: string | undefined;
+        if (encryptedPin) {
+            try {
+                const plainPin = decryptVault(encryptedPin, currentKey);
+                newEncryptedPin = encryptVault(plainPin, newKey);
+            } catch {
+                // PIN decryption failed — it may already be stale or in plain format; skip silently
+            }
+        }
 
         // 4. Update user record
         users[userIndex].hash = hash;
@@ -582,7 +608,7 @@ export async function changePassword(newPassword: string): Promise<{ success: bo
         // 7. Update local session storage
         localStorage.setItem('active_session_key', newKey.toString('base64'));
 
-        return { success: true, message: "Password changed successfully." };
+        return { success: true, message: "Password changed successfully.", newEncryptedPin };
     } catch (err) {
         console.error("Password change failed:", err);
         return { success: false, message: "Failed to change password." };

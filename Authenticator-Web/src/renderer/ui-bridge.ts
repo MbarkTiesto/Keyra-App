@@ -51,7 +51,17 @@ export const bridge = {
 
     // Account Management
     changeUsername: async (newName: string) => syncWrapper(() => auth.changeUsername(newName), "Updating Profile", "SYNCHRONIZING CHANGES"),
-    changePassword: async (newPassword: string) => syncWrapper(() => auth.changePassword(newPassword), "Re-encrypting Vault", "MASTER KEY ROTATION"),
+    changePassword: async (newPassword: string) => syncWrapper(async () => {
+        const user = auth.getCurrentUser();
+        const pinKey = user ? `${user.id}_vault_pin` : null;
+        const encryptedPin = pinKey ? localStorage.getItem(pinKey) ?? undefined : undefined;
+        const result = await auth.changePassword(newPassword, encryptedPin);
+        // If the PIN was re-encrypted with the new key, persist it
+        if (result.success && result.newEncryptedPin && pinKey) {
+            localStorage.setItem(pinKey, result.newEncryptedPin);
+        }
+        return result;
+    }, "Re-encrypting Vault", "MASTER KEY ROTATION"),
     updateProfilePicture: async (base64Image: string) => syncWrapper(() => auth.updateProfilePicture(base64Image), "Updating Photo", "UPLOADING AVATAR"),
     requestEmailChange: async (newEmail: string) => syncWrapper(() => auth.requestEmailChange(newEmail), "Processing", "INITIATING EMAIL ROTATION"),
     confirmEmailChange: async (code: string) => syncWrapper(() => auth.confirmEmailChange(code), "Verifying", "FINALIZING EMAIL IDENTITY"),
@@ -69,7 +79,15 @@ export const bridge = {
             (error) => {
                 console.error("Failed to load accounts:", error);
                 const ui = (window as any).ui;
-                if (ui) {
+                // Decryption failure likely means the password was changed on another device.
+                // Force logout so the user re-authenticates with the new password.
+                if (error?.message?.includes('authenticate data') || error?.message?.includes('decrypt')) {
+                    auth.logout();
+                    if (ui) {
+                        ui.showToast('Session expired. Your password may have changed on another device. Please log in again.', 'error');
+                    }
+                    setTimeout(() => window.location.reload(), 2000);
+                } else if (ui) {
                     ui.showToast('Failed to load accounts. Please try again.', 'error');
                 }
             }
