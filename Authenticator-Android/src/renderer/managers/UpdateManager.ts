@@ -1,9 +1,12 @@
 // Current app version — bump this on each release
 export const APP_VERSION = '1.0.0';
 
-// URL to your hosted version.json — GitHub raw content is ideal
-// Update this to your actual repo URL before release
-const VERSION_URL = 'https://raw.githubusercontent.com/you/keyra/main/version.json';
+// URL to your hosted version.json
+// Host this file at https://keyraauth.netlify.app/version.json to enable OTA update checks
+const VERSION_URL = 'https://keyraauth.netlify.app/version.json';
+
+// Only run update checks on the real Android app — skip in browser/dev to avoid CORS noise
+const IS_NATIVE = !!(window as any).Capacitor?.isNativePlatform?.();
 
 export interface VersionManifest {
     version: string;
@@ -43,6 +46,7 @@ export class UpdateManager {
     private manifest: VersionManifest | null = null;
     private dismissed = false;
     private downloading = false;
+    private startupChecked = false;
 
     constructor(host: UpdateManagerHost) {
         this.host = host;
@@ -52,6 +56,8 @@ export class UpdateManager {
 
     /** Called once on app start — silent, no toast when up to date */
     public async checkOnStartup(): Promise<void> {
+        if (this.startupChecked) return;
+        this.startupChecked = true;
         if (this.dismissed) return;
         if (this.isBannerVisible()) return;
         await this.fetchAndEvaluate(false);
@@ -94,13 +100,23 @@ export class UpdateManager {
     }
 
     private async fetchManifest(): Promise<VersionManifest | null> {
+        if (!IS_NATIVE) return null; // skip in browser/dev — avoids CORS errors
         try {
-            const res = await fetch(VERSION_URL, { cache: 'no-store' });
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 8000);
+            let res: Response;
+            try {
+                res = await fetch(VERSION_URL, { cache: 'no-store', signal: controller.signal });
+            } finally {
+                clearTimeout(timeout);
+            }
             if (!res.ok) return null;
             const data = await res.json();
-            if (data?.version) return data as VersionManifest;
+            // Support both unified { android: {...}, desktop: {...} } and flat { version, ... }
+            const manifest = data?.android ?? data;
+            if (manifest?.version) return manifest as VersionManifest;
         } catch {
-            // network unavailable or CORS — silently ignore
+            // network unavailable, timeout, or CORS — silently ignore
         }
         return null;
     }
@@ -284,6 +300,7 @@ export class UpdateManager {
         const badge = document.getElementById('version-row-badge');
         if (!badge) return;
 
+        badge.classList.remove('hidden');
         if (semverGt(remoteVersion, APP_VERSION)) {
             badge.textContent = 'UPDATE';
             badge.className = 'update-badge update-badge--new';
@@ -296,6 +313,7 @@ export class UpdateManager {
     private setLatestBadge(): void {
         const badge = document.getElementById('version-row-badge');
         if (badge) {
+            badge.classList.remove('hidden');
             badge.textContent = 'LATEST';
             badge.className = 'update-badge update-badge--ok';
         }

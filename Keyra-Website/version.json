@@ -1,0 +1,11 @@
+{
+  "android": {
+    "version": "1.0.0",
+    "releaseDate": "2026-03-23",
+    "changelog": [
+      "Initial release"
+    ],
+    "downloadUrl": "https://keyraauth.netlify.app/keyra-1.0.0.apk",
+    "critical": false
+  }
+}
