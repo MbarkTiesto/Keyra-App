@@ -144,12 +144,18 @@ input, textarea {
         flex-direction: column;
         margin: 12px 0 16px;
         border-radius: 22px;
-        background: var(--bg-primary);
+        background: var(--panel-glass-bg);
+        backdrop-filter: blur(18px) saturate(1.4);
+        -webkit-backdrop-filter: blur(18px) saturate(1.4);
         box-shadow:
             8px 8px 20px var(--nm-shadow-dark),
-            -8px -8px 20px var(--nm-shadow-light);
+            -8px -8px 20px var(--nm-shadow-light),
+            inset 0 1px 0 var(--panel-glass-border);
         flex-shrink: 0;
         overflow: hidden;
+        position: sticky;
+        top: -6px;
+        z-index: 100;
     }
 
     /* Top row: brand + actions */
@@ -664,10 +670,13 @@ input, textarea {
         left: calc(env(safe-area-inset-left) + 14px);
         right: calc(env(safe-area-inset-right) + 14px);
         height: 58px;
-        background: var(--bg-primary);
+        background: var(--panel-glass-bg);
+        backdrop-filter: blur(18px) saturate(1.4);
+        -webkit-backdrop-filter: blur(18px) saturate(1.4);
         box-shadow:
             8px 8px 20px var(--nm-shadow-dark),
-            -8px -8px 20px var(--nm-shadow-light);
+            -8px -8px 20px var(--nm-shadow-light),
+            inset 0 1px 0 var(--panel-glass-border);
         border-radius: 22px;
         z-index: 200;
         align-items: center;
@@ -723,17 +732,17 @@ input, textarea {
     /* ── Active state ── */
     .bottom-nav-tab.active {
         color: var(--accent-primary);
-        background: var(--bg-primary);
+        background: var(--panel-glass-active);
         box-shadow:
-            inset 3px 3px 8px var(--nm-shadow-dark),
-            inset -3px -3px 8px var(--nm-shadow-light);
+            inset 2px 2px 6px var(--nm-shadow-dark),
+            inset -2px -2px 6px var(--nm-shadow-light);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
     }
 
     .bottom-nav-tab.active .bottom-nav-tab-icon {
-        background: var(--bg-primary);
-        box-shadow:
-            4px 4px 10px var(--nm-shadow-dark),
-            -4px -4px 10px var(--nm-shadow-light);
+        background: transparent;
+        box-shadow: none;
     }
 
     .bottom-nav-tab.active i {
