@@ -63,7 +63,13 @@ export async function setupAuthUI() {
             vessel.classList.remove('show');
             setTimeout(() => vessel.classList.add('hidden'), 500);
         }
-        
+
+        // Remove the device-theme override applied during splash/auth so
+        // ThemeManager can apply the user's saved preference cleanly.
+        document.body.classList.remove('light-theme', 'dark-theme');
+        document.documentElement.classList.remove('light-theme', 'dark-theme');
+        document.documentElement.removeAttribute('data-theme');
+
         if (appInitCallback) await appInitCallback(resumed);
 
         // Let UIManager handle initial data loading

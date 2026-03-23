@@ -119,7 +119,8 @@
 }
 
 /* ── Enhanced Light Theme (Arctic Palette) ── */
-body.light-theme {
+body.light-theme,
+html.light-theme body {
     --bg-primary: #e8edf3;
     --bg-secondary: #dde3ec;
     --bg-tertiary: #d0d8e4;
@@ -142,7 +143,8 @@ body.light-theme {
 }
 
 /* ── Enhanced Dark Theme ── */
-body.dark-theme {
+body.dark-theme,
+html.dark-theme body {
     --bg-primary: #121214;
     --bg-secondary: #18181b;
     --bg-tertiary: #202023;
