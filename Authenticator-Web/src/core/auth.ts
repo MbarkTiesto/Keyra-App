@@ -400,8 +400,7 @@ export function getBackupData(): {
     };
     
     // Generate checksum (SHA-256 hash of critical data)
-    const checksumData = backup.salt + backup.encryptedVaultData + backup.encryptedSettings;
-    const checksum = generateChecksum(checksumData);
+    const checksum = generateChecksum(backup.salt + backup.encryptedVaultData + (backup.encryptedSettings || ''));
     
     return {
         ...backup,
@@ -489,74 +488,55 @@ export async function importVaultData(
     autolock?: string, 
     desktopSettings?: any, 
     webSettings?: any
-): Promise<{ success: boolean, message: string }> {
+): Promise<{ success: boolean, message: string, restoredSettings?: any }> {
     if (!currentUser || !currentKey) throw new Error("No active user session.");
 
     try {
         const key = deriveKey(password, salt);
+
+        // Decrypt vault first — wrong password throws here before any writes
         const decryptedJson = decryptVault(encryptedVaultData, key);
         const accounts = JSON.parse(decryptedJson) as AuthenticatorAccount[];
 
-        // 1. Restore Vault Data - this will re-encrypt with current user's key
-        await saveActiveAccounts(accounts);
-
-        // 2. Restore Settings
-        const users = await getUsers();
-        const userIndex = users.findIndex(u => u.id === currentUser!.id);
-        if (userIndex !== -1) {
-            // New format: encrypted settings
-            if (encryptedSettings) {
-                try {
-                    const decryptedSettings = decryptVault(encryptedSettings, key);
-                    const settings = JSON.parse(decryptedSettings);
-                    
-                    if (settings.autolock !== undefined) {
-                        users[userIndex].autolock = settings.autolock;
-                        currentUser.autolock = settings.autolock;
-                    }
-                    if (settings["Desktop Settings"]) {
-                        users[userIndex]["Desktop Settings"] = settings["Desktop Settings"];
-                        currentUser["Desktop Settings"] = settings["Desktop Settings"];
-                    }
-                    if (settings["Web Settings"]) {
-                        users[userIndex]["Web Settings"] = settings["Web Settings"];
-                        currentUser["Web Settings"] = settings["Web Settings"];
-                    }
-                } catch (err) {
-                    console.error("Failed to decrypt settings:", err);
-                    return { success: false, message: "Failed to decrypt backup settings." };
-                }
+        // Decrypt settings before any writes (fail fast, no partial state)
+        let restoredSettings: any = null;
+        if (encryptedSettings) {
+            try {
+                restoredSettings = JSON.parse(decryptVault(encryptedSettings, key));
+            } catch {
+                return { success: false, message: "Failed to decrypt backup settings. Wrong password?" };
             }
-            // Legacy format: plaintext settings (for backward compatibility)
-            else if (autolock !== undefined || desktopSettings || webSettings) {
-                if (autolock !== undefined) {
-                    users[userIndex].autolock = autolock;
-                    currentUser.autolock = autolock;
-                }
-                if (desktopSettings) {
-                    users[userIndex]["Desktop Settings"] = desktopSettings;
-                    currentUser["Desktop Settings"] = desktopSettings;
-                }
-                if (webSettings) {
-                    users[userIndex]["Web Settings"] = webSettings;
-                    currentUser["Web Settings"] = webSettings;
-                }
-            }
-            
-            // Only save settings if they were updated
-            if (encryptedSettings || autolock !== undefined || desktopSettings || webSettings) {
-                await saveUsers(users);
-                await syncUserData(currentUser.username, users[userIndex]);
-                
-                // Update session state
-                currentUser.settings = currentUser["Web Settings"];
-            }
+        } else if (autolock !== undefined || desktopSettings || webSettings) {
+            // Legacy plaintext format
+            restoredSettings = { autolock, "Desktop Settings": desktopSettings, "Web Settings": webSettings };
         }
 
-        return { success: true, message: "Vault and settings successfully restored." };
+        // All decryption succeeded — now commit to storage
+        await saveActiveAccounts(accounts);
+
+        const users = await getUsers();
+        const userIndex = users.findIndex(u => u.id === currentUser!.id);
+        if (userIndex !== -1 && restoredSettings) {
+            if (restoredSettings.autolock !== undefined) {
+                users[userIndex].autolock = restoredSettings.autolock;
+                currentUser.autolock = restoredSettings.autolock;
+            }
+            if (restoredSettings["Desktop Settings"]) {
+                users[userIndex]["Desktop Settings"] = restoredSettings["Desktop Settings"];
+                currentUser["Desktop Settings"] = restoredSettings["Desktop Settings"];
+            }
+            if (restoredSettings["Web Settings"]) {
+                users[userIndex]["Web Settings"] = restoredSettings["Web Settings"];
+                currentUser["Web Settings"] = restoredSettings["Web Settings"];
+            }
+            await saveUsers(users);
+            await syncUserData(currentUser.username, users[userIndex]);
+        }
+
+        return { success: true, message: "Vault and settings successfully restored.", restoredSettings };
     } catch (err) {
         console.error("Vault Import Error:", err);
-        return { success: false, message: "Decryption failed." };
+        return { success: false, message: "Decryption failed. Check your password and try again." };
     }
 }
 

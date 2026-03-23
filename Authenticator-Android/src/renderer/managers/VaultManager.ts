@@ -1,3 +1,7 @@
+import { IS_NATIVE } from '../../core/storage';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+
 export interface VaultManagerHost {
     accounts: any[];
     getIcon(issuer: string): string;
@@ -260,6 +264,7 @@ export class VaultManager {
                         </div>
                         ${checksumStatus}
                     </div>
+                    <div id="checksum-warning-inline" class="hidden"></div>
                     <div class="form-group">
                         <label class="form-label">Backup Master Password</label>
                         <input type="password" id="import-pass" class="form-input" placeholder="Enter your master password" ${!verification.valid ? 'disabled' : ''}>
@@ -283,9 +288,22 @@ export class VaultManager {
             document.getElementById('confirm-import')?.addEventListener('click', async () => {
                 const pass = (document.getElementById('import-pass') as HTMLInputElement).value;
                 if (!pass) { this.host.showToast('Password required', 'error'); return; }
+
+                // Replace window.confirm (blocked in Capacitor WebView) with inline warning
                 if (verification.hasChecksum && !verification.checksumValid) {
-                    const confirmed = confirm('Warning: Backup file integrity check failed. The file may be corrupted or tampered with. Continue anyway?');
-                    if (!confirmed) return;
+                    const warningEl = document.getElementById('checksum-warning-inline');
+                    if (warningEl && !warningEl.classList.contains('acknowledged')) {
+                        warningEl.classList.remove('hidden');
+                        warningEl.classList.add('acknowledged');
+                        warningEl.innerHTML = `<div class="import-warning-banner" style="margin-bottom:12px;">
+                            <i class="fa-solid fa-triangle-exclamation import-warning-icon"></i>
+                            <div>
+                                <div class="import-warning-title">Integrity check failed</div>
+                                <div class="import-warning-body">The file may be corrupted. Tap Restore again to proceed anyway.</div>
+                            </div>
+                        </div>`;
+                        return;
+                    }
                 }
 
                 // Show loading state
@@ -515,25 +533,13 @@ export class VaultManager {
 
         html += `<script>${qrCodes.map((item, index) => `new QRCode(document.getElementById('qr-${index}'),{text:'${item.uri}',width:256,height:256});`).join('\n')}</script></body></html>`;
 
-        const blob = new Blob([html], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Keyra_QR_Codes_${Date.now()}.html`;
-        a.click();
-        URL.revokeObjectURL(url);
+        await this.shareTextFile(html, `Keyra_QR_Codes_${Date.now()}.html`, 'text/html');
         this.host.showToast('Open the HTML file and print to PDF', 'info');
     }
 
     private async exportJSON(accounts: any[]) {
         const data = accounts.map(acc => ({ issuer: acc.issuer, account: acc.account, secret: acc.secret, type: 'totp', algorithm: 'SHA1', digits: 6, period: 30 }));
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Keyra_Export_${Date.now()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
+        await this.shareTextFile(JSON.stringify(data, null, 2), `Keyra_Export_${Date.now()}.json`, 'application/json');
     }
 
     private async exportText(accounts: any[]) {
@@ -542,12 +548,21 @@ export class VaultManager {
             text += `${index + 1}. ${acc.issuer}\n   Account: ${acc.account}\n   Secret: ${acc.secret}\n   URI: otpauth://totp/${encodeURIComponent(acc.issuer)}:${encodeURIComponent(acc.account)}?secret=${acc.secret}&issuer=${encodeURIComponent(acc.issuer)}\n\n`;
         });
         text += `${'='.repeat(60)}\n\nIMPORTANT: Keep this file secure. It contains sensitive authentication data.\n`;
-        const blob = new Blob([text], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Keyra_Export_${Date.now()}.txt`;
-        a.click();
-        URL.revokeObjectURL(url);
+        await this.shareTextFile(text, `Keyra_Export_${Date.now()}.txt`, 'text/plain');
     }
-}
+
+    private async shareTextFile(content: string, filename: string, mimeType: string) {
+        if (IS_NATIVE) {
+            await Filesystem.writeFile({ path: filename, data: content, directory: Directory.Cache, encoding: Encoding.UTF8 });
+            const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache });
+            await Share.share({ title: filename, url: uri, dialogTitle: 'Save File' });
+        } else {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    }

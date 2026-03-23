@@ -2767,6 +2767,10 @@ export class UIManager {
                     this.hideModal();
                     this.showToast("Vault successfully restored!", "success");
                     await this.refreshAccounts();
+                    // Apply restored settings to UI if available
+                    if (res.restoredSettings) {
+                        this.applySettings(res.restoredSettings["Web Settings"] || res.restoredSettings, false);
+                    }
                 } else {
                     this.showToast(res.message, "error");
                 }

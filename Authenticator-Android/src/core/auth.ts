@@ -284,7 +284,7 @@ export function getBackupData(): {
         accountCount = Array.isArray(accounts) ? accounts.length : 0;
     } catch {}
     const backup = { version: "1.2.0", timestamp: Date.now(), accountCount, salt: currentUser.salt, encryptedVaultData: currentUser.encryptedVaultData, encryptedSettings };
-    const checksum = generateChecksum(backup.salt + backup.encryptedVaultData + backup.encryptedSettings);
+    const checksum = generateChecksum(backup.salt + backup.encryptedVaultData + (backup.encryptedSettings || ''));
     return { ...backup, checksum };
 }
 

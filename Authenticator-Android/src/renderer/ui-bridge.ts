@@ -2,6 +2,9 @@ import * as auth from '../core/auth';
 import * as totp from '../core/totp';
 import { parseOTPAuthURI } from '../core/otpauth';
 import { handleError, withErrorHandling } from '../core/errorHandler';
+import { IS_NATIVE } from '../core/storage';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 const syncWrapper = async <T>(fn: () => Promise<T>, title: string = "Processing", subtitle: string = "VAULT SECURITY SYNCHRONIZATION"): Promise<T> => {
     const ui = (window as any).ui;
@@ -127,16 +130,34 @@ export const bridge = {
             const data = auth.getBackupData();
             const json = JSON.stringify(data);
             const filename = `Keyra_Vault_Backup_${Date.now()}.keyra`;
-            const blob = new Blob([json], { type: 'application/octet-stream' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+            if (IS_NATIVE) {
+                // On real Android, write to cache then share — <a>.click() doesn't save files
+                await Filesystem.writeFile({
+                    path: filename,
+                    data: json,
+                    directory: Directory.Cache,
+                    encoding: Encoding.UTF8
+                });
+                const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache });
+                await Share.share({
+                    title: 'Keyra Vault Backup',
+                    text: 'Save your Keyra vault backup file.',
+                    url: uri,
+                    dialogTitle: 'Save Backup'
+                });
+            } else {
+                const blob = new Blob([json], { type: 'application/octet-stream' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }
             return { success: true };
         } catch (e: any) {
             return { success: false, message: e?.message || "Export failed." };
@@ -147,18 +168,15 @@ export const bridge = {
         return new Promise((resolve) => {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.keyra,application/json,application/octet-stream';
+            // Use permissive accept — Android file pickers often ignore MIME/extension filters
+            input.accept = IS_NATIVE ? '*/*' : '.keyra,application/json,application/octet-stream';
             input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
             document.body.appendChild(input);
 
             let resolved = false;
             const cleanup = () => { try { document.body.removeChild(input); } catch {} };
 
-            input.onchange = (e: any) => {
-                resolved = true;
-                cleanup();
-                const file = e.target.files?.[0];
-                if (!file) { resolve({ success: false }); return; }
+            const readFile = (file: File) => {
                 const reader = new FileReader();
                 reader.onload = (event: any) => {
                     try {
@@ -172,14 +190,27 @@ export const bridge = {
                         resolve({ success: false, message: "Could not parse backup file." });
                     }
                 };
+                reader.onerror = () => resolve({ success: false, message: "Failed to read file." });
                 reader.readAsText(file);
             };
 
-            // Detect picker dismissed without selection
-            window.addEventListener('focus', function onFocus() {
-                window.removeEventListener('focus', onFocus);
-                setTimeout(() => { if (!resolved) { cleanup(); resolve({ success: false }); } }, 500);
-            }, { once: true });
+            input.onchange = (e: any) => {
+                resolved = true;
+                cleanup();
+                const file = e.target.files?.[0];
+                if (!file) { resolve({ success: false }); return; }
+                readFile(file);
+            };
+
+            if (!IS_NATIVE) {
+                // On web, use focus event to detect picker dismissed without selection
+                window.addEventListener('focus', function onFocus() {
+                    window.removeEventListener('focus', onFocus);
+                    setTimeout(() => { if (!resolved) { cleanup(); resolve({ success: false }); } }, 500);
+                }, { once: true });
+            }
+            // On native Android, skip focus-dismiss detection entirely — it races with onchange
+            // and causes false cancellations. The input.onchange is reliable enough on its own.
 
             input.click();
         });
